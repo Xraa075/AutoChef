@@ -1,0 +1,1 @@
+//Berisi file konstanta (warna, teks, dll.)

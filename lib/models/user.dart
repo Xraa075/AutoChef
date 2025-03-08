@@ -1,0 +1,1 @@
+//Model untuk data aplikasi
