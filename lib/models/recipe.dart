@@ -9,6 +9,8 @@ class Recipe {
   final int carbs;
   final List<String> ingredients;
   final List<String> steps;
+  final String difficulity;
+
 
   Recipe({
     required this.name,
@@ -20,5 +22,6 @@ class Recipe {
     required this.carbs,
     required this.ingredients,
     required this.steps,
+    required this.difficulity,
   });
 }

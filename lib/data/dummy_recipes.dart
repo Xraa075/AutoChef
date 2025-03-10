@@ -9,6 +9,7 @@ List<Recipe> dummyRecipes = [
     calories: 312,
     protein: 13,
     carbs: 9,
+    difficulity: "Mudah",
     ingredients: [
       "100 gram Tepung Terigu",
       "2 sendok makan Gula Pasir",

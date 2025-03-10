@@ -36,7 +36,7 @@ class DetailMakanan extends StatelessWidget {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => RecommendationScreen()),
+                  MaterialPageRoute(builder: (context) => RekomendationRecipe()),
                 );
               },
             ),
