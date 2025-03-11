@@ -41,8 +41,7 @@ class RekomendationRecipe extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
-                          children: [
-                            
+                          children: [  
                             const Text(
                               "Hallo Sobat",
                               style: TextStyle(
