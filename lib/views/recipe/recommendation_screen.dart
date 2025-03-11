@@ -44,7 +44,7 @@ class RekomendationRecipe extends StatelessWidget {
                           children: [
                             
                             const Text(
-                              "Hallo Chef",
+                              "Hallo Sobat",
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
