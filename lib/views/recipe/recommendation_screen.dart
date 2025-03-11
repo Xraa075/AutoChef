@@ -1,3 +1,4 @@
+import 'package:autochef/views/recipe/recipe_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:autochef/data/dummy_recipes.dart';
 import 'components/card_rekomendation.dart';
@@ -10,7 +11,7 @@ class RekomendationRecipe extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellow[100],
+      backgroundColor: Colors.yellow[600],
       appBar: AppBar(
         title: const Text("Hallo User"),
         backgroundColor: Colors.yellow[600],
@@ -27,6 +28,7 @@ class RekomendationRecipe extends StatelessWidget {
               style: TextStyle(fontSize: 14, color: Colors.white),
             ),
           ),
+          // list rekomendasi
           Expanded(
             child: Container(
               decoration: const BoxDecoration(
@@ -40,7 +42,15 @@ class RekomendationRecipe extends StatelessWidget {
                 padding: const EdgeInsets.all(10),
                 itemCount: dummyRecipes.length,
                 itemBuilder: (context, index) {
-                  return RecipeCard(recipe: dummyRecipes[index]);
+                  return RecipeCard(
+                    recipe: dummyRecipes[index],
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailMakanan(recipe: dummyRecipes[index])));
+                    },
+                  );
                 },
               ),
             ),

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:autochef/models/recipe.dart';
-import 'package:autochef/data/dummy_recipes.dart';
 import 'components/recipe_info.dart';
 import 'components/ingredients.dart';
 import 'components/steps.dart';
 import 'package:autochef/views/recipe/recommendation_screen.dart';
 
 class DetailMakanan extends StatelessWidget {
-  final Recipe recipe = dummyRecipes[0];
+  final Recipe recipe;
+
+  const DetailMakanan({super.key, required this.recipe});
 
   @override
   Widget build(BuildContext context) {
