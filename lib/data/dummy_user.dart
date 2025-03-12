@@ -4,7 +4,7 @@ List<User> dummyUsers = [
   User(
     username: "Guest",
     email: "guest@autochef.com",
-    userImage: "assets/images/default_user.png",
+    userImage: "lib/assets/images/default_user.png",
   ),
 ];
 

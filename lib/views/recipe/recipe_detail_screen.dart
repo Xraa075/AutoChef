@@ -3,7 +3,6 @@ import 'package:autochef/models/recipe.dart';
 import 'components/recipe_info.dart';
 import 'components/ingredients.dart';
 import 'components/steps.dart';
-import 'package:autochef/views/recipe/recommendation_screen.dart';
 
 class DetailMakanan extends StatelessWidget {
   final Recipe recipe;

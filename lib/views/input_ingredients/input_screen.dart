@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:autochef/views/recipe/recommendation_screen.dart';
 import 'package:autochef/widgets/header.dart';
-import 'package:autochef/models/user.dart';
-import 'package:autochef/data/dummy_user.dart';
 
 class InputRecipe extends StatefulWidget {
   const InputRecipe({super.key});
 
   @override
-  State<InputRecipe> createState() => _InputRecipeState();
+  State<InputRecipe> createState() => InputRecipeState();
 }
 
-class _InputRecipeState extends State<InputRecipe> {
+class InputRecipeState extends State<InputRecipe> {
   final List<TextEditingController> controllers = [];
 
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 1; i++) {
       controllers.add(TextEditingController());
     }
   }
@@ -37,7 +35,7 @@ class _InputRecipeState extends State<InputRecipe> {
 
   @override
   Widget build(BuildContext context) {
-    User currentUser = getActiveUser();
+  
 
     return Scaffold(
       backgroundColor: Colors.yellow[600],
