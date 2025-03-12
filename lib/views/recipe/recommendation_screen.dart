@@ -20,8 +20,7 @@ class RekomendationRecipe extends StatelessWidget {
       
       body: SafeArea(
         child: Column(
-          children: [
-            
+          children: [     
             Expanded(
               child: Container(
                 margin: const EdgeInsets.only(top: 30), // Sedikit jarak agar lebih lega
@@ -48,7 +47,7 @@ class RekomendationRecipe extends StatelessWidget {
                     ),
                     Expanded(
                       child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
                         itemCount: dummyRecipes.length,
                         itemBuilder: (context, index) {
                           return RecipeCard(

@@ -54,7 +54,7 @@ class RecipeCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      "Bahan: ${recipe.ingredients}",
+                      "Bahan: ${recipe.ingredients.join(', ')}",
                       style: TextStyle(fontSize: 12, color: Colors.grey[700]),
                       maxLines: 1, //biasany untuk menampilkan judul artikel
                       overflow: TextOverflow.ellipsis, 
