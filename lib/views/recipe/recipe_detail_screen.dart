@@ -28,24 +28,23 @@ class DetailMakanan extends StatelessWidget {
               filterQuality: FilterQuality.high,
             ),
           ),
- /// **Tombol Kembali**
+
+          /// **Tombol Kembali**
           Positioned(
             top: 40, // Jarak dari atas
             left: 10, // Jarak dari kiri
             child: IconButton(
               icon: Icon(Icons.arrow_back, color: Colors.white, size: 30),
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => RekomendationRecipe()),
-                );
+                Navigator.pop(context); // Kembali ke halaman sebelumnya
               },
             ),
           ),
+
           /// **Bottom Sheet Bisa Ditarik**
           DraggableScrollableSheet(
-            initialChildSize: 0.69,
-            minChildSize: 0.69,
+            initialChildSize: 0.71,
+            minChildSize: 0.71,
             maxChildSize: 0.9,
             builder: (context, scrollController) {
               return ClipRRect(
@@ -53,15 +52,20 @@ class DetailMakanan extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                   decoration: BoxDecoration(
-                    color: Colors.white, // Hilangkan efek transparan agar lebih ringan
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                    color:
+                        Colors
+                            .white, // Hilangkan efek transparan agar lebih ringan
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(30),
+                    ),
                   ),
                   child: ListView(
-                    controller: scrollController, // Gunakan ListView agar lebih optimal
+                    controller:
+                        scrollController, // Gunakan ListView agar lebih optimal
                     children: [
                       Container(
                         alignment: Alignment.center,
-                        margin: EdgeInsets.only(bottom: 10,),
+                        margin: EdgeInsets.only(bottom: 10),
                         child: Container(
                           width: 50,
                           height: 5,
@@ -71,8 +75,17 @@ class DetailMakanan extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Text(recipe.name, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                      Text(recipe.category, style: TextStyle(fontSize: 16, color: Colors.grey)),
+                      Text(
+                        recipe.name,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        recipe.category,
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
                       SizedBox(height: 15),
                       RecipeInfo(
                         time: recipe.time.toString(),

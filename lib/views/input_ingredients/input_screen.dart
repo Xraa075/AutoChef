@@ -1,107 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:autochef/views/recipe/recommendation_screen.dart';
+import 'package:autochef/widgets/header.dart';
+import 'package:autochef/models/user.dart';
+import 'package:autochef/data/dummy_user.dart';
 
-void main() {
-  runApp(const InputRecipe());
-}
-
-class InputRecipe extends StatelessWidget {
-  const InputRecipe ({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Input Bahan Makanan',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.yellow),
-      ),
-      home: const MyHomePage(title: 'Input Bahan Makanan'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+class InputRecipe extends StatefulWidget {
+  const InputRecipe({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<InputRecipe> createState() => _InputRecipeState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final List<TextEditingController> _controllers = [];
+class _InputRecipeState extends State<InputRecipe> {
+  final List<TextEditingController> controllers = [];
 
   @override
   void initState() {
     super.initState();
-    _addInputField();
-    _addInputField();
-    _addInputField();
-    _addInputField();
+    for (int i = 0; i < 4; i++) {
+      controllers.add(TextEditingController());
+    }
   }
 
-  void _addInputField() {
+  void addInputField() {
     setState(() {
-      _controllers.add(TextEditingController());
+      controllers.add(TextEditingController());
     });
   }
 
-  void _removeInputField(int index) {
+  void removeInputField(int index) {
     setState(() {
-      _controllers.removeAt(index);
+      controllers[index].dispose();
+      controllers.removeAt(index);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    User currentUser = getActiveUser();
+
     return Scaffold(
       backgroundColor: Colors.yellow[600],
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(120), // Menyesuaikan tinggi header
+        child: CustomHeader(title: "Ini adalah rekomendasi resep sesuai dengan bahanmu"),
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(15),
-              alignment: Alignment.centerLeft,
-              color: Colors.yellow[600],
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.account_circle, color: Colors.white, size: 60,),
-                  ), 
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [  
-                            const Text(
-                              "Hallo Sobat",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        const Text(
-                          "Mau masak apa hari ini ?",
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                          textAlign: TextAlign.left,
-                          maxLines: 2,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Container Putih (Form Input)
             Expanded(
               child: Container(
+                margin: const EdgeInsets.only(
+                  top: 30,
+                ), // Tambahkan margin agar sama dengan RekomendationRecipe
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -109,74 +62,143 @@ class _MyHomePageState extends State<MyHomePage> {
                     topRight: Radius.circular(20),
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Silakan masukkan bahan makanan:',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Bagian Judul
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Bahan apa yang kamu miliki?",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              "Tuliskan bahan-bahanmu",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        ),
+                        GestureDetector(
+                          onTap: addInputField,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.grey[300],
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            child: const Icon(Icons.add, color: Colors.black),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.add_circle, color: Colors.blue),
-                            onPressed: _addInputField,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      ...List.generate(_controllers.length, (index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+
+                    // List Input Bahan
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.only(
+                          bottom: 20,
+                        ), // Biar ada space di bawah
+                        itemCount: controllers.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
                             child: Container(
-                              padding: const EdgeInsets.all(12.0),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
                               decoration: BoxDecoration(
-                                color: Colors.blueAccent.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(20.0),
+                                color: Colors.white.withOpacity(
+                                  0.9,
+                                ), // Transparansi kecil biar lebih soft
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey[300]!),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.1),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
                               child: Row(
                                 children: [
+                                  Text(
+                                    "${index + 1}.",
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
                                   Expanded(
                                     child: TextField(
-                                      controller: _controllers[index],
-                                      decoration: InputDecoration(
-                                        hintText: 'Masukkan Bahan Makanan ${index + 1}',
+                                      controller: controllers[index],
+                                      decoration: const InputDecoration(
+                                        hintText: "Masukkan Bahan Makanan",
                                         border: InputBorder.none,
                                       ),
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () => _removeInputField(index),
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () => removeInputField(index),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                        );
-                      }),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const RekomendationRecipe()),
                           );
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                        ),
-                        child: const Text(
-                          'Cari',
-                          style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Tombol Cari
+                    Center(
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => const RekomendationRecipe(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Cari',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),

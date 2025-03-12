@@ -1,6 +1,5 @@
-
-import 'package:autochef/widgets/navbar.dart';
 import 'package:flutter/material.dart';
+import 'package:autochef/routes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,16 +8,13 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Auto Chef',
-      theme: ThemeData(
-        
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: Navbar(),
+      debugShowCheckedModeBanner: false,
+      title: 'AutoChef',
+      initialRoute: Routes.home, // Langsung ke Navbar
+      onGenerateRoute: Routes.onGenerateRoute,
     );
   }
 }
