@@ -1,0 +1,128 @@
+.unique-section {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: #f8f9fa;
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.small-heading {
+  color: #ff6600;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.unique-features {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 4rem;
+}
+
+.feature {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  text-align: center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.feature:hover {
+  transform: translateY(-10px);
+}
+
+.icon {
+  font-size: 2.5rem;
+  color: #ff6600;
+  margin-bottom: 1rem;
+}
+
+.promo-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.promo-text {
+  width: 50%;
+}
+
+.promo-text h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.promo-text p {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.app-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.store-button {
+  width: 150px;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+}
+
+.store-button:hover {
+  transform: scale(1.1);
+}
+
+.promo-image {
+  position: relative;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+}
+
+.phone-mockup {
+  width: 300px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+.floating-burger {
+  position: absolute;
+  bottom: -20px;
+  right: -40px;
+  width: 120px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+  animation: floatAnimation 2s infinite alternate ease-in-out;
+}
+
+@keyframes floatAnimation {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-10px);
+  }
+}

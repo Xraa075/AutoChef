@@ -1,0 +1,140 @@
+/* === Global Styles === */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* === Header Styles === */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 80px;
+  background: #fff;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ff5722;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links li a {
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-links li a:hover {
+  color: #ff5722;
+}
+
+/* === Hero Section Styles === */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 100px 80px;
+  background: linear-gradient(to right, #fff, #f8f9fa);
+}
+
+.hero-text {
+  max-width: 500px;
+}
+
+.hero-text h1 {
+  font-size: 48px;
+  font-weight: 700;
+  color: #ff5722;
+}
+
+.hero-text p {
+  font-size: 18px;
+  color: #666;
+  margin: 15px 0;
+}
+
+.buttons {
+  margin-top: 20px;
+}
+
+.btn-primary {
+  background: #ff5722;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-primary:hover {
+  background: #e64a19;
+}
+
+.btn-secondary {
+  margin-left: 10px;
+  border: 2px solid #ff5722;
+  background: transparent;
+  color: #ff5722;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+.btn-secondary:hover {
+  background: #ff5722;
+  color: white;
+}
+
+/* Stacked Text */
+.stacked-text {
+  display: block; /* Membuat teks bertumpuk ke bawah */
+  font-size: 60px; /* Sesuaikan ukuran */
+  font-weight: 700;
+  color: #ff5722;
+  line-height: 1;
+}
+
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stacked-text {
+  display: block;
+  font-size: 60px;
+  font-weight: 700;
+  color: #ff5722;
+  line-height: 1;
+  animation: slideUpFadeIn 1s ease-out;
+}
+

@@ -1,0 +1,129 @@
+/* Impor font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 80px 10%;
+  background-color: #f8f9fa;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dekorasi Bulatan di Background */
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  width: 150px;
+  height: 150px;
+  background-color: rgba(255, 87, 34, 0.1);
+  border-radius: 50%;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  bottom: 15%;
+  right: 10%;
+  width: 180px;
+  height: 180px;
+  background-color: rgba(255, 87, 34, 0.1);
+  border-radius: 50%;
+}
+
+.hero-content {
+  max-width: 45%;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: #ff5722;
+  margin: 0;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: #555;
+  margin: 20px 0;
+  max-width: 500px;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 20px;
+}
+
+.btn {
+  padding: 12px 24px;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.btn-primary {
+  background-color: #ff5722;
+  color: white;
+}
+
+.btn-secondary {
+  border: 2px solid #ff5722;
+  color: #ff5722;
+  background: transparent;
+}
+
+.btn-primary:hover {
+  background-color: #e64a19;
+}
+
+.btn-secondary:hover {
+  background-color: #ff5722;
+  color: white;
+}
+
+/* Bagian Gambar */
+.hero-image {
+  position: relative;
+}
+
+.phone {
+  width: 300px;
+  max-width: 100%;
+}
+
+.sushi {
+  position: absolute;
+  bottom: -20px;
+  left: -40px;
+  width: 130px;
+  transform: scale(0.9);
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  color: #ff5722;
+  display: flex;
+  align-items: center;
+}
+
+.scroll-indicator::before {
+  content: "⬇";
+  margin-right: 8px;
+}

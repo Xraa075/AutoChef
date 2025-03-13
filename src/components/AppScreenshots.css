@@ -1,0 +1,68 @@
+.app-screenshots {
+  position: relative;
+  text-align: center;
+  padding: 80px 0;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  overflow: hidden;
+}
+
+.screenshots-heading {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.sub-heading {
+  font-size: 1.5rem;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+/* Swiper Styles */
+.swiper {
+  width: 90%;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.screenshot-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.screenshot-image {
+  width: auto;
+  height: 450px;
+  object-fit: contain;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: rotate(0deg); 
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  color: #ff7f50 !important; 
+  transform: scale(0.8);
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 25px;
+  font-weight: bold;
+  color: #ff7f50 !important; 
+}
+
+.swiper-pagination-bullet {
+  background: #ff7f50 !important; 
+  opacity: 0.5;
+}
+
+.swiper-pagination-bullet-active {
+  background: #ff7f50 !important; 
+  opacity: 1;
+}

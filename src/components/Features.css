@@ -1,0 +1,106 @@
+.features-section {
+  background: linear-gradient(to bottom, #ff6243, #e63e30);
+  padding: 60px 20px;
+  text-align: center;
+  color: white;
+}
+
+.section-title {
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.features-heading {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+.features-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  max-width: 250px;
+  position: relative;
+}
+
+.feature-dot {
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.feature-item h4 {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.feature-item p {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.features-image img {
+  width: 300px;
+  display: block;
+  object-fit: cover;
+  z-index: 2;
+}
+
+/* Garis Tengah */
+.features-container::before {
+  content: "";
+  position: absolute;
+  width: 2px;
+  height: 80%;
+  background-color: white;
+  left: 50%;
+  top: 10%;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 768px) {
+  .features-container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .features-list {
+    align-items: center;
+  }
+
+  .feature-item {
+    align-items: center;
+    text-align: center;
+  }
+
+  .features-image img {
+    width: 200px;
+  }
+
+  .features-container::before {
+    display: none; /* Hilangkan garis tengah di tampilan mobile */
+  }
+}
