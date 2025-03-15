@@ -4,15 +4,20 @@ import 'package:autochef/views/recipe/recommendation_screen.dart';
 import 'package:autochef/views/input_ingredients/input_screen.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
 import 'package:autochef/models/recipe.dart';
+import 'package:autochef/views/intro/intro_screen.dart';
 
 class Routes {
+  static const String introScreen = '/intro-screen';
   static const String home = '/home';
   static const String inputRecipe = '/input-recipe';
   static const String recommendationRecipe = '/recommendation-recipe';
   static const String detailMakanan = '/detail-makanan';
 
-  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+  static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case introScreen:
+        return MaterialPageRoute(builder: (_) => const IntroScreen());
+
       case home:
         return MaterialPageRoute(builder: (_) => const Navbar());
 
@@ -27,20 +32,10 @@ class Routes {
           final recipe = settings.arguments as Recipe;
           return MaterialPageRoute(builder: (_) => DetailMakanan(recipe: recipe));
         }
-        return _errorRoute();
+        return MaterialPageRoute(builder: (_) => const Navbar());
 
       default:
-        return _errorRoute();
+        return MaterialPageRoute(builder: (_) => const InputRecipe()); // **🔹 Jika tidak match, ke InputRecipe**
     }
-  }
-
-  static Route<dynamic> _errorRoute() {
-    return MaterialPageRoute(
-      builder: (_) => const Scaffold(
-        body: Center(
-          child: Text('Halaman tidak ditemukan!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        ),
-      ),
-    );
   }
 }

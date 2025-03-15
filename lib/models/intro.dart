@@ -3,20 +3,28 @@ class Intro {
   final String title;
   final String description;
 
-  Intro({required this.image, required this.title, required this.description});
+  Intro({
+    required this.image,
+    required this.title,
+    required this.description,
+  });
 }
 
-var introList = [
+// 🔹 Data Intro
+List<Intro> introData = [
   Intro(
-      image: "lib/assets/image1.png",
-      title: "Welcome To AutoChef",
-      description: "Temukan inspirasi masakan dari bahan yang ada di kulkas. Mudah, cepat, dan tanpa ribet!"),
+    image: "lib/assets/images/image1.png",
+    title: "Selamat Datang di AutoChef!",
+    description: "Temukan rekomendasi resep terbaik berdasarkan bahan yang kamu miliki.",
+  ),
   Intro(
-      image: "lib/assets/image2.png",
-      title: "Minimalisasi Food Waste",
-      description: "Masak apapun dengan bahan yang kamu miliki. Hemat waktu dan lebih bergizi"),
+    image: "lib/assets/images/image2.png",
+    title: "Masukkan Bahan Masakan",
+    description: "Cukup ketik bahan-bahan yang kamu punya dan dapatkan inspirasi masakan.",
+  ),
   Intro(
-      image: "lib/assets/image3.png",
-      title: "Cook In Just 5 Minutes",
-      description: "Resep cepat dengan bahan minimalis. Solusi praktis untuk masakan sehari-hari."),
+    image: "lib/assets/images/image3.png",
+    title: "Mulai Memasak Sekarang!",
+    description: "Dapatkan petunjuk langkah demi langkah untuk membuat makanan lezat.",
+  ),
 ];
