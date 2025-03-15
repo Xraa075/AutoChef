@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/models/intro.dart';
-import 'package:autochef/routes.dart';
+
+import 'package:autochef/widgets/navbar.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
@@ -18,7 +19,10 @@ class IntroScreenState extends State<IntroScreen> {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setBool('hasSeenIntro', true);
 
-  Navigator.pushReplacementNamed(context, Routes.home); // ✅ Langsung ke Navbar
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => const Navbar()), // ✅ Langsung ke Navbar
+  );
 }
 
   void nextPage() {
