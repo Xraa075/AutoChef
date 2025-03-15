@@ -143,7 +143,6 @@ class NavbarState extends State<Navbar> {
   }
 
   Future<bool> _showExitConfirmation() async {
-    //Styling konfirmasi keluar di sini
     return await showDialog(
           context: context,
           builder:
@@ -152,32 +151,40 @@ class NavbarState extends State<Navbar> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 backgroundColor: Colors.white,
-                title: Row(
-                  children: [
-                    Text(
-                      'Keluar Aplikasi',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                title: Center(
+                  child: Text(
+                    'Keluar Aplikasi',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
-                content: const Text(
+                content: Text(
                   'Apakah Anda yakin ingin keluar?',
+                  textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16),
                 ),
+                actionsAlignment: MainAxisAlignment.spaceEvenly,
                 actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    style: TextButton.styleFrom(foregroundColor: Colors.black),
-                    child: const Text('Batal'),
-                  ),
-                  ElevatedButton(
-                    onPressed:
-                        () => SystemNavigator.pop(), // Keluar dari aplikasi
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
+                  SizedBox(
+                    width: 100,
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        side: BorderSide(color: Colors.black),
+                      ),
+                      child: const Text('Batal'),
                     ),
-                    child: const Text('Keluar'),
+                  ),
+                  SizedBox(
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: () => SystemNavigator.pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Keluar'),
+                    ),
                   ),
                 ],
               ),
@@ -189,10 +196,8 @@ class NavbarState extends State<Navbar> {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        systemNavigationBarColor: Color(
-          0xFFFBC72A,
-        ), //Menyatukan warna gesture pill dengan navbar
-        systemNavigationBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: Color.fromARGB(255, 0, 0, 0),
+        systemNavigationBarIconBrightness: Brightness.light,
       ),
     );
 

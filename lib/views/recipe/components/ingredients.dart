@@ -11,9 +11,15 @@ class Ingredients extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("Bahan-bahan", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        ...ingredients.map((item) => ListTile(
-              leading: Icon(Icons.check_circle, color: Colors.orange),
-              title: Text(item, style: TextStyle(fontSize: 16)),
+        ...ingredients.map((step) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("• ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Expanded(child: Text(step, style: TextStyle(fontSize: 16))),
+                ],
+              ),
             )),
       ],
     );

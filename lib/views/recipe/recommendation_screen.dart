@@ -10,7 +10,7 @@ class RekomendationRecipe extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellow[600],
+      backgroundColor: const Color(0xFFFBC72A),
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(120), // Menyesuaikan tinggi header
         child: CustomHeader(

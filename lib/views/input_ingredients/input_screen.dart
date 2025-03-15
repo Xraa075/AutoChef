@@ -52,10 +52,10 @@ class _InputRecipeState extends State<InputRecipe> {
         return false;
       },
       child: Scaffold(
-        backgroundColor: Colors.yellow[600],
+        backgroundColor: const Color(0xFFFBC72A),
         appBar: const PreferredSize(
           preferredSize: Size.fromHeight(120),
-          child: CustomHeader(title: "Ini adalah rekomendasi resep sesuai dengan bahanmu"),
+          child: CustomHeader(title: "AutoChef siap mecarikan rekomendasi resep sesuai bahan yang kamu miliki"),
         ),
         body: SafeArea(
           child: Column(
@@ -63,7 +63,7 @@ class _InputRecipeState extends State<InputRecipe> {
               Expanded(
                 child: Container(
                   margin: const EdgeInsets.only(top: 30),
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(

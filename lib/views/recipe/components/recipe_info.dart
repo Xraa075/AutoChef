@@ -34,7 +34,7 @@ class RecipeInfo extends StatelessWidget {
           width: 70,
           height: 90,
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 255, 221, 118),
+            color: const Color.fromARGB(255, 255, 204, 51),
             borderRadius: BorderRadius.circular(40),
           ),
           child: Column(
