@@ -14,18 +14,34 @@ class Routes {
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case home:
-        return MaterialPageRoute(builder: (_) => const Navbar());
+        return MaterialPageRoute(
+          builder: (_) => const Navbar(),
+          settings: settings,
+        );
 
       case inputRecipe:
-        return MaterialPageRoute(builder: (_) => const InputRecipe());
+        return MaterialPageRoute(
+          builder: (_) => const InputRecipe(),
+          settings: settings,
+        );
 
       case recommendationRecipe:
-        return MaterialPageRoute(builder: (_) => const RekomendationRecipe());
+        if (settings.arguments is List<String>) {
+          final bahan = settings.arguments as List<String>;
+          return MaterialPageRoute(
+            builder: (_) => RekomendationRecipe(bahan: bahan),
+            settings: settings,
+          );
+        }
+        return _errorRoute();
 
       case detailMakanan:
         if (settings.arguments is Recipe) {
           final recipe = settings.arguments as Recipe;
-          return MaterialPageRoute(builder: (_) => DetailMakanan(recipe: recipe));
+          return MaterialPageRoute(
+            builder: (_) => DetailMakanan(recipe: recipe),
+            settings: settings,
+          );
         }
         return _errorRoute();
 
@@ -38,7 +54,10 @@ class Routes {
     return MaterialPageRoute(
       builder: (_) => const Scaffold(
         body: Center(
-          child: Text('Halaman tidak ditemukan!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          child: Text(
+            'Halaman tidak ditemukan!',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );

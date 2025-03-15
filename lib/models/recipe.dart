@@ -1,27 +1,25 @@
-//Model untuk data aplikasi
 class Recipe {
-  final String name;
-  final String category;
-  final String image;
-  final int time;
-  final int calories;
-  final int protein;
-  final int carbs;
-  final List<String> ingredients;
-  final List<String> steps;
-  final String difficulity;
-
+  final int id;
+  final String namaResep;
+  final String bahan;
+  final String steps;
+  final String gambar;
 
   Recipe({
-    required this.name,
-    required this.category,
-    required this.image,
-    required this.time,
-    required this.calories,
-    required this.protein,
-    required this.carbs,
-    required this.ingredients,
+    required this.id,
+    required this.namaResep,
+    required this.bahan,
     required this.steps,
-    required this.difficulity,
+    required this.gambar,
   });
+
+  factory Recipe.fromJson(Map<String, dynamic> json) {
+    return Recipe(
+      id: json['id'],
+      namaResep: json['nama_resep'],
+      bahan: json['bahan'],
+      steps: json['steps'],
+      gambar: "http://localhost:8000/api/proxy-image?url=${json['gambar']}",
+    );
+  }
 }

@@ -7,7 +7,7 @@ class RecipeCard extends StatelessWidget {
   final Recipe recipe;
   final VoidCallback? onTap;
 
-  const RecipeCard({super.key, required this.recipe, this.onTap});
+  const RecipeCard({super.key, required this.recipe, this.onTap, required String image});
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +24,9 @@ class RecipeCard extends StatelessWidget {
               color: Colors.black.withOpacity(0.2),
               spreadRadius: 0.1,
               blurRadius: 6,
-              offset: Offset(1.5, 1)
+              offset: Offset(1.5, 1),
             ),
-          ]
+          ],
         ),
         // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         // elevation: 3,
@@ -35,9 +35,12 @@ class RecipeCard extends StatelessWidget {
           child: Row(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                ),
                 child: Image.asset(
-                  recipe.image,
+                  recipe.gambar,
                   width: 120,
                   height: 120,
                   fit: BoxFit.cover,
@@ -49,28 +52,42 @@ class RecipeCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      recipe.name,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      recipe.namaResep,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      "Bahan: ${recipe.ingredients.join(', ')}",
+                      "Bahan: ${recipe.bahan.split(',').join(', ')}",
                       style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                      maxLines: 1, //biasany untuk menampilkan judul artikel
-                      overflow: TextOverflow.ellipsis, 
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    Text(
-                      "Kalori: ${recipe.calories} kalori",
-                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                    ),
+
+                    // Text(
+                    //   "Kalori: ${recipe.calories} kalori",
+                    //   style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                    // ),
                     const SizedBox(height: 5),
                     Row(
                       children: [
-                        const Icon(Icons.access_time, size: 14, color: Colors.red),
-                        Text(" ${recipe.time} Menit", style: const TextStyle(fontSize: 12)),
+                        // const Icon(
+                        //   Icons.access_time,
+                        //   size: 14,
+                        //   color: Colors.red,
+                        // ),
+                        // Text(
+                        //   " ${recipe.time} Menit",
+                        //   style: const TextStyle(fontSize: 12),
+                        // ),
                         const SizedBox(width: 10),
                         const Icon(Icons.star, size: 14, color: Colors.orange),
-                        Text(" ${recipe.difficulity}", style: const TextStyle(fontSize: 12)),
+                        // Text(
+                        //   " ${recipe.difficulity}",
+                        //   style: const TextStyle(fontSize: 12),
+                        // ),
                       ],
                     ),
                   ],

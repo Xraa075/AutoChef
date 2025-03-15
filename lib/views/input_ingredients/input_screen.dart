@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:autochef/views/recipe/recommendation_screen.dart';
 import 'package:autochef/widgets/header.dart';
 
@@ -33,14 +35,52 @@ class InputRecipeState extends State<InputRecipe> {
     });
   }
 
+  Future<void> fetchRecipes() async {
+  List<String> bahan = controllers.map((controller) => controller.text).toList();
+  String bahanQuery = bahan.join(',');
+
+  String url = 'http://127.0.0.1:8000/api/resepmakanan/search?bahan=$bahanQuery';
+
+  try {
+    final response = await http.get(Uri.parse(url));
+
+    print("Request URL: $url");
+    print("Response Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      if (data == null || data.isEmpty) {
+        throw Exception('Tidak ada resep ditemukan.');
+      }
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RekomendationRecipe(bahan: bahan),
+        ),
+      );
+    } else {
+      throw Exception('Gagal mendapatkan data resep. Kode: ${response.statusCode}');
+    }
+  } catch (e) {
+    print("Error: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Gagal mendapatkan data resep: $e'),
+      ),
+    );
+  }
+}
+
+
   @override
   Widget build(BuildContext context) {
-  
-
     return Scaffold(
       backgroundColor: Colors.yellow[600],
       appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(120), // Menyesuaikan tinggi header
+        preferredSize: Size.fromHeight(120), 
         child: CustomHeader(title: "Ini adalah rekomendasi resep sesuai dengan bahanmu"),
       ),
       body: SafeArea(
@@ -174,15 +214,16 @@ class InputRecipeState extends State<InputRecipe> {
                         width: double.infinity,
                         height: 48,
                         child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => const RekomendationRecipe(),
-                              ),
-                            );
-                          },
+                          onPressed: fetchRecipes,
+                          // onPressed: () {
+                          //   Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //       builder:
+                          //           (context) => const RekomendationRecipe(),
+                          //     ),
+                          //   );
+                          // },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             shape: RoundedRectangleBorder(
