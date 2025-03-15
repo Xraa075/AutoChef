@@ -1,66 +1,45 @@
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:autochef/views/input_ingredients/input_screen.dart';
+// import 'package:flutter/material.dart';
+// import 'package:autochef/views/input_ingredients/input_screen.dart';
 
-class Navbar extends StatefulWidget {
-  const Navbar({super.key});
+// class Navbar extends StatefulWidget {
+//   const Navbar({super.key});
 
-  @override
-  NavbarState createState() => NavbarState();
-}
+//   @override
+//   NavbarState createState() => NavbarState();
+// }
 
-class NavbarState extends State<Navbar> {
-  int selectedIndex = 1; // Default ke halaman "InputRecipe"
-  DateTime? lastPressed; // Waktu terakhir tombol back ditekan
+// class NavbarState extends State<Navbar> {
+//   int selectedIndex = 1; // Default ke halaman "InputRecipe"
 
-  void onNavTapped(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-  }
+//   void onNavTapped(int index) {
+//     setState(() {
+//       selectedIndex = index;
+//     });
+//   }
 
-  Future<bool> onWillPop() async {
-    DateTime now = DateTime.now();
-    if (lastPressed == null || now.difference(lastPressed!) > const Duration(seconds: 2)) {
-      lastPressed = now;
-      Fluttertoast.showToast(
-        msg: "Tekan sekali lagi untuk keluar",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
-      return Future.value(false);
-    }
-    return Future.value(true); // Keluar dari aplikasi
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: onWillPop, // Menangani tombol back
-      child: Scaffold(
-        body: const InputRecipe(), // Hanya menampilkan InputRecipe
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: selectedIndex,
-          onTap: onNavTapped,
-          backgroundColor: Colors.white,
-          selectedItemColor: Colors.orange,
-          unselectedItemColor: Colors.grey,
-          type: BottomNavigationBarType.fixed,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Bahan'),
-            BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifikasi'),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: const InputRecipe(), // Hanya menampilkan InputRecipe
+//       bottomNavigationBar: BottomNavigationBar(
+//         currentIndex: 1, // Langsung default ke "InputRecipe"
+//         onTap: (index) {}, // Tidak melakukan navigasi ke halaman lain
+//         backgroundColor: Colors.white,
+//         selectedItemColor: Colors.orange,
+//         unselectedItemColor: Colors.grey,
+//         type: BottomNavigationBarType.fixed,
+//         showSelectedLabels: false,
+//         showUnselectedLabels: false,
+//         items: const [
+//           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+//           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Bahan'),
+//           BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifikasi'),
+//           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 //Bagian ini akan digunakan untuk menampilkan halaman Home, Input Bahan, Notifikasi, dan Profil pada sprint selanjutnya
 
@@ -116,3 +95,173 @@ class NavbarState extends State<Navbar> {
 //     );
 //   }
 // }
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:autochef/views/input_ingredients/input_screen.dart';
+import 'package:autochef/views/profile/profile_screen.dart';
+import 'package:autochef/views/notifications/notification_screen.dart';
+import 'package:autochef/views/home/home_screen.dart';
+
+class Navbar extends StatefulWidget {
+  const Navbar({super.key});
+
+  @override
+  NavbarState createState() => NavbarState();
+}
+
+class NavbarState extends State<Navbar> {
+  int selectedIndex = 0;
+
+  final List<Widget> pages = [
+    //Ini navigasi navbar ke halaman masing masing, jumlahnya sesuai dengan jumlah icon di navbar
+    InputRecipe(),
+    InputRecipe(),
+    InputRecipe(),
+    InputRecipe(),
+  ];
+
+  void onNavTapped(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+  }
+
+  // Future<bool> _onWillPop() async { // Menampilkan konfirmasi keluar hanya di homescreen
+  //   if (selectedIndex != 0) {
+  //     setState(() {
+  //       selectedIndex = 0; // Kembali ke HomeScreen jika bukan di halaman Home
+  //     });
+  //     return false; // Mencegah keluar dari aplikasi
+  //   } else {
+  //     return await _showExitConfirmation(); // Menampilkan konfirmasi keluar saat di halaman Home
+  //   }
+  // }
+  Future<bool> _onWillPop() async {
+    // Menampilkan konfirmasi keluar di setiap halaman
+    return await _showExitConfirmation();
+  }
+
+  Future<bool> _showExitConfirmation() async {
+    //Styling konfirmasi keluar di sini
+    return await showDialog(
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                backgroundColor: Colors.white,
+                title: Row(
+                  children: [
+                    Text(
+                      'Keluar Aplikasi',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                content: const Text(
+                  'Apakah Anda yakin ingin keluar?',
+                  style: TextStyle(fontSize: 16),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    style: TextButton.styleFrom(foregroundColor: Colors.black),
+                    child: const Text('Batal'),
+                  ),
+                  ElevatedButton(
+                    onPressed:
+                        () => SystemNavigator.pop(), // Keluar dari aplikasi
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Keluar'),
+                  ),
+                ],
+              ),
+        ) ??
+        false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: Color(
+          0xFFFBC72A,
+        ), //Menyatukan warna gesture pill dengan navbar
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+    );
+
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        extendBody: true,
+        body: pages[selectedIndex],
+        bottomNavigationBar: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(36),
+            topRight: Radius.circular(36),
+          ),
+          child: NavigationBarTheme(
+            data: NavigationBarThemeData(
+              height: 65,
+              backgroundColor: const Color(0xFFFBC72A),
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+              indicatorColor: Colors.transparent,
+            ),
+            child: NavigationBar(
+              onDestinationSelected: onNavTapped,
+              selectedIndex: selectedIndex,
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.home_filled, size: 30, color: Colors.white),
+                  selectedIcon: Icon(
+                    Icons.home_filled,
+                    size: 30,
+                    color: Colors.orange,
+                  ),
+                  label: '',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.list, size: 30, color: Colors.white),
+                  selectedIcon: Icon(
+                    Icons.list,
+                    size: 30,
+                    color: Colors.orange,
+                  ),
+                  label: '',
+                ),
+                NavigationDestination(
+                  icon: Icon(
+                    Icons.notifications,
+                    size: 30,
+                    color: Colors.white,
+                  ),
+                  selectedIcon: Icon(
+                    Icons.notifications,
+                    size: 30,
+                    color: Colors.orange,
+                  ),
+                  label: '',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.person, size: 30, color: Colors.white),
+                  selectedIcon: Icon(
+                    Icons.person,
+                    size: 30,
+                    color: Colors.orange,
+                  ),
+                  label: '',
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
