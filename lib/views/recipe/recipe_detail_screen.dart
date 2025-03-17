@@ -19,7 +19,7 @@ class DetailMakanan extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            child: Image.asset(
+            child: Image.network(
               recipe.gambar,
               width: double.infinity,
               height: 292,

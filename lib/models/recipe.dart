@@ -19,7 +19,7 @@ class Recipe {
       namaResep: json['nama_resep'],
       bahan: json['bahan'],
       steps: json['steps'],
-      gambar: "http://localhost:8000/api/proxy-image?url=${json['gambar']}",
+      gambar: json['gambar'],
     );
   }
 }
