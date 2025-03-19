@@ -39,7 +39,7 @@ class InputRecipeState extends State<InputRecipe> {
   List<String> bahan = controllers.map((controller) => controller.text).toList();
   String bahanQuery = bahan.join(',');
 
-  String url = 'http://127.0.0.1:8000/api/resepmakanan/search?bahan=$bahanQuery';
+  String url = 'http://localhost:8000/api/resepmakanan/search?bahan=$bahanQuery';
 
   try {
     final response = await http.get(Uri.parse(url));
@@ -49,7 +49,8 @@ class InputRecipeState extends State<InputRecipe> {
     print("Response Body: ${response.body}");
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final List<dynamic> data = jsonDecode(response.body);
+
 
       if (data == null || data.isEmpty) {
         throw Exception('Tidak ada resep ditemukan.');

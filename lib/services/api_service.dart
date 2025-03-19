@@ -6,21 +6,29 @@ class ApiService {
 
   // 🔍 Fungsi untuk mencari resep berdasarkan bahan
   Future<List<Map<String, dynamic>>> searchRecipes(List<String> bahan) async {
-    String bahanQuery = bahan.join(',');
+  String bahanQuery = bahan.join(',');
 
-    final response = await http.get(Uri.parse("$baseUrl/search?bahan=$bahanQuery"));
+  final response = await http.get(Uri.parse("$baseUrl/search?bahan=$bahanQuery"));
 
     if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-      
-      // Pastikan 'data' ada dalam respons
-      if (jsonResponse.containsKey('data') && jsonResponse['data'] is List) {
-        return List<Map<String, dynamic>>.from(jsonResponse['data']);
-      } else {
-        throw Exception("Format respons API tidak sesuai.");
+      print("Response Body: ${response.body}"); // Tambahkan debug print
+
+      try {
+        final decodedResponse = jsonDecode(response.body);
+        
+        if (decodedResponse is List) {
+          return List<Map<String, dynamic>>.from(decodedResponse);
+        } else if (decodedResponse is Map<String, dynamic> && decodedResponse.containsKey('data')) {
+          return List<Map<String, dynamic>>.from(decodedResponse['data']);
+        } else {
+          throw Exception("Format respons API tidak sesuai.");
+        }
+      } catch (e) {
+        throw Exception("Gagal memproses JSON: $e");
       }
     } else {
       throw Exception("Gagal mengambil data resep. Kode status: ${response.statusCode}");
     }
   }
+
 }

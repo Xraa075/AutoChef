@@ -29,11 +29,18 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
   Future<List<Recipe>> _fetchRecipes() async {
     try {
       final response = await ApiService().searchRecipes(widget.bahan);
+
+      debugPrint("Fetching recipes for: ${widget.bahan}");
+      debugPrint("Response: $response");
+
       if (response == null || response.isEmpty) {
         throw Exception("Tidak ada data resep yang ditemukan.");
       }
       return response.map<Recipe>((json) => Recipe.fromJson(json)).toList();
     } catch (e) {
+      debugPrint("Error fetching recipes: $e");
+      // debugPrint("Stacktrace: $stacktrace");
+      // print("Error fetching recipes: $e");
       return Future.error("Gagal memuat data: $e");
     }
   }
