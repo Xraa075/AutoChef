@@ -36,45 +36,55 @@ class InputRecipeState extends State<InputRecipe> {
   }
 
   Future<void> fetchRecipes() async {
-  List<String> bahan = controllers.map((controller) => controller.text).toList();
-  String bahanQuery = bahan.join(',');
+    List<String> bahan = controllers.map((controller) => controller.text).toList();
+    String bahanQuery = bahan.join(',');
 
-  String url = 'http://localhost:8000/api/resepmakanan/search?bahan=$bahanQuery';
+    String url = 'http://localhost:8000/api/resepmakanan/search?bahan=$bahanQuery';
 
-  try {
-    final response = await http.get(Uri.parse(url));
+    try {
+      final response = await http.get(Uri.parse(url));
 
-    print("Request URL: $url");
-    print("Response Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
+      print("Request URL: $url");
+      print("Response Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
 
+        if (data == null || data.isEmpty) {
+          throw Exception('Tidak ada resep ditemukan.');
+        }
 
-      if (data == null || data.isEmpty) {
-        throw Exception('Tidak ada resep ditemukan.');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RekomendationRecipe(bahan: bahan),
+          ),
+        );
+      } else {
+        throw Exception('Gagal mendapatkan data resep. Kode: ${response.statusCode}');
       }
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => RekomendationRecipe(bahan: bahan),
-        ),
+    } catch (e) {
+      print("Error: $e");
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Error"),
+            content: Text("Gagal mendapatkan data resep: $e"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
       );
-    } else {
-      throw Exception('Gagal mendapatkan data resep. Kode: ${response.statusCode}');
     }
-  } catch (e) {
-    print("Error: $e");
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Gagal mendapatkan data resep: $e'),
-      ),
-    );
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -87,12 +97,9 @@ class InputRecipeState extends State<InputRecipe> {
       body: SafeArea(
         child: Column(
           children: [
-            // Container Putih (Form Input)
             Expanded(
               child: Container(
-                margin: const EdgeInsets.only(
-                  top: 30,
-                ), // Tambahkan margin agar sama dengan RekomendationRecipe
+                margin: const EdgeInsets.only(top: 30),
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -104,7 +111,6 @@ class InputRecipeState extends State<InputRecipe> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Bagian Judul
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -143,13 +149,9 @@ class InputRecipeState extends State<InputRecipe> {
                       ],
                     ),
                     const SizedBox(height: 30),
-
-                    // List Input Bahan
                     Expanded(
                       child: ListView.builder(
-                        padding: const EdgeInsets.only(
-                          bottom: 20,
-                        ), // Biar ada space di bawah
+                        padding: const EdgeInsets.only(bottom: 20),
                         itemCount: controllers.length,
                         itemBuilder: (context, index) {
                           return Padding(
@@ -160,9 +162,7 @@ class InputRecipeState extends State<InputRecipe> {
                                 vertical: 12,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(
-                                  0.9,
-                                ), // Transparansi kecil biar lebih soft
+                                color: Colors.white.withOpacity(0.9),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: Colors.grey[300]!),
                                 boxShadow: [
@@ -206,25 +206,13 @@ class InputRecipeState extends State<InputRecipe> {
                         },
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
-                    // Tombol Cari
                     Center(
                       child: SizedBox(
                         width: double.infinity,
                         height: 48,
                         child: ElevatedButton(
                           onPressed: fetchRecipes,
-                          // onPressed: () {
-                          //   Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //       builder:
-                          //           (context) => const RekomendationRecipe(),
-                          //     ),
-                          //   );
-                          // },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             shape: RoundedRectangleBorder(
