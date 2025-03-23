@@ -13,7 +13,7 @@ class Navbar extends StatefulWidget {
 }
 
 class NavbarState extends State<Navbar> {
-  int selectedIndex = 0;
+  int selectedIndex = 1;
 
   final List<Widget> pages = [
     //Ini navigasi navbar ke halaman masing masing, jumlahnya sesuai dengan jumlah icon di navbar
