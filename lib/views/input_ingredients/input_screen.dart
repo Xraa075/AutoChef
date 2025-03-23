@@ -1,58 +1,77 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart'; // Untuk keluar dari aplikasi
 import 'package:autochef/views/recipe/recommendation_screen.dart';
 import 'package:autochef/widgets/header.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class InputRecipe extends StatefulWidget {
   const InputRecipe({super.key});
 
   @override
-  State<InputRecipe> createState() => InputRecipeState();
+  State<InputRecipe> createState() => _InputRecipeState();
 }
 
-class InputRecipeState extends State<InputRecipe> {
+class _InputRecipeState extends State<InputRecipe> {
   final List<TextEditingController> controllers = [];
 
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < 1; i++) {
+    _addInputField(); // Mulai dengan 1 input field
+  }
+
+  void _addInputField() {
+    setState(() {
       controllers.add(TextEditingController());
+    });
+  }
+
+  void _removeInputField(int index) {
+    if (controllers.length > 1) {
+      setState(() {
+        controllers[index].dispose();
+        controllers.removeAt(index);
+      });
     }
   }
 
-  void addInputField() {
-    setState(() {
-      controllers.add(TextEditingController());
-    });
-  }
-
-  void removeInputField(int index) {
-    setState(() {
-      controllers[index].dispose();
-      controllers.removeAt(index);
-    });
+  @override
+  void dispose() {
+    for (var controller in controllers) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 
   Future<void> fetchRecipes() async {
-    List<String> bahan = controllers.map((controller) => controller.text).toList();
+    List<String> bahan =
+        controllers.map((controller) => controller.text.trim()).toList();
+
+    // Validasi jika input kosong
+    if (bahan.isEmpty || bahan.every((element) => element.isEmpty)) {
+      _showPopup("Harap masukkan minimal satu bahan.");
+      return;
+    }
+
     String bahanQuery = bahan.join(',');
 
-    String url = 'http://localhost:8000/api/resepmakanan/search?bahan=$bahanQuery';
+    String url =
+        'http://localhost:8000/api/resepmakanan/search?bahan=$bahanQuery';
 
     try {
       final response = await http.get(Uri.parse(url));
 
-      print("Request URL: $url");
-      print("Response Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
+      debugPrint("Request URL: $url");
+      debugPrint("Response Code: ${response.statusCode}");
+      debugPrint("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
+        final data = jsonDecode(response.body);
 
         if (data == null || data.isEmpty) {
-          throw Exception('Tidak ada resep ditemukan.');
+          _showPopup("Tidak ada resep ditemukan untuk bahan yang kamu masukkan.");
+          return;
         }
 
         Navigator.push(
@@ -62,175 +81,196 @@ class InputRecipeState extends State<InputRecipe> {
           ),
         );
       } else {
-        throw Exception('Gagal mendapatkan data resep. Kode: ${response.statusCode}');
+        _showPopup("Gagal mendapatkan data resep. Coba lagi nanti.");
       }
     } catch (e) {
-      print("Error: $e");
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text("Error"),
-            content: Text("Gagal mendapatkan data resep: $e"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text("OK"),
-              ),
-            ],
-          );
-        },
-      );
+      debugPrint("Error: $e");
+      _showPopup("Terjadi kesalahan saat mengambil data. Periksa koneksi internetmu.");
     }
+  }
+
+  void _showPopup(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Informasi"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.yellow[600],
-      appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(120), 
-        child: CustomHeader(title: "Ini adalah rekomendasi resep sesuai dengan bahanmu"),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.only(top: 30),
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Bahan apa yang kamu miliki?",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              "Tuliskan bahan-bahanmu",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black54,
-                              ),
-                            ),
-                          ],
-                        ),
-                        GestureDetector(
-                          onTap: addInputField,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.grey[300],
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.add, color: Colors.black),
-                          ),
-                        ),
-                      ],
+    return WillPopScope(
+      onWillPop: () async {
+        SystemNavigator.pop(); // Tutup aplikasi jika user tekan back
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFFBC72A),
+        appBar: const PreferredSize(
+          preferredSize: Size.fromHeight(120),
+          child: CustomHeader(
+            title:
+                "AutoChef siap mecarikan rekomendasi resep sesuai bahan yang kamu miliki",
+          ),
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 30),
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
                     ),
-                    const SizedBox(height: 30),
-                    Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        itemCount: controllers.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Bahan apa yang kamu miliki?",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                "Tuliskan bahan-bahanmu",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                            ],
+                          ),
+                          GestureDetector(
+                            onTap: _addInputField,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.9),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.grey[300]!),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.1),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
+                                shape: BoxShape.circle,
+                                color: Colors.grey[300],
                               ),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    "${index + 1}.",
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.black,
+                              padding: const EdgeInsets.all(8),
+                              child: const Icon(Icons.add, color: Colors.black),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 30),
+
+                      // List Input Bahan
+                      Expanded(
+                        child: ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          itemCount: controllers.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.grey[300]!),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.1),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: TextField(
-                                      controller: controllers[index],
-                                      decoration: const InputDecoration(
-                                        hintText: "Masukkan Bahan Makanan",
-                                        border: InputBorder.none,
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "${index + 1}.",
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black,
                                       ),
                                     ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: controllers[index],
+                                        decoration: const InputDecoration(
+                                          hintText: "Masukkan Bahan Makanan",
+                                          border: InputBorder.none,
+                                        ),
+                                      ),
                                     ),
-                                    onPressed: () => removeInputField(index),
-                                  ),
-                                ],
+                                    if (controllers.length >
+                                        1) // Tidak hapus jika hanya 1
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed:
+                                            () => _removeInputField(index),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Center(
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: fetchRecipes,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton(
-                          onPressed: fetchRecipes,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                            child: const Text(
+                              'Cari',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                          child: const Text(
-                            'Cari',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

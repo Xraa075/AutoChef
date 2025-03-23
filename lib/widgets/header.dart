@@ -14,7 +14,7 @@ class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       decoration: BoxDecoration(
-        color: Colors.yellow[600],
+        color: const Color(0xFFFBC72A),
       ),
       child: SafeArea(
         child: Column(

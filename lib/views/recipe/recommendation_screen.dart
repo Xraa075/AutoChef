@@ -27,28 +27,55 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
 
   // 🔍 Fetch data dari API dengan validasi
   Future<List<Recipe>> _fetchRecipes() async {
-    try {
-      final response = await ApiService().searchRecipes(widget.bahan);
+  try {
+    final response = await ApiService().searchRecipes(widget.bahan);
 
-      debugPrint("Fetching recipes for: ${widget.bahan}");
-      debugPrint("Response: $response");
+    debugPrint("Fetching recipes for: ${widget.bahan}");
+    debugPrint("Response: $response");
 
-      if (response == null || response.isEmpty) {
-        throw Exception("Tidak ada data resep yang ditemukan.");
-      }
-      return response.map<Recipe>((json) => Recipe.fromJson(json)).toList();
-    } catch (e) {
-      debugPrint("Error fetching recipes: $e");
-      // debugPrint("Stacktrace: $stacktrace");
-      // print("Error fetching recipes: $e");
-      return Future.error("Gagal memuat data: $e");
+    if (response == null || response.isEmpty) {
+      throw Exception("Tidak ada data resep yang ditemukan.");
     }
+    return response.map<Recipe>((json) => Recipe.fromJson(json)).toList();
+  } catch (e) {
+    debugPrint("Error fetching recipes: $e");
+    
+    // Menampilkan pop-up error
+    _showErrorDialog("Gagal memuat data: $e");
+
+    return Future.error("Gagal memuat data: $e");
   }
+}
+
+// ❌ **Pop-up Error**
+void _showErrorDialog(String message) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Mencegah pengguna menutup dialog dengan tap di luar
+      builder: (context) => AlertDialog(
+        title: const Text("Terjadi Kesalahan"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Menutup dialog
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context); // Kembali ke halaman sebelumnya jika memungkinkan
+              }
+            },
+            child: const Text("Tutup"),
+          ),
+        ],
+      ),
+    );
+  });
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellow[600],
+      backgroundColor: const Color(0xFFFBC72A),
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(120),
         child: CustomHeader(
