@@ -27,50 +27,80 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
 
   // 🔍 Fetch data dari API dengan validasi
   Future<List<Recipe>> _fetchRecipes() async {
-  try {
-    final response = await ApiService().searchRecipes(widget.bahan);
+    try {
+      final response = await ApiService().searchRecipes(widget.bahan);
 
-    debugPrint("Fetching recipes for: ${widget.bahan}");
-    debugPrint("Response: $response");
+      debugPrint("Fetching recipes for: ${widget.bahan}");
+      debugPrint("Response: $response");
 
-    if (response == null || response.isEmpty) {
-      throw Exception("Tidak ada data resep yang ditemukan.");
+      if (response == null || response.isEmpty) {
+        throw Exception("Tidak ada data resep yang ditemukan.");
+      }
+      return response.map<Recipe>((json) => Recipe.fromJson(json)).toList();
+    } catch (e) {
+      debugPrint("Error fetching recipes: $e");
+
+      // Menampilkan pop-up error
+      _showErrorDialog(
+        "Tidak ada data resep yang ditemukan dari bahan yang kamu masukkan.",
+      );
+
+      return Future.error("Gagal memuat data: $e");
     }
-    return response.map<Recipe>((json) => Recipe.fromJson(json)).toList();
-  } catch (e) {
-    debugPrint("Error fetching recipes: $e");
-    
-    // Menampilkan pop-up error
-    _showErrorDialog("Gagal memuat data: $e");
-
-    return Future.error("Gagal memuat data: $e");
   }
-}
 
-// ❌ **Pop-up Error**
-void _showErrorDialog(String message) {
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Mencegah pengguna menutup dialog dengan tap di luar
-      builder: (context) => AlertDialog(
-        title: const Text("Terjadi Kesalahan"),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context); // Menutup dialog
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context); // Kembali ke halaman sebelumnya jika memungkinkan
-              }
-            },
-            child: const Text("Tutup"),
-          ),
-        ],
-      ),
-    );
-  });
-}
+  // ❌ **Pop-up Error**
+  void _showErrorDialog(String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        barrierDismissible:
+            false, // Mencegah pengguna menutup dialog dengan tap di luar
+        builder:
+            (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  15,
+                ), // Membuat sudut dialog lebih halus
+              ),
+              title: Row(
+                children: [
+                  Icon(Icons.info, color: Colors.orange),
+                  SizedBox(width: 10),
+                  Text("Informasi"),
+                ],
+              ),
+              content: Text(message, style: TextStyle(fontSize: 16)),
+              actions: [
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context); // Menutup dialog
+                      if (Navigator.canPop(context)) {
+                        Navigator.pop(
+                          context,
+                        ); // Kembali ke halaman sebelumnya jika memungkinkan
+                      }
+                    },
+                    child: Text(
+                      "Oke",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,12 +143,14 @@ void _showErrorDialog(String message) {
                       child: FutureBuilder<List<Recipe>>(
                         future: _futureRecipes,
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return _buildShimmerLoading();
+                          } else if (snapshot.data == null ||
+                              snapshot.data!.isEmpty) {
+                            return _buildErrorWidget();
                           } else if (snapshot.hasError) {
-                            return _buildErrorWidget(snapshot.error.toString());
-                          } else if (snapshot.data == null || snapshot.data!.isEmpty) {
-                            return _buildNoDataWidget();
+                            return _buildErrorWidget();
                           }
 
                           final recipes = snapshot.data!;
@@ -134,7 +166,9 @@ void _showErrorDialog(String message) {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => DetailMakanan(recipe: recipe),
+                                      builder:
+                                          (context) =>
+                                              DetailMakanan(recipe: recipe),
                                     ),
                                   );
                                 },
@@ -158,27 +192,26 @@ void _showErrorDialog(String message) {
   // 🖼 **Perbaikan: CachedNetworkImage dengan Validasi URL**
   Widget _buildImage(String? imageUrl) {
     if (imageUrl == null || imageUrl.isEmpty) {
-      return Image.asset(
-        "assets/images/placeholder.png",
-        fit: BoxFit.cover,
-      );
+      return Image.asset("assets/images/placeholder.png", fit: BoxFit.cover);
     }
 
     return CachedNetworkImage(
       imageUrl: Uri.encodeFull(imageUrl), // Encode URL untuk menghindari error
-      placeholder: (context, url) => Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
-        child: Container(
-          width: double.infinity,
-          height: 150,
-          color: Colors.white,
-        ),
-      ),
-      errorWidget: (context, url, error) => Image.asset(
-        "assets/images/placeholder.png", // Gunakan gambar default jika gagal
-        fit: BoxFit.cover,
-      ),
+      placeholder:
+          (context, url) => Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              width: double.infinity,
+              height: 150,
+              color: Colors.white,
+            ),
+          ),
+      errorWidget:
+          (context, url, error) => Image.asset(
+            "assets/images/placeholder.png", // Gunakan gambar default jika gagal
+            fit: BoxFit.cover,
+          ),
       fit: BoxFit.cover,
     );
   }
@@ -206,38 +239,24 @@ void _showErrorDialog(String message) {
   }
 
   // ❌ **Pesan Error**
-  Widget _buildErrorWidget(String errorMessage) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline, color: Colors.red, size: 60),
-          const SizedBox(height: 10),
-          const Text(
-            "Terjadi Kesalahan!",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 5),
-          Text(errorMessage, textAlign: TextAlign.center),
-        ],
-      ),
-    );
+  Widget _buildErrorWidget() {
+    return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center));
   }
 
   // 📭 **Tidak Ada Data**
-  Widget _buildNoDataWidget() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset("assets/images/no_data.png", width: 200),
-          const SizedBox(height: 10),
-          const Text(
-            "Resep tidak ditemukan!",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildNoDataWidget() {
+  //   return Center(
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Image.asset("assets/images/no_data.png", width: 200),
+  //         const SizedBox(height: 10),
+  //         const Text(
+  //           "Resep tidak ditemukan!",
+  //           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
