@@ -70,9 +70,7 @@ class _InputRecipeState extends State<InputRecipe> {
         final data = jsonDecode(response.body);
 
         if (data == null || data.isEmpty) {
-          _showPopup(
-            "Tidak ada resep ditemukan untuk bahan yang kamu masukkan.",
-          );
+          _showPopup("Tidak ada resep ditemukan untuk bahan yang kamu masukkan.");
           return;
         }
 
@@ -87,9 +85,7 @@ class _InputRecipeState extends State<InputRecipe> {
       }
     } catch (e) {
       debugPrint("Error: $e");
-      _showPopup(
-        "Terjadi kesalahan saat mengambil data. Periksa koneksi internetmu.",
-      );
+      _showPopup("Terjadi kesalahan saat mengambil data. Periksa koneksi internetmu.");
     }
   }
 
@@ -205,8 +201,8 @@ class _InputRecipeState extends State<InputRecipe> {
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.grey.withOpacity(0.1),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 5),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
                                     ),
                                   ],
                                 ),
@@ -249,7 +245,7 @@ class _InputRecipeState extends State<InputRecipe> {
                       const SizedBox(height: 20),
                       Center(
                         child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.5,
+                          width: double.infinity,
                           height: 48,
                           child: ElevatedButton(
                             onPressed: fetchRecipes,
