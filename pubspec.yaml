@@ -39,7 +39,6 @@ flutter:
   uses-material-design: true
 
   assets:
-      - lib/assets/images/pancake.jpg
       - lib/assets/images/default_user.png
       - lib/assets/images/image1.png
       - lib/assets/images/image2.png
