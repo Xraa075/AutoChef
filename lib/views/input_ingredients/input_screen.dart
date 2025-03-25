@@ -57,7 +57,7 @@ class _InputRecipeState extends State<InputRecipe> {
     String bahanQuery = bahan.join(',');
 
     String url =
-        'http://localhost:8000/api/resepmakanan/search?bahan=$bahanQuery';
+        'http://156.67.214.60/api/resepmakanan/search?bahan=$bahanQuery';
 
     try {
       final response = await http.get(Uri.parse(url));

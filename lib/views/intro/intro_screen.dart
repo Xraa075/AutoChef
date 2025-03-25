@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/models/intro.dart';
 import 'package:autochef/widgets/navbar.dart';
+import 'package:autochef/views/input_ingredients/input_screen.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});
@@ -20,7 +21,7 @@ class IntroScreenState extends State<IntroScreen> {
 
   Navigator.pushReplacement(
     context,
-    MaterialPageRoute(builder: (context) => const Navbar()), // ✅ Langsung ke Navbar
+    MaterialPageRoute(builder: (context) => const InputRecipe()), // ✅ Langsung ke Navbar
   );
 }
 
