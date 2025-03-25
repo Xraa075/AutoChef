@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.example.autochef"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -24,11 +24,12 @@ android {
 
     defaultConfig {
         applicationId = "com.autochef.app"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        minSdk = 21
+        targetSdk = 35
+        versionCode = 4
+        versionName = "1.0.3"
     }
+
 
     // Load keystore properties
     val keystorePropertiesFile = rootProject.file("key.properties")
