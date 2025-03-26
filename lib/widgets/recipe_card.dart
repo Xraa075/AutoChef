@@ -83,7 +83,7 @@ class RecipeCard extends StatelessWidget {
                         //   style: const TextStyle(fontSize: 12),
                         // ),
                         const SizedBox(width: 10),
-                        const Icon(Icons.star, size: 14, color: Colors.orange),
+                        // const Icon(Icons.star, size: 14, color: Colors.orange),
                         // Text(
                         //   " ${recipe.difficulity}",
                         //   style: const TextStyle(fontSize: 12),
