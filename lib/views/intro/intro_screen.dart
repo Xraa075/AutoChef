@@ -1,5 +1,6 @@
+import 'package:autochef/login/login.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Untuk SystemNavigator.pop()
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/models/intro.dart';
 import 'package:autochef/widgets/navbar.dart';
@@ -22,7 +23,7 @@ class IntroScreenState extends State<IntroScreen> {
 
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const Navbar()),
+      MaterialPageRoute(builder: (context) => const LoginPage()),
       (Route<dynamic> route) => false,
     );
   }
@@ -43,7 +44,7 @@ class IntroScreenState extends State<IntroScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        SystemNavigator.pop(); // ⬅️ Langsung keluar aplikasi
+        SystemNavigator.pop();
         return false;
       },
       child: Scaffold(

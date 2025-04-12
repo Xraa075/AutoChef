@@ -6,20 +6,30 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool hasSeenIntro = prefs.getBool('hasSeenIntro') ?? false;
+  bool hasLoggedAsGuest = prefs.getBool('hasLoggedAsGuest') ?? false;
 
-  runApp(MyApp(hasSeenIntro: hasSeenIntro));
+  runApp(MyApp(hasSeenIntro: hasSeenIntro, hasLoggedAsGuest: hasLoggedAsGuest));
 }
 
 class MyApp extends StatelessWidget {
   final bool hasSeenIntro;
-  const MyApp({super.key, required this.hasSeenIntro});
+  final bool hasLoggedAsGuest;
+
+  const MyApp({
+    super.key,
+    required this.hasSeenIntro,
+    required this.hasLoggedAsGuest,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'AutoChef',
-      initialRoute: hasSeenIntro ? Routes.home : Routes.introScreen, // **Cek apakah intro sudah dilihat**
+      initialRoute:
+          hasSeenIntro
+              ? (hasLoggedAsGuest ? Routes.home : Routes.login)
+              : Routes.introScreen,
       onGenerateRoute: Routes.onGenerateRoute,
     );
   }

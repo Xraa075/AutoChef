@@ -39,6 +39,7 @@ flutter:
   uses-material-design: true
 
   assets:
+      - lib/assets/images/autochef_launcher.png
       - lib/assets/images/default_user.png
       - lib/assets/images/image1.png
       - lib/assets/images/image2.png
