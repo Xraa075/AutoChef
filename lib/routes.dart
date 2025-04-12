@@ -19,7 +19,7 @@ class Routes {
         return MaterialPageRoute(builder: (_) => const IntroScreen());
 
       case home:
-        return MaterialPageRoute(builder: (_) => const InputRecipe());
+        return MaterialPageRoute(builder: (_) => const Navbar());
 
       case inputRecipe:
         return MaterialPageRoute(builder: (_) => const InputRecipe());
@@ -32,7 +32,7 @@ class Routes {
           final recipe = settings.arguments as Recipe;
           return MaterialPageRoute(builder: (_) => DetailMakanan(recipe: recipe));
         }
-        return MaterialPageRoute(builder: (_) => const InputRecipe());
+        return MaterialPageRoute(builder: (_) => const Navbar());
 
       default:
         return MaterialPageRoute(builder: (_) => const InputRecipe()); // **🔹 Jika tidak match, ke InputRecipe**

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Untuk SystemNavigator.pop()
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/models/intro.dart';
 import 'package:autochef/widgets/navbar.dart';
@@ -15,15 +16,16 @@ class IntroScreenState extends State<IntroScreen> {
   final PageController pageController = PageController();
   int currentPage = 0;
 
- Future<void> completeIntro() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setBool('hasSeenIntro', true);
+  Future<void> completeIntro() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasSeenIntro', true);
 
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => const InputRecipe()), // ✅ Langsung ke Navbar
-  );
-}
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const Navbar()),
+      (Route<dynamic> route) => false,
+    );
+  }
 
   void nextPage() {
     if (currentPage < introData.length - 1) {
@@ -33,68 +35,72 @@ class IntroScreenState extends State<IntroScreen> {
         curve: Curves.ease,
       );
     } else {
-      completeIntro(); // ✅ Jika di halaman terakhir, tandai sudah melihat intro
+      completeIntro();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                controller: pageController,
-                itemCount: introData.length,
-                onPageChanged: (index) {
-                  setState(() {
-                    currentPage = index;
-                  });
-                },
-                itemBuilder: (context, index) {
-                  return buildPage(introData[index]);
-                },
+    return WillPopScope(
+      onWillPop: () async {
+        SystemNavigator.pop(); // ⬅️ Langsung keluar aplikasi
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: PageView.builder(
+                  controller: pageController,
+                  itemCount: introData.length,
+                  onPageChanged: (index) {
+                    setState(() {
+                      currentPage = index;
+                    });
+                  },
+                  itemBuilder: (context, index) {
+                    return buildPage(introData[index]);
+                  },
+                ),
               ),
-            ),
-
-            // 🔹 Indikator Halaman (Dot Navigation)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                introData.length,
-                (index) => buildDot(index),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  introData.length,
+                  (index) => buildDot(index),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-
-            // 🔹 Tombol Lanjut / Mulai
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20.0),
-              child: ElevatedButton(
-                onPressed: nextPage,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(234, 60),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 20.0),
+                child: ElevatedButton(
+                  onPressed: nextPage,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(234, 60),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: Text(
+                    currentPage < introData.length - 1 ? 'Lanjut' : 'Mulai',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                child: Text(
-                  currentPage < introData.length - 1 ? 'Lanjut' : 'Mulai',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // 🔹 Widget Halaman Intro
   Widget buildPage(Intro intro) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -122,7 +128,6 @@ class IntroScreenState extends State<IntroScreen> {
     );
   }
 
-  // 🔹 Widget Dot Navigation
   Widget buildDot(int index) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),

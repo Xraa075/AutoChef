@@ -13,14 +13,12 @@ class Navbar extends StatefulWidget {
 }
 
 class NavbarState extends State<Navbar> {
-  int selectedIndex = 1;
-
+  int selectedIndex = 0;
   final List<Widget> pages = [
     //Ini navigasi navbar ke halaman masing masing, jumlahnya sesuai dengan jumlah icon di navbar
+    HomeScreen(),
     InputRecipe(),
-    InputRecipe(),
-    InputRecipe(),
-    InputRecipe(),
+    ProfileScreen(),
   ];
 
   void onNavTapped(int index) {
@@ -134,22 +132,13 @@ class NavbarState extends State<Navbar> {
                   label: '',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.list, size: 30, color: Colors.white),
-                  selectedIcon: Icon(
-                    Icons.list,
-                    size: 30,
-                    color: Colors.orange,
-                  ),
-                  label: '',
-                ),
-                NavigationDestination(
                   icon: Icon(
-                    Icons.notifications,
+                    Icons.search_rounded,
                     size: 30,
                     color: Colors.white,
                   ),
                   selectedIcon: Icon(
-                    Icons.notifications,
+                    Icons.search_rounded,
                     size: 30,
                     color: Colors.orange,
                   ),
@@ -172,8 +161,6 @@ class NavbarState extends State<Navbar> {
     );
   }
 }
-
-
 
 //Bagian ini akan digunakan untuk menampilkan halaman Home, Input Bahan, Notifikasi, dan Profil pada sprint selanjutnya
 
