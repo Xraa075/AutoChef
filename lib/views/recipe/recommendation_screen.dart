@@ -18,6 +18,12 @@ class RekomendationRecipe extends StatefulWidget {
 
 class _RekomendationRecipeState extends State<RekomendationRecipe> {
   late Future<List<Recipe>> _futureRecipes;
+  final ScrollController _scrollController = ScrollController();
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -154,27 +160,35 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                           }
 
                           final recipes = snapshot.data!;
-                          return ListView.builder(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                            itemCount: recipes.length,
-                            itemBuilder: (context, index) {
-                              final recipe = recipes[index];
+                          return Scrollbar(
+                            controller: _scrollController,
+                            thumbVisibility: true,
+                            radius: Radius.circular(8),
 
-                              return RecipeCard(
-                                recipe: recipe,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) =>
-                                              DetailMakanan(recipe: recipe),
-                                    ),
-                                  );
-                                },
-                                image: recipe.gambar,
-                              );
-                            },
+                            interactive: true,
+                            thickness: 8,
+                            child: ListView.builder(
+                              controller: _scrollController,
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                              itemCount: recipes.length,
+                              itemBuilder: (context, index) {
+                                final recipe = recipes[index];
+                                return RecipeCard(
+                                  recipe: recipe,
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (context) =>
+                                                DetailMakanan(recipe: recipe),
+                                      ),
+                                    );
+                                  },
+                                  image: recipe.gambar,
+                                );
+                              },
+                            ),
                           );
                         },
                       ),
