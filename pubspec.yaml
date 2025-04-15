@@ -44,3 +44,8 @@ flutter:
       - lib/assets/images/image1.png
       - lib/assets/images/image2.png
       - lib/assets/images/image3.png
+      - lib/assets/images/snacks.jpg
+      - lib/assets/images/meal.jpg
+      - lib/assets/images/vegan.jpg
+      - lib/assets/images/dessert.jpg
+      - lib/assets/images/drinks.jpg

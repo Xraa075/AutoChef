@@ -4,8 +4,13 @@ import 'package:autochef/data/dummy_user.dart';
 
 class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final Widget? child; // ✅ Tambahin child di sini
 
-  const CustomHeader({super.key, required this.title});
+  const CustomHeader({
+    super.key,
+    required this.title,
+    this.child, // ✅ Masukin ke constructor
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,8 +18,8 @@ class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFBC72A),
+      decoration: const BoxDecoration(
+        color: Color(0xFFFBC72A),
       ),
       child: SafeArea(
         child: Column(
@@ -56,6 +61,10 @@ class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ],
             ),
+            if (child != null) ...[
+              const SizedBox(height: 12), // Tambahin jarak dari row ke child
+              child!, // ✅ Tampilkan child kalau ada
+            ],
           ],
         ),
       ),
@@ -63,5 +72,8 @@ class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(80); // Ukuran header lebih besar
+  Size get preferredSize {
+    return child != null ? const Size.fromHeight(140) : const Size.fromHeight(80);
+  }
+
 }
