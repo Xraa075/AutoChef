@@ -16,7 +16,7 @@ class Ingredients extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("• ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text("✓ ", style: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 255, 187, 0),fontWeight: FontWeight.bold)),
                   Expanded(child: Text(step, style: TextStyle(fontSize: 16))),
                 ],
               ),
