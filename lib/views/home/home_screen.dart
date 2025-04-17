@@ -29,39 +29,38 @@ class _HomeScreenState extends State<HomeScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
-  children: [
-    const Icon(Icons.search, color: Colors.grey),
-    const SizedBox(width: 8),
-    Expanded(
-      child: TextField(
-        style: const TextStyle(fontSize: 18),
-        decoration: const InputDecoration(
-          hintText: 'Cari resep...',
-          border: InputBorder.none,
-        ),
-        onChanged: (value) {
-          print("User ngetik: $value");
-        },
-      ),
-    ),
-    const SizedBox(width: 8),
-    GestureDetector(
-      onTap: () {
-        print("Ikon + ditekan");
-        // Tambahkan aksi di sini kalau diperlukan
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.grey[300],
-        ),
-        padding: const EdgeInsets.all(8),
-        child: const Icon(Icons.add, color: Colors.black),
-      ),
-    ),
-  ],
-),
-
+              children: [
+                const Icon(Icons.search, color: Colors.grey),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    style: const TextStyle(fontSize: 18),
+                    decoration: const InputDecoration(
+                      hintText: 'Cari resep...',
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (value) {
+                      print("User ngetik: $value");
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
+                    print("Ikon + ditekan");
+                    // Tambahkan aksi di sini kalau diperlukan
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey[300],
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Icon(Icons.add, color: Colors.black),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
