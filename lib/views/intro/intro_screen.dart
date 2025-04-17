@@ -23,7 +23,7 @@ class IntroScreenState extends State<IntroScreen> {
 
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
+      MaterialPageRoute(builder: (context) => LoginPage()),
       (Route<dynamic> route) => false,
     );
   }

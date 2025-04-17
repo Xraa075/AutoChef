@@ -26,10 +26,10 @@ class Routes {
         return MaterialPageRoute(builder: (_) => const Navbar());
 
       case login:
-        return MaterialPageRoute(builder: (_) => const LoginPage());
+        return MaterialPageRoute(builder: (_) => LoginPage());
 
       case register:
-        return MaterialPageRoute(builder: (_) => const RegisterPage());
+        return MaterialPageRoute(builder: (_) => RegisterPage());
 
       case inputRecipe:
         return MaterialPageRoute(builder: (_) => const InputRecipe());

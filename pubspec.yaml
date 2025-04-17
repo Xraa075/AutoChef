@@ -16,10 +16,9 @@ dependencies:
   shimmer: ^3.0.0
   cached_network_image: ^3.2.0
   shared_preferences: ^2.2.2
-
-  
   cupertino_icons: ^1.0.8
   fluttertoast: ^8.2.12
+  flutter_native_splash: ^2.4.6
 
 dev_dependencies:
   flutter_test:
@@ -27,25 +26,27 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_launcher_icons: "^0.14.3"
 
+flutter_native_splash:
+  color: "#ffffff"
+  image: "lib/assets/images/splashlogo.png"
+
+  color_dark: "#ffffff"
+  image_dark: "lib/assets/images/splashlogodark.png"
+  
+  android_12:
+    color: "#ffffff"
+    image: "lib/assets/images/splashlogo.png"
+
+    color_dark: "#ffffff"
+    image_dark: "lib/assets/images/splashlogodark.png"
+
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "lib/assets/images/autochef_launcher.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
 
-
 flutter:
-
   uses-material-design: true
-
   assets:
-      - lib/assets/images/autochef_launcher.png
-      - lib/assets/images/default_user.png
-      - lib/assets/images/image1.png
-      - lib/assets/images/image2.png
-      - lib/assets/images/image3.png
-      - lib/assets/images/snacks.jpg
-      - lib/assets/images/meal.jpg
-      - lib/assets/images/vegan.jpg
-      - lib/assets/images/dessert.jpg
-      - lib/assets/images/drinks.jpg
+      - lib/assets/images/
