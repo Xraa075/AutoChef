@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:autochef/widgets/header.dart';
+import 'package:autochef/widgets/category_item.dart';
+import 'package:autochef/widgets/recommendation_item.dart';
+import 'package:autochef/widgets/healthy_food_item.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -109,8 +112,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Text(
                             "Categories",
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -119,11 +122,26 @@ class _HomeScreenState extends State<HomeScreen> {
                             runSpacing: 16,
                             alignment: WrapAlignment.spaceBetween,
                             children: [
-                              _buildCategory("Snacks", "lib/assets/images/snacks.jpg"),
-                              _buildCategory("Meal", "lib/assets/images/meal.jpg"),
-                              _buildCategory("Vegan", "lib/assets/images/vegan.jpg"),
-                              _buildCategory("Dessert", "lib/assets/images/dessert.jpg"),
-                              _buildCategory("Drinks", "lib/assets/images/drinks.jpg"),
+                              CategoryItem(
+                                title: "Snacks",
+                                imagePath: "lib/assets/images/snacks.jpg",
+                              ),
+                              CategoryItem(
+                                title: "Meal",
+                                imagePath: "lib/assets/images/meal.jpg",
+                              ),
+                              CategoryItem(
+                                title: "Vegan",
+                                imagePath: "lib/assets/images/vegan.jpg",
+                              ),
+                              CategoryItem(
+                                title: "Dessert",
+                                imagePath: "lib/assets/images/dessert.jpg",
+                              ),
+                              CategoryItem(
+                                title: "Drinks",
+                                imagePath: "lib/assets/images/drinks.jpg",
+                              ),
                             ],
                           ),
 
@@ -131,39 +149,39 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Text(
                             "Rekomendasi",
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           const SizedBox(height: 10),
                           SizedBox(
-                            height: 121,
+                            height: 123,
                             child: ListView(
                               scrollDirection: Axis.horizontal,
                               children: [
-                                _buildRekomendasi(
-                                  "Tempe Orek",
-                                  "assets/tempe_orek.png",
+                                RecommendationItem(
+                                  title: "Tempe Orek",
+                                  imagePath: "assets/tempe_orek.png",
                                 ),
-                                _buildRekomendasi(
-                                  "Capcay",
-                                  "assets/capcay.png",
+                                RecommendationItem(
+                                  title: "Capcay",
+                                  imagePath: "assets/capcay.png",
                                 ),
-                                _buildRekomendasi(
-                                  "Telur Balado",
-                                  "assets/telur_balado.png",
+                                RecommendationItem(
+                                  title: "Telur Balado",
+                                  imagePath: "assets/telur_balado.png",
                                 ),
-                                _buildRekomendasi(
-                                  "Tempe Orek",
-                                  "assets/tempe_orek.png",
+                                RecommendationItem(
+                                  title: "Tempe Orek",
+                                  imagePath: "assets/tempe_orek.png",
                                 ),
-                                _buildRekomendasi(
-                                  "Capcay",
-                                  "assets/capcay.png",
+                                RecommendationItem(
+                                  title: "Capcay",
+                                  imagePath: "assets/capcay.png",
                                 ),
-                                _buildRekomendasi(
-                                  "Telur Balado",
-                                  "assets/telur_balado.png",
+                                RecommendationItem(
+                                  title: "Telur Balado",
+                                  imagePath: "assets/telur_balado.png",
                                 ),
                               ],
                             ),
@@ -172,8 +190,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           const Text(
                             "Masakan Sehat",
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -182,23 +200,29 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: ListView(
                               scrollDirection: Axis.horizontal,
                               children: [
-                                _buildHealthyFood(
-                                  "Tumis Kangkung",
-                                  "assets/tumis_kangkung.png",
+                                HealthyFoodItem(
+                                  title: "Tumis Kangkung",
+                                  imagePath: "assets/tumis_kangkung.png",
                                 ),
-                                _buildHealthyFood("Sop", "assets/sop.png"),
-                                _buildHealthyFood(
-                                  "Tumis Jamur dan Brokoli",
-                                  "assets/jamur_brokoli.png",
+                                HealthyFoodItem(
+                                  title: "Sop",
+                                  imagePath: "assets/sop.png",
                                 ),
-                                _buildHealthyFood(
-                                  "Tumis Kangkung",
-                                  "assets/tumis_kangkung.png",
+                                HealthyFoodItem(
+                                  title: "Tumis Jamur dan Brokoli",
+                                  imagePath: "assets/jamur_brokoli.png",
                                 ),
-                                _buildHealthyFood("Sop", "assets/sop.png"),
-                                _buildHealthyFood(
-                                  "Tumis Jamur dan Brokoli",
-                                  "assets/jamur_brokoli.png",
+                                HealthyFoodItem(
+                                  title: "Tumis Kangkung",
+                                  imagePath: "assets/tumis_kangkung.png",
+                                ),
+                                HealthyFoodItem(
+                                  title: "Sop",
+                                  imagePath: "assets/sop.png",
+                                ),
+                                HealthyFoodItem(
+                                  title: "Tumis Jamur dan Brokoli",
+                                  imagePath: "assets/jamur_brokoli.png",
                                 ),
                               ],
                             ),
@@ -217,91 +241,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-}
-
-Widget _buildCategory(String title, String imagePath) {
-  return SizedBox(
-    width:
-        MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width /
-            5 -
-        24, // 5 items per row, padding 20px
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(50),
-          child: Image.asset(
-            imagePath,
-            width: 50,
-            height: 65,
-            fit: BoxFit.cover,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(title, style: const TextStyle(fontSize: 12)),
-      ],
-    ),
-  );
-}
-
-Widget _buildRekomendasi(String title, String imagePath) {
-  return Container(
-    child: Column(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(50),
-          child: Image.asset(
-            'lib/assets/images/image2.png',
-            width: 100,
-            height: 100,
-            fit: BoxFit.cover,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(title, style: const TextStyle(fontSize: 12)),
-        const SizedBox(width: 10),
-      ],
-    ),
-  );
-}
-
-Widget _buildHealthyFood(String title, String imagePath) {
-  return Container(
-    width: 120,
-    margin: const EdgeInsets.only(right: 12),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(10),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black12,
-          blurRadius: 5,
-          offset: Offset(0, 3),
-        ),
-      ],
-    ),
-    clipBehavior: Clip.antiAlias, // <- ini penting untuk potong overflow
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-          child: Image.asset(
-            'lib/assets/images/image2.png',
-            width: 120,
-            height: 90,
-            fit: BoxFit.cover,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8),
-          child: Text(title, style: const TextStyle(fontSize: 14)),
-        ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8),
-          child: Icon(Icons.favorite_border, size: 16, color: Colors.orange),
-        ),
-      ],
-    ),
-  );
 }
