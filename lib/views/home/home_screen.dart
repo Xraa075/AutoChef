@@ -4,6 +4,8 @@ import 'package:autochef/widgets/header.dart';
 import 'package:autochef/widgets/category_item.dart';
 import 'package:autochef/widgets/recommendation_item.dart';
 import 'package:autochef/widgets/healthy_food_item.dart';
+import 'package:autochef/services/api_rekomendation.dart';
+import 'package:autochef/models/recipe.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,6 +15,30 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<Recipe> _rekomendasi = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    getRekomendasi();
+  }
+
+  Future<void> getRekomendasi() async {
+    try {
+      final data = await ApiRekomendasi.fetchRekomendasi();
+      setState(() {
+        _rekomendasi = data;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Terjadi error: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,36 +197,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 10),
                           SizedBox(
                             height: 123,
-                            child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              children: [
-                                RecommendationItem(
-                                  title: "Tempe Orek",
-                                  imagePath: "lib/assets/images/meal.jpg",
-                                ),
-                                RecommendationItem(
-                                  title: "Capcay",
-                                  imagePath: "lib/assets/images/meal.jpg",
-                                ),
-                                RecommendationItem(
-                                  title: "Telur Balado",
-                                  imagePath: "lib/assets/images/meal.jpg",
-                                ),
-                                RecommendationItem(
-                                  title: "Tempe Orek",
-                                  imagePath: "lib/assets/images/meal.jpg",
-                                ),
-                                RecommendationItem(
-                                  title: "Capcay",
-                                  imagePath: "lib/assets/images/meal.jpg",
-                                ),
-                                RecommendationItem(
-                                  title: "Telur Balado",
-                                  imagePath: "lib/assets/images/meal.jpg",
-                                ),
-                              ],
-                            ),
+                            child:
+                                _isLoading
+                                    ? const Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                    : ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: _rekomendasi.length,
+                                      itemBuilder: (context, index) {
+                                        final resep = _rekomendasi[index];
+                                        return RecommendationItem(
+                                          title: resep.namaResep,
+                                          imagePath: resep.gambar,
+                                        );
+                                      },
+                                    ),
                           ),
+
                           const SizedBox(height: 20),
                           const Text(
                             "Masakan Sehat",
@@ -212,36 +226,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 10),
                           SizedBox(
                             height: 170,
-                            child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              children: [
-                                HealthyFoodItem(
-                                  title: "Tumis Kangkung",
-                                  imagePath: "lib/assets/images/vegan.jpg",
-                                ),
-                                HealthyFoodItem(
-                                  title: "Sop",
-                                  imagePath: "lib/assets/images/vegan.jpg",
-                                ),
-                                HealthyFoodItem(
-                                  title: "Tumis Jamur dan Brokoli",
-                                  imagePath: "lib/assets/images/vegan.jpg",
-                                ),
-                                HealthyFoodItem(
-                                  title: "Tumis Kangkung",
-                                  imagePath: "lib/assets/images/vegan.jpg",
-                                ),
-                                HealthyFoodItem(
-                                  title: "Sop",
-                                  imagePath: "lib/assets/images/vegan.jpg",
-                                ),
-                                HealthyFoodItem(
-                                  title: "Tumis Jamur dan Brokoli",
-                                  imagePath: "lib/assets/images/vegan.jpg",
-                                ),
-                              ],
-                            ),
+                            child:
+                                _isLoading
+                                    ? const Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                    : ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: _rekomendasi.length,
+                                      itemBuilder: (context, index) {
+                                        final resep = _rekomendasi[index];
+                                        return HealthyFoodItem(
+                                          title: resep.namaResep,
+                                          imagePath: resep.gambar,
+                                        );
+                                      },
+                                    ),
                           ),
+
                           const SizedBox(height: 10),
                         ],
                       ),

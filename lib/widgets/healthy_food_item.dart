@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 
 class HealthyFoodItem extends StatelessWidget {
   final String title;
-  final String imagePath;
+  final String imagePath; // URL dari API
 
-  const HealthyFoodItem({super.key, required this.title, required this.imagePath});
+  const HealthyFoodItem({
+    super.key,
+    required this.title,
+    required this.imagePath,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,16 +32,30 @@ class HealthyFoodItem extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-            child: Image.asset(
+            child: Image.network(
               imagePath,
               width: 120,
               height: 90,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return const SizedBox(
+                  width: 120,
+                  height: 90,
+                  child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                );
+              },
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8),
-            child: Text(title, style: const TextStyle(fontSize: 14)),
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 14),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 8),
