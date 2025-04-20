@@ -48,7 +48,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
 
       // Menampilkan pop-up error
       _showErrorDialog(
-        "Tidak ada data resep yang ditemukan dari bahan yang kamu masukkan.",
+        "Tidak ada data resep yang ditemukan dari kombinasi bahan yang kamu masukkan.",
       );
 
       return Future.error("Gagal memuat data: $e");
@@ -84,7 +84,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(25),
                       ),
                       padding: EdgeInsets.symmetric(vertical: 12),
                     ),

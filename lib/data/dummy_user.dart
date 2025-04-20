@@ -1,27 +1,19 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/models/user.dart';
 
-List<User> dummyUsers = [
-  User(
-    username: "Guest",
-    email: "guest@autochef.com",
-    userImage: "lib/assets/images/default_user.png",
-  ),
-];
+Future<User> getActiveUser() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? username = prefs.getString('username');
+  String? email = prefs.getString('email');
+  String? userImage = prefs.getString('userImage');
 
-// Variabel global untuk menyimpan user aktif
-User? activeUser;
+  if (username == null || email == null || userImage == null) {
+    return User(
+      username: 'Guest',
+      email: 'guest@autochef.com',
+      userImage: 'lib/assets/images/default_user.png',
+    );
+  }
 
-// Fungsi untuk mendapatkan user aktif atau default jika belum login
-User getActiveUser() {
-  return activeUser ?? dummyUsers.first; // Gunakan user default jika belum login
-}
-
-// Fungsi untuk mengubah user setelah login
-void loginUser(User user) {
-  activeUser = user;
-}
-
-// Fungsi untuk logout
-void logoutUser() {
-  activeUser = null;
+  return User(username: username, email: email, userImage: userImage);
 }

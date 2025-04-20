@@ -37,6 +37,17 @@ class _LoginPageState extends State<LoginPage> {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      String username = data['user']['name'];
+      String email = data['user']['email'];
+
+      await prefs.setBool('hasLoggedAsUser', true);
+      await prefs.setBool('hasLoggedAsGuest', false);
+      await prefs.setString('username', username);
+      await prefs.setString('email', data['user']['email']);
+      await prefs.setString('userImage', 'lib/assets/images/default_user.png');
+
       print('Login berhasil: ${data['user']['name']}');
       setState(() {
         errorMessage = null; // Reset error message
@@ -61,6 +72,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> loginAsGuest(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('hasLoggedAsGuest', true);
+    await prefs.setBool('hasLoggedAsUser', false);
 
     Navigator.pushAndRemoveUntil(
       context,
@@ -114,7 +126,11 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               const SizedBox(height: 10),
               _buildTextField('Email', controller: emailController),
-              _buildTextField('Password', controller: passwordController, isPassword: true),
+              _buildTextField(
+                'Password',
+                controller: passwordController,
+                isPassword: true,
+              ),
               const SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(

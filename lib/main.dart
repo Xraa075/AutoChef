@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
 import 'package:autochef/routes.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
@@ -8,18 +9,32 @@ void main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool hasSeenIntro = prefs.getBool('hasSeenIntro') ?? false;
   bool hasLoggedAsGuest = prefs.getBool('hasLoggedAsGuest') ?? false;
+  bool hasLoggedAsUser = prefs.getBool('hasLoggedAsUser') ?? false;
 
-  runApp(MyApp(hasSeenIntro: hasSeenIntro, hasLoggedAsGuest: hasLoggedAsGuest));
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  runApp(
+    MyApp(
+      hasSeenIntro: hasSeenIntro,
+      hasLoggedAsGuest: hasLoggedAsGuest,
+      hasLoggedAsUser: hasLoggedAsUser,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   final bool hasSeenIntro;
   final bool hasLoggedAsGuest;
+  final bool hasLoggedAsUser;
 
   const MyApp({
     super.key,
     required this.hasSeenIntro,
     required this.hasLoggedAsGuest,
+    required this.hasLoggedAsUser,
   });
 
   @override
@@ -29,7 +44,9 @@ class MyApp extends StatelessWidget {
       title: 'AutoChef',
       initialRoute:
           hasSeenIntro
-              ? (hasLoggedAsGuest ? Routes.home : Routes.login)
+              ? ((hasLoggedAsGuest || hasLoggedAsUser)
+                  ? Routes.home
+                  : Routes.login)
               : Routes.introScreen,
       onGenerateRoute: Routes.onGenerateRoute,
     );

@@ -105,7 +105,11 @@ class _InputRecipeState extends State<InputRecipe> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text("OK"),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.orange,
+              ),
+              child: const Text("Oke"),
             ),
           ],
         );
