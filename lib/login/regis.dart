@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -13,49 +14,62 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
   String? successMessage;
 
+  bool isUsernameValid = true;
+  bool isPasswordValid = true;
+
   Future<void> registerUser(BuildContext context) async {
-  if (nameController.text.isEmpty ||
-      emailController.text.isEmpty ||
-      passwordController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Semua field harus diisi')),
-    );
-    return;
-  }
-
-  final response = await http.post(
-    Uri.parse('http://156.67.214.60/api/register'),
-    headers: {'Accept': 'application/json'}, // Pastikan header ini ditambahkan
-    body: {
-      'name': nameController.text,
-      'email': emailController.text,
-      'password': passwordController.text,
-    },
-  );
-
-  if (response.statusCode == 200) {
     setState(() {
-      successMessage = 'Registrasi berhasil';
-      // Reset form fields
-      nameController.clear();
-      emailController.clear();
-      passwordController.clear();
+      isUsernameValid = nameController.text.isNotEmpty &&
+          !nameController.text.contains(' ') &&
+          nameController.text.length <= 10;
+
+      isPasswordValid = passwordController.text.length >= 5;
     });
-  } else if (response.statusCode == 422) {
-    // Dekode respons JSON untuk validasi error
-    final responseData = jsonDecode(response.body);
-    final errorMessage = responseData['errors']['email']?.first ?? 'Gagal registrasi';
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(errorMessage)),
+
+    if (!isUsernameValid || !isPasswordValid) return;
+
+    if (nameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Semua field harus diisi')),
+      );
+      return;
+    }
+
+    final response = await http.post(
+      Uri.parse('http://156.67.214.60/api/register'),
+      headers: {'Accept': 'application/json'},
+      body: {
+        'name': nameController.text,
+        'email': emailController.text,
+        'password': passwordController.text,
+      },
     );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Gagal: ${response.body}')),
-    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        successMessage = 'Registrasi berhasil';
+        nameController.clear();
+        emailController.clear();
+        passwordController.clear();
+      });
+    } else if (response.statusCode == 422) {
+      final responseData = jsonDecode(response.body);
+      final errorMessage =
+          responseData['errors']['email']?.first ?? 'Gagal registrasi';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal: ${response.body}')),
+      );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -95,13 +109,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
             const SizedBox(height: 10),
-            _buildTextField('Name', controller: nameController),
+            _buildUsernameField(),
             _buildTextField('Email', controller: emailController),
-            _buildTextField(
-              'Password',
-              controller: passwordController,
-              isPassword: true,
-            ),
+            _buildPasswordField(),
             const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -143,25 +153,84 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  Widget _buildUsernameField() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: TextField(
+        controller: nameController,
+        maxLength: 10,
+        inputFormatters: [
+          FilteringTextInputFormatter.deny(RegExp(r'\s')),
+        ],
+        decoration: InputDecoration(
+          counterText: '',
+          hintText: 'Username',
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 16,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: isUsernameValid ? Colors.grey : Colors.red,
+              width: 0.7,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: isUsernameValid ? Colors.orange : Colors.red,
+              width: 1,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: TextField(
+        controller: passwordController,
+        obscureText: true,
+        decoration: InputDecoration(
+          hintText: 'Password',
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 16,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: isPasswordValid ? Colors.grey : Colors.red,
+              width: 0.7,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: isPasswordValid ? Colors.orange : Colors.red,
+              width: 1,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildTextField(
     String hint, {
     required TextEditingController controller,
-    bool isPassword = false,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       child: TextField(
         controller: controller,
-        obscureText: isPassword,
         decoration: InputDecoration(
           hintText: hint,
           filled: true,
