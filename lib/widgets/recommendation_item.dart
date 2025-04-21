@@ -15,7 +15,7 @@ class RecommendationItem extends StatelessWidget {
     final bool isNetworkImage = imagePath.startsWith("http");
 
     return Container(
-      margin: const EdgeInsets.all(12),
+      margin: const EdgeInsets.fromLTRB(20, 12, 20, 12),
       child: Column(
         children: [
           ClipRRect(
