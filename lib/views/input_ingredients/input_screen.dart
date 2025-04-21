@@ -22,6 +22,10 @@ class _InputRecipeState extends State<InputRecipe> {
   }
 
   void _addInputField() {
+    if (controllers.length >= 9) {
+      _showPopup("Maksimal hanya dapat memasukkan 9 bahan.");
+      return;
+    }
     setState(() {
       controllers.add(TextEditingController());
     });

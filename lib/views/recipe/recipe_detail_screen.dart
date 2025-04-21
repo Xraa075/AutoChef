@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:autochef/models/recipe.dart';
-import 'components/recipe_info.dart';
+import 'package:autochef/views/recipe/components/recipe_info.dart';
 import 'components/ingredients.dart';
 import 'components/steps.dart';
 

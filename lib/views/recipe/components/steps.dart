@@ -22,7 +22,28 @@ class Steps extends StatelessWidget {
             if (step.isEmpty) return SizedBox(); // skip langkah kosong
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 6.0),
-              child: Text('${index + 1}. $step'),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${index + 1}.',
+                    style: const TextStyle(
+                      fontSize: 16, // Ukuran teks untuk nomor
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(width: 10), // Margin antara nomor dan teks
+                  Expanded(
+                    child: Text(
+                      step,
+                      style: const TextStyle(
+                        fontSize: 16, // Ukuran teks untuk langkah
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             );
           },
         ),
