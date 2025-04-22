@@ -16,6 +16,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController passwordController = TextEditingController();
 
   String? successMessage;
+  String? passwordErrorText;
 
   bool isUsernameValid = true;
   bool isPasswordValid = true;
@@ -27,6 +28,8 @@ class _RegisterPageState extends State<RegisterPage> {
           nameController.text.length <= 10;
 
       isPasswordValid = passwordController.text.length >= 5;
+      passwordErrorText =
+          isPasswordValid ? null : 'Password minimal 5 karakter';
     });
 
     if (!isUsernameValid || !isPasswordValid) return;
@@ -56,6 +59,7 @@ class _RegisterPageState extends State<RegisterPage> {
         nameController.clear();
         emailController.clear();
         passwordController.clear();
+        passwordErrorText = null;
       });
     } else if (response.statusCode == 422) {
       final responseData = jsonDecode(response.body);
@@ -160,7 +164,7 @@ class _RegisterPageState extends State<RegisterPage> {
         controller: nameController,
         maxLength: 10,
         inputFormatters: [
-          FilteringTextInputFormatter.deny(RegExp(r'\s')),
+          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
         ],
         decoration: InputDecoration(
           counterText: '',
@@ -193,32 +197,45 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildPasswordField() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: TextField(
-        controller: passwordController,
-        obscureText: true,
-        decoration: InputDecoration(
-          hintText: 'Password',
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 16,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: isPasswordValid ? Colors.grey : Colors.red,
-              width: 0.7,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: passwordController,
+            obscureText: true,
+            decoration: InputDecoration(
+              hintText: 'Password',
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: isPasswordValid ? Colors.grey : Colors.red,
+                  width: 0.7,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(
+                  color: isPasswordValid ? Colors.orange : Colors.red,
+                  width: 1,
+                ),
+              ),
             ),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: isPasswordValid ? Colors.orange : Colors.red,
-              width: 1,
+          if (passwordErrorText != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4, left: 12),
+              child: Text(
+                passwordErrorText!,
+                style: const TextStyle(color: Colors.red, fontSize: 12),
+              ),
             ),
-          ),
-        ),
+        ],
       ),
     );
   }
