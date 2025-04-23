@@ -63,46 +63,50 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
         barrierDismissible:
             false, // Mencegah pengguna menutup dialog dengan tap di luar
         builder:
-            (context) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  15,
-                ), // Membuat sudut dialog lebih halus
-              ),
-              title: Row(
-                children: [
-                  Icon(Icons.info, color: Colors.orange),
-                  SizedBox(width: 10),
-                  Text("Informasi"),
-                ],
-              ),
-              content: Text(message, style: TextStyle(fontSize: 16)),
-              actions: [
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
+            (context) => WillPopScope(
+              onWillPop:
+                  () async => false, // Mencegah back button menutup dialog
+              child: AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    25,
+                  ), // Membuat sudut dialog lebih halus
+                ),
+                title: Row(
+                  children: [
+                    Icon(Icons.info, color: Colors.orange),
+                    SizedBox(width: 10),
+                    Text("Informasi"),
+                  ],
+                ),
+                content: Text(message, style: TextStyle(fontSize: 15)),
+                actions: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 10),
                       ),
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context); // Menutup dialog
-                      if (Navigator.canPop(context)) {
-                        Navigator.pop(
-                          context,
-                        ); // Kembali ke halaman sebelumnya jika memungkinkan
-                      }
-                    },
-                    child: Text(
-                      "Oke",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      onPressed: () {
+                        Navigator.pop(context); // Menutup dialog
+                        if (Navigator.canPop(context)) {
+                          Navigator.pop(
+                            context,
+                          ); // Kembali ke halaman sebelumnya jika memungkinkan
+                        }
+                      },
+                      child: Text(
+                        "Oke",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
       );
     });
@@ -252,7 +256,6 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
     );
   }
 
-  // ❌ **Pesan Error**
   Widget _buildErrorWidget() {
     return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center));
   }

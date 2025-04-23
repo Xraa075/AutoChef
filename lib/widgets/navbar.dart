@@ -48,42 +48,50 @@ class NavbarState extends State<Navbar> {
           builder:
               (context) => AlertDialog(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(25),
                 ),
-                backgroundColor: Colors.white,
-                title: Center(
-                  child: Text(
-                    'Keluar Aplikasi',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                title: Row(
+                  children: [
+                    Icon(Icons.info, color: Colors.orange),
+                    SizedBox(width: 10),
+                    Text("Konfirmasi Keluar"),
+                  ],
                 ),
                 content: Text(
-                  'Apakah Anda yakin ingin keluar?',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16),
+                  "Apakah anda yakin ingin keluar dari aplikasi?",
+                  style: TextStyle(fontSize: 15),
                 ),
-                actionsAlignment: MainAxisAlignment.spaceEvenly,
+                actionsAlignment: MainAxisAlignment.spaceAround,
                 actions: [
                   SizedBox(
-                    width: 100,
+                    width: MediaQuery.of(context).size.width * 0.3,
                     child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(false),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.black,
-                        side: BorderSide(color: Colors.black),
                       ),
-                      child: const Text('Batal'),
+                      onPressed: () {
+                        Navigator.pop(context, false);
+                      },
+                      child: Text("Batal"),
                     ),
                   ),
                   SizedBox(
-                    width: 100,
+                    width: MediaQuery.of(context).size.width * 0.3,
                     child: ElevatedButton(
-                      onPressed: () => SystemNavigator.pop(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
-                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 10),
                       ),
-                      child: const Text('Keluar'),
+                      onPressed: () {
+                        SystemNavigator.pop(); // Keluar dari aplikasi
+                      },
+                      child: Text(
+                        "Keluar",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                     ),
                   ),
                 ],

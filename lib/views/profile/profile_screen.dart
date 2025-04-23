@@ -316,25 +316,55 @@ class ProfileScreen extends StatelessWidget {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            title: const Text("Logout"),
-                            content: const Text(
-                              "Apakah kamu yakin ingin logout?",
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
                             ),
+                            title: Row(
+                              children: [
+                                Icon(Icons.info, color: Colors.orange),
+                                SizedBox(width: 10),
+                                Text("Logout"),
+                              ],
+                            ),
+                            content: Text(
+                              "Apakah anda yakin ingin logout?",
+                              style: TextStyle(fontSize: 15),
+                            ),
+                            actionsAlignment: MainAxisAlignment.spaceAround,
                             actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, false),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Colors.orange,
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.25,
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.black,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context, false);
+                                  },
+                                  child: Text("Batal"),
                                 ),
-                                child: const Text("Batal"),
                               ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, true),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  backgroundColor: Color(0xFFD32F2F),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.25,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(25),
+                                    ),
+                                    padding: EdgeInsets.symmetric(vertical: 10),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  child: Text(
+                                    "Logout",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
                                 ),
-                                child: const Text("Logout"),
                               ),
                             ],
                           );

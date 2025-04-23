@@ -103,9 +103,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 child: Center(
                   child: Image.asset(
-                    'lib/assets/images/autochef_launcher.png',
-                    height: 100,
-                    width: 100,
+                    'lib/assets/images/splashlogodark.png',
+                    height: 250,
+                    width: 250,
                   ),
                 ),
               ),
@@ -140,11 +140,17 @@ class _LoginPageState extends State<LoginPage> {
                     vertical: 12,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(15),
                   ),
                 ),
                 onPressed: loginUser,
-                child: const Text('Login'),
+                child: const Text(
+                  'Login',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
               const SizedBox(height: 20),
               Row(
@@ -153,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
                   const Text("Don’t have an account ? "),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (_) => RegisterPage()),
                       );
@@ -177,6 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                     color: Colors.grey,
                     fontSize: 16,
                     decoration: TextDecoration.underline,
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
               ),
@@ -215,11 +222,11 @@ class _LoginPageState extends State<LoginPage> {
             vertical: 16,
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(15),
             borderSide: const BorderSide(color: Colors.grey, width: 0.7),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(15),
             borderSide: const BorderSide(color: Colors.orange, width: 1),
           ),
         ),

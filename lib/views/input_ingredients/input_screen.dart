@@ -102,18 +102,36 @@ class _InputRecipeState extends State<InputRecipe> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Informasi"),
-          content: Text(message),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.info, color: Colors.orange),
+              SizedBox(width: 10),
+              Text("Informasi"),
+            ],
+          ),
+          content: Text(message, style: TextStyle(fontSize: 15)),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.orange,
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  "Oke",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
               ),
-              child: const Text("Oke"),
             ),
           ],
         );
@@ -204,12 +222,12 @@ class _InputRecipeState extends State<InputRecipe> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 16,
-                                  vertical: 12,
+                                  vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.9),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.grey[300]!),
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color: Colors.grey!),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.grey.withOpacity(0.1),
@@ -258,13 +276,13 @@ class _InputRecipeState extends State<InputRecipe> {
                       Center(
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width * 0.5,
-                          height: 48,
+                          height: 46,
                           child: ElevatedButton(
                             onPressed: fetchRecipes,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.orange,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(15),
                               ),
                             ),
                             child: const Text(
