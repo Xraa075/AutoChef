@@ -7,6 +7,7 @@ import 'package:autochef/widgets/recommendation_item.dart';
 import 'package:autochef/widgets/healthy_food_item.dart';
 import 'package:autochef/services/api_rekomendation.dart';
 import 'package:autochef/models/recipe.dart';
+import 'package:autochef/views/recipe/recipe_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -180,6 +181,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: RecommendationItem(
                                 title: resep.namaResep,
                                 imagePath: resep.gambar,
+                                onTap: () {
+                                  print("Tapped on recipe: ${resep.namaResep}");
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailMakanan(recipe: resep),
+                                    )
+                                  );
+                                },
                               ),
                             );
                           },
@@ -211,6 +221,15 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: HealthyFoodItem(
                                 title: resep.namaResep,
                                 imagePath: resep.gambar,
+                                onTap: () {
+                                  print("Tapped on recipe: ${resep.namaResep}");
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailMakanan(recipe: resep),
+                                    ),
+                                  );
+                                },
                               ),
                             );
                           },
