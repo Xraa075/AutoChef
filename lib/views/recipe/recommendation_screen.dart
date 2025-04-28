@@ -6,14 +6,18 @@ import 'package:autochef/widgets/recipe_card.dart';
 import 'package:autochef/widgets/header.dart';
 import 'package:autochef/services/api_service.dart';
 import 'package:autochef/models/recipe.dart';
+import 'package:autochef/services/kategori_service.dart';
 
 class RekomendationRecipe extends StatefulWidget {
-  final List<String> bahan;
+  final List<String>? bahan;
+  final String? kategori; 
 
-  const RekomendationRecipe({super.key, required this.bahan});
+  const RekomendationRecipe({super.key, this.bahan, this.kategori});
 
   @override
-  _RekomendationRecipeState createState() => _RekomendationRecipeState();
+  _RekomendationRecipeState createState() => _RekomendationRecipeState(
+    
+  );
 }
 
 class _RekomendationRecipeState extends State<RekomendationRecipe> {
@@ -33,27 +37,37 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
 
   // 🔍 Fetch data dari API dengan validasi
   Future<List<Recipe>> _fetchRecipes() async {
-    try {
-      final response = await ApiService().searchRecipes(widget.bahan);
-
-      debugPrint("Fetching recipes for: ${widget.bahan}");
-      debugPrint("Response: $response");
-
-      if (response == null || response.isEmpty) {
-        throw Exception("Tidak ada data resep yang ditemukan.");
-      }
-      return response.map<Recipe>((json) => Recipe.fromJson(json)).toList();
-    } catch (e) {
-      debugPrint("Error fetching recipes: $e");
-
-      // Menampilkan pop-up error
-      _showErrorDialog(
-        "Tidak ada data resep yang ditemukan dari kombinasi bahan yang kamu masukkan.",
-      );
-
-      return Future.error("Gagal memuat data: $e");
+  try {
+    List<dynamic> response = [];
+    if (widget.bahan != null && widget.bahan!.isNotEmpty) {
+      final apiService = ApiService();
+      response = await apiService.searchRecipes(widget.bahan!);
+    } else if (widget.kategori != null && widget.kategori!.isNotEmpty) {
+      final kategoriService = KategoriService();
+      response = await kategoriService.getRecipesByKategori(widget.kategori!);
+    } else {
+      throw Exception("Bahan atau kategori harus diisi.");
     }
+
+    if (response.isEmpty) {
+      throw Exception("Data kosong.");
+    }
+
+    // VALIDASI setiap item harus Map<String, dynamic>
+    if (response.any((item) => item is! Map<String, dynamic>)) {
+      throw Exception("Format data salah.");
+    }
+
+    return response.map<Recipe>((json) => Recipe.fromJson(json)).toList();
+  } catch (e, stacktrace) {
+    debugPrint("Error fetching recipes: $e");
+    debugPrint("Stacktrace: $stacktrace");
+    _showErrorDialog("Tidak ada data resep yang ditemukan dari bahan atau kategori yang kamu pilih.");
+    return Future.error(e.toString());
   }
+}
+
+
 
   // ❌ **Pop-up Error**
   void _showErrorDialog(String message) {

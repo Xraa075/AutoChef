@@ -8,6 +8,8 @@ import 'package:autochef/widgets/healthy_food_item.dart';
 import 'package:autochef/services/api_rekomendation.dart';
 import 'package:autochef/models/recipe.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
+import 'package:autochef/services/kategori_service.dart';
+import 'package:autochef/views/recipe/recommendation_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -101,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: const Icon(Icons.search, color: Colors.black54),
                   ),
                 ),
-                SizedBox(height: 10,)
+                SizedBox(height: 10),
               ],
             ),
           ),
@@ -132,29 +134,80 @@ class _HomeScreenState extends State<HomeScreen> {
                 spacing: 16,
                 runSpacing: 16,
                 alignment: WrapAlignment.spaceBetween,
-                children: const [
+                children: [
                   CategoryItem(
                     title: "Snacks",
                     imagePath: "lib/assets/images/snacks.jpg",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  RekomendationRecipe(kategori: "snack"),
+                        ),
+                      );
+                    },
                   ),
                   CategoryItem(
                     title: "Meal",
                     imagePath: "lib/assets/images/meal.jpg",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  RekomendationRecipe(kategori: "meal"),
+                        ),
+                      );
+                    },
                   ),
                   CategoryItem(
                     title: "Vegan",
                     imagePath: "lib/assets/images/vegan.jpg",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  RekomendationRecipe(kategori: "vegan"),
+                        ),
+                      );
+                    },
                   ),
                   CategoryItem(
                     title: "Dessert",
                     imagePath: "lib/assets/images/dessert.jpg",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                RekomendationRecipe(kategori: "dessert"),
+                        ),
+                      );
+                    },
                   ),
                   CategoryItem(
                     title: "Drinks",
                     imagePath: "lib/assets/images/drinks.jpg",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  RekomendationRecipe(kategori: "drink"),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
+
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -186,8 +239,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => DetailMakanan(recipe: resep),
-                                    )
+                                      builder:
+                                          (context) =>
+                                              DetailMakanan(recipe: resep),
+                                    ),
                                   );
                                 },
                               ),
@@ -217,7 +272,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           itemBuilder: (context, index) {
                             final resep = _rekomendasi[index];
                             return Padding(
-                              padding: const EdgeInsets.only(right: 10, bottom: 10,),
+                              padding: const EdgeInsets.only(
+                                right: 10,
+                                bottom: 10,
+                              ),
                               child: HealthyFoodItem(
                                 title: resep.namaResep,
                                 imagePath: resep.gambar,
@@ -226,7 +284,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => DetailMakanan(recipe: resep),
+                                      builder:
+                                          (context) =>
+                                              DetailMakanan(recipe: resep),
                                     ),
                                   );
                                 },
