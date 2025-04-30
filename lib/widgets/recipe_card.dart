@@ -1,5 +1,3 @@
-//Reusable UI components
-
 import 'package:flutter/material.dart';
 import 'package:autochef/models/recipe.dart';
 
@@ -7,7 +5,12 @@ class RecipeCard extends StatelessWidget {
   final Recipe recipe;
   final VoidCallback? onTap;
 
-  const RecipeCard({super.key, required this.recipe, this.onTap, required String image});
+  const RecipeCard({
+    super.key,
+    required this.recipe,
+    this.onTap,
+    required String image,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +18,6 @@ class RecipeCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: EdgeInsets.only(top: 15),
-        //color: Colors.white,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
@@ -28,8 +30,6 @@ class RecipeCard extends StatelessWidget {
             ),
           ],
         ),
-        // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        // elevation: 3,
         child: Padding(
           padding: const EdgeInsets.only(right: 15),
           child: Row(
@@ -44,6 +44,18 @@ class RecipeCard extends StatelessWidget {
                   width: 120,
                   height: 120,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 120,
+                      height: 120,
+                      color: Colors.grey[200],
+                      child: const Icon(
+                        Icons.broken_image,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(width: 10),
@@ -65,29 +77,10 @@ class RecipeCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-
-                    // Text(
-                    //   "Kalori: ${recipe.calories} kalori",
-                    //   style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                    // ),
                     const SizedBox(height: 5),
                     Row(
                       children: [
-                        // const Icon(
-                        //   Icons.access_time,
-                        //   size: 14,
-                        //   color: Colors.red,
-                        // ),
-                        // Text(
-                        //   " ${recipe.time} Menit",
-                        //   style: const TextStyle(fontSize: 12),
-                        // ),
                         const SizedBox(width: 10),
-                        // const Icon(Icons.star, size: 14, color: Colors.orange),
-                        // Text(
-                        //   " ${recipe.difficulity}",
-                        //   style: const TextStyle(fontSize: 12),
-                        // ),
                       ],
                     ),
                   ],

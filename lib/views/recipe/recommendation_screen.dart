@@ -8,26 +8,21 @@ import 'package:autochef/services/api_service.dart';
 import 'package:autochef/models/recipe.dart';
 import 'package:autochef/services/kategori_service.dart';
 
+/// Widget utama untuk menampilkan daftar rekomendasi resep
+/// berdasarkan bahan atau kategori yang dipilih pengguna
 class RekomendationRecipe extends StatefulWidget {
   final List<String>? bahan;
-  final String? kategori; 
+  final String? kategori;
 
   const RekomendationRecipe({super.key, this.bahan, this.kategori});
 
   @override
-  _RekomendationRecipeState createState() => _RekomendationRecipeState(
-    
-  );
+  _RekomendationRecipeState createState() => _RekomendationRecipeState();
 }
 
 class _RekomendationRecipeState extends State<RekomendationRecipe> {
   late Future<List<Recipe>> _futureRecipes;
   final ScrollController _scrollController = ScrollController();
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
 
   @override
   void initState() {
@@ -35,93 +30,92 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
     _futureRecipes = _fetchRecipes();
   }
 
-  // 🔍 Fetch data dari API dengan validasi
-  Future<List<Recipe>> _fetchRecipes() async {
-  try {
-    List<dynamic> response = [];
-    if (widget.bahan != null && widget.bahan!.isNotEmpty) {
-      final apiService = ApiService();
-      response = await apiService.searchRecipes(widget.bahan!);
-    } else if (widget.kategori != null && widget.kategori!.isNotEmpty) {
-      final kategoriService = KategoriService();
-      response = await kategoriService.getRecipesByKategori(widget.kategori!);
-    } else {
-      throw Exception("Bahan atau kategori harus diisi.");
-    }
-
-    if (response.isEmpty) {
-      throw Exception("Data kosong.");
-    }
-
-    // VALIDASI setiap item harus Map<String, dynamic>
-    if (response.any((item) => item is! Map<String, dynamic>)) {
-      throw Exception("Format data salah.");
-    }
-
-    return response.map<Recipe>((json) => Recipe.fromJson(json)).toList();
-  } catch (e, stacktrace) {
-    debugPrint("Error fetching recipes: $e");
-    debugPrint("Stacktrace: $stacktrace");
-    _showErrorDialog("Tidak ada data resep yang ditemukan dari bahan atau kategori yang kamu pilih.");
-    return Future.error(e.toString());
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
-}
 
+  /// Mengambil data resep dari API berdasarkan bahan atau kategori
+  Future<List<Recipe>> _fetchRecipes() async {
+    try {
+      List<dynamic> response = [];
 
+      if (widget.bahan != null && widget.bahan!.isNotEmpty) {
+        final apiService = ApiService();
+        response = await apiService.searchRecipes(widget.bahan!);
+      } else if (widget.kategori != null && widget.kategori!.isNotEmpty) {
+        final kategoriService = KategoriService();
+        response = await kategoriService.getRecipesByKategori(widget.kategori!);
+      } else {
+        throw Exception("Bahan atau kategori harus diisi.");
+      }
 
-  // ❌ **Pop-up Error**
+      if (response.isEmpty) {
+        throw Exception("Data kosong.");
+      }
+
+      if (response.any((item) => item is! Map<String, dynamic>)) {
+        throw Exception("Format data salah.");
+      }
+
+      return response.map<Recipe>((json) => Recipe.fromJson(json)).toList();
+    } catch (e, stacktrace) {
+      debugPrint("Error fetching recipes: $e");
+      debugPrint("Stacktrace: $stacktrace");
+      _showErrorDialog(
+        "Tidak ada data resep yang ditemukan dari bahan atau kategori yang kamu pilih.",
+      );
+      return Future.error(e.toString());
+    }
+  }
+
+  /// Menampilkan dialog error jika terjadi kesalahan saat mengambil data
   void _showErrorDialog(String message) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showDialog(
         context: context,
-        barrierDismissible:
-            false, // Mencegah pengguna menutup dialog dengan tap di luar
-        builder:
-            (context) => WillPopScope(
-              onWillPop:
-                  () async => false, // Mencegah back button menutup dialog
-              child: AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    25,
-                  ), // Membuat sudut dialog lebih halus
-                ),
-                title: Row(
-                  children: [
-                    Icon(Icons.info, color: Colors.orange),
-                    SizedBox(width: 10),
-                    Text("Informasi"),
-                  ],
-                ),
-                content: Text(message, style: TextStyle(fontSize: 15)),
-                actions: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context); // Menutup dialog
-                        if (Navigator.canPop(context)) {
-                          Navigator.pop(
-                            context,
-                          ); // Kembali ke halaman sebelumnya jika memungkinkan
-                        }
-                      },
-                      child: Text(
-                        "Oke",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        barrierDismissible: false,
+        builder: (context) => WillPopScope(
+          onWillPop: () async => false,
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
             ),
+            title: Row(
+              children: [
+                Icon(Icons.info, color: Colors.orange),
+                SizedBox(width: 10),
+                Text("Informasi"),
+              ],
+            ),
+            content: Text(message, style: TextStyle(fontSize: 15)),
+            actions: [
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    if (Navigator.canPop(context)) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Text(
+                    "Oke",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     });
   }
@@ -167,13 +161,9 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                       child: FutureBuilder<List<Recipe>>(
                         future: _futureRecipes,
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
                             return _buildShimmerLoading();
-                          } else if (snapshot.data == null ||
-                              snapshot.data!.isEmpty) {
-                            return _buildErrorWidget();
-                          } else if (snapshot.hasError) {
+                          } else if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
                             return _buildErrorWidget();
                           }
 
@@ -182,7 +172,6 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                             controller: _scrollController,
                             thumbVisibility: true,
                             radius: Radius.circular(8),
-
                             interactive: true,
                             thickness: 8,
                             child: ListView.builder(
@@ -197,9 +186,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder:
-                                            (context) =>
-                                                DetailMakanan(recipe: recipe),
+                                        builder: (context) => DetailMakanan(recipe: recipe),
                                       ),
                                     );
                                   },
@@ -221,34 +208,39 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
     );
   }
 
-  // 🖼 **Perbaikan: CachedNetworkImage dengan Validasi URL**
+  /// Widget gambar resep dengan validasi URL dan efek loading shimmer
   Widget _buildImage(String? imageUrl) {
     if (imageUrl == null || imageUrl.isEmpty) {
-      return Image.asset("assets/images/placeholder.png", fit: BoxFit.cover);
+      return Container(
+        color: Colors.grey[200],
+        height: 150,
+        child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+      );
     }
 
     return CachedNetworkImage(
-      imageUrl: Uri.encodeFull(imageUrl), // Encode URL untuk menghindari error
-      placeholder:
-          (context, url) => Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              width: double.infinity,
-              height: 150,
-              color: Colors.white,
-            ),
-          ),
-      errorWidget:
-          (context, url, error) => Image.asset(
-            "assets/images/placeholder.png", // Gunakan gambar default jika gagal
-            fit: BoxFit.cover,
-          ),
+      imageUrl: Uri.encodeFull(imageUrl),
+      placeholder: (context, url) => Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Container(
+          width: double.infinity,
+          height: 150,
+          color: Colors.white,
+        ),
+      ),
+      errorWidget: (context, url, error) => Container(
+        color: Colors.grey[200],
+        height: 150,
+        child: const Center(
+          child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
+        ),
+      ),
       fit: BoxFit.cover,
     );
   }
 
-  // 🔄 **Shimmer Loading**
+  /// Widget loading shimmer sebagai placeholder saat data sedang dimuat
   Widget _buildShimmerLoading() {
     return ListView.builder(
       itemCount: 5,
@@ -270,24 +262,20 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
     );
   }
 
+  /// Widget fallback saat terjadi error atau data kosong
   Widget _buildErrorWidget() {
-    return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center));
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.error_outline, size: 60, color: Colors.grey),
+          SizedBox(height: 10),
+          Text(
+            "Data tidak ditemukan.",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
   }
-
-  // 📭 **Tidak Ada Data**
-  // Widget _buildNoDataWidget() {
-  //   return Center(
-  //     child: Column(
-  //       mainAxisAlignment: MainAxisAlignment.center,
-  //       children: [
-  //         Image.asset("assets/images/no_data.png", width: 200),
-  //         const SizedBox(height: 10),
-  //         const Text(
-  //           "Resep tidak ditemukan!",
-  //           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }
