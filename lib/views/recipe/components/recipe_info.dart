@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 
 class RecipeInfo extends StatelessWidget {
-  final String time;
-  final String calories;
-  final String protein;
-  final String carbs;
+  final int waktu;
+  final int kalori;
+  final int protein;  
+  final int karbohidrat;
 
   const RecipeInfo({
-    required this.time,
-    required this.calories,
+    super.key,
+    required this.waktu,
+    required this.kalori,
     required this.protein,
-    required this.carbs,
+    required this.karbohidrat,
   });
 
   @override
@@ -18,10 +19,10 @@ class RecipeInfo extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildInfoItem(Icons.restaurant, "$time", "menit"),
-        _buildInfoItem(Icons.local_fire_department, "$calories", "kalori"),
+        _buildInfoItem(Icons.restaurant, "$waktu", "menit"),
+        _buildInfoItem(Icons.local_fire_department, "$kalori", "kalori"),
         _buildInfoItem(Icons.fastfood, "$protein g", "protein"),
-        _buildInfoItem(Icons.lunch_dining, "$carbs g", "karbohidrat"),
+        _buildInfoItem(Icons.lunch_dining, "$karbohidrat g", "karbohidrat"),
       ],
     );
   }

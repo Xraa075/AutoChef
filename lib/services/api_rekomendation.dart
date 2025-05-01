@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/recipe.dart';
 
 class ApiRekomendasi {
-  static const String baseUrl = 'http://156.67.214.60/api/resepmakanan/rekomendasi';
+  static const String baseUrl = 'http://localhost:8000/api/resepmakanan/rekomendasi';
 
   static Future<List<Recipe>> fetchRekomendasi() async {
     try {

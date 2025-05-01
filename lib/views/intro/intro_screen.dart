@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/models/intro.dart';
-import 'package:autochef/widgets/navbar.dart';
-import 'package:autochef/views/input_ingredients/input_screen.dart';
 
 class IntroScreen extends StatefulWidget {
   const IntroScreen({super.key});

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:autochef/models/recipe.dart';
 import 'package:autochef/views/recipe/components/recipe_info.dart';
-import 'components/ingredients.dart';
-import 'components/steps.dart';
+import 'package:autochef/views/recipe/components/ingredients.dart';
+import 'package:autochef/views/recipe/components/steps.dart';
 
 class DetailMakanan extends StatelessWidget {
   final Recipe recipe;
@@ -51,16 +51,13 @@ class DetailMakanan extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                   decoration: BoxDecoration(
-                    color:
-                        Colors
-                            .white, // Hilangkan efek transparan agar lebih ringan
+                    color: Colors.white,
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(30),
                     ),
                   ),
                   child: ListView(
-                    controller:
-                        scrollController, // Gunakan ListView agar lebih optimal
+                    controller: scrollController,
                     children: [
                       Container(
                         alignment: Alignment.center,
@@ -82,16 +79,43 @@ class DetailMakanan extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 15),
-                      // RecipeInfo(
-                      //   time: recipe.time.toString(),
-                      //   calories: recipe.calories.toString(),
-                      //   protein: recipe.protein.toString(),
-                      //   carbs: recipe.carbs.toString(),
-                      // ),
+
+
+ /// **Kategori dan Negara**
+                        Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                          "${recipe.negara}",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: const Color.fromARGB(121, 0, 0, 0),
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.5,
+                          ),
+                          ),
+                        ],
+                        ),
+                        SizedBox(height: 20),
+
+                      
+                      /// **Informasi Resep**
+                      RecipeInfo(
+                        waktu: recipe.waktu,
+                        kalori: recipe.kalori,
+                        protein: recipe.protein,
+                        karbohidrat: recipe.karbohidrat,
+                      ),
                       SizedBox(height: 20),
-                       Ingredients(ingredients: recipe.bahan?.split(",") ?? []),
+
+                     
+
+                      /// **Bahan-bahan**
+                      Ingredients(ingredients: recipe.bahan.split(",") ?? []),
                       SizedBox(height: 20),
-                      Steps(steps: recipe.steps?.split(".") ?? []), 
+
+                      /// **Langkah-langkah**
+                      Steps(steps: recipe.steps.split(".") ?? []),
                     ],
                   ),
                 ),
