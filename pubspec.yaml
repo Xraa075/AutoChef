@@ -19,6 +19,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   fluttertoast: ^8.2.12
   flutter_native_splash: ^2.4.6
+  connectivity_plus: ^5.0.2
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class InputRecipe extends StatefulWidget {
   const InputRecipe({super.key});
@@ -14,11 +15,12 @@ class InputRecipe extends StatefulWidget {
 
 class _InputRecipeState extends State<InputRecipe> {
   final List<TextEditingController> controllers = [];
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _addInputField(); // Mulai dengan 1 input field
+    _addInputField();
   }
 
   void _addInputField() {
@@ -52,14 +54,20 @@ class _InputRecipeState extends State<InputRecipe> {
     List<String> bahan =
         controllers.map((controller) => controller.text.trim()).toList();
 
-    // Validasi jika input kosong
     if (bahan.isEmpty || bahan.every((element) => element.isEmpty)) {
       _showPopup("Harap masukkan minimal satu bahan.");
       return;
     }
 
-    String bahanQuery = bahan.join(',');
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      _showPopup("Kamu sedang offline. Periksa koneksi internetmu.");
+      return;
+    }
 
+    setState(() => isLoading = true);
+
+    String bahanQuery = bahan.join(',');
     String url = 'http://156.67.214.60/api/resepmakanan?bahan=$bahanQuery';
 
     try {
@@ -90,9 +98,9 @@ class _InputRecipeState extends State<InputRecipe> {
       }
     } catch (e) {
       debugPrint("Error: $e");
-      _showPopup(
-        "Terjadi kesalahan saat mengambil data. Periksa koneksi internetmu.",
-      );
+      _showPopup("Terjadi kesalahan saat mengambil data. Coba lagi nanti.");
+    } finally {
+      setState(() => isLoading = false);
     }
   }
 
@@ -251,8 +259,7 @@ class _InputRecipeState extends State<InputRecipe> {
                                         ),
                                       ),
                                     ),
-                                    if (controllers.length >
-                                        1) // Tidak hapus jika hanya 1
+                                    if (controllers.length > 1)
                                       IconButton(
                                         icon: const Icon(
                                           Icons.delete,
@@ -274,20 +281,26 @@ class _InputRecipeState extends State<InputRecipe> {
                           width: MediaQuery.of(context).size.width * 0.5,
                           height: 45,
                           child: ElevatedButton(
-                            onPressed: fetchRecipes,
+                            onPressed: isLoading ? null : fetchRecipes,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Color(0xFFF46A06),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
                             ),
-                            child: const Text(
-                              'Cari',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                              ),
-                            ),
+                            child:
+                                isLoading
+                                    ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    )
+                                    : const Text(
+                                      'Cari',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                           ),
                         ),
                       ),
