@@ -123,90 +123,57 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ListView(
             children: [
               Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: const Text(
-                  "Categories",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                alignment: WrapAlignment.spaceBetween,
-                children: [
-                  CategoryItem(
-                    title: "Snacks",
-                    imagePath: "lib/assets/images/snacks.jpg",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  RekomendationRecipe(kategori: "snack"),
-                        ),
-                      );
-                    },
-                  ),
-                  CategoryItem(
-                    title: "Meal",
-                    imagePath: "lib/assets/images/meal.jpg",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  RekomendationRecipe(kategori: "meal"),
-                        ),
-                      );
-                    },
-                  ),
-                  CategoryItem(
-                    title: "Vegan",
-                    imagePath: "lib/assets/images/vegan.jpg",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  RekomendationRecipe(kategori: "vegan"),
-                        ),
-                      );
-                    },
-                  ),
-                  CategoryItem(
-                    title: "Dessert",
-                    imagePath: "lib/assets/images/dessert.jpg",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                RekomendationRecipe(kategori: "dessert"),
-                        ),
-                      );
-                    },
-                  ),
-                  CategoryItem(
-                    title: "Drinks",
-                    imagePath: "lib/assets/images/drinks.jpg",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  RekomendationRecipe(kategori: "drink"),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+    padding: const EdgeInsets.all(20.0),
+    child: const Text(
+      "Categories",
+      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+    ),
+  ),
+  const SizedBox(height: 10),
+  SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: Row(
+      children: const [
+        SizedBox(width: 10),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: CategoryItem(
+            title: "Snacks",
+            imagePath: "lib/assets/images/snacks.jpg",
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: CategoryItem(
+            title: "Meal",
+            imagePath: "lib/assets/images/meal.jpg",
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: CategoryItem(
+            title: "Vegan",
+            imagePath: "lib/assets/images/vegan.jpg",
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: CategoryItem(
+            title: "Dessert",
+            imagePath: "lib/assets/images/dessert.jpg",
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          child: CategoryItem(
+            title: "Drinks",
+            imagePath: "lib/assets/images/drinks.jpg",
+          ),
+        ),
+        SizedBox(width: 10),
+      ],
+    ),
+  ),
 
               const SizedBox(height: 20),
               Padding(

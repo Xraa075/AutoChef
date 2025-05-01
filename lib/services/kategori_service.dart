@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class KategoriService {
-  static const String baseUrl = "http://localhost:8000/api/resepmakanan"; // Pastikan URL betul
+  static const String baseUrl = "http://156.67.214.60/api/resepmakanan"; // Pastikan URL betul
 
   // 🔍 Fungsi untuk mencari resep berdasarkan banyak kategori
   Future<List<Map<String, dynamic>>> searchRecipes(List<String> kategori) async {

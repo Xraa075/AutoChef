@@ -25,6 +25,18 @@ class DetailMakanan extends StatelessWidget {
               height: 292,
               fit: BoxFit.cover,
               filterQuality: FilterQuality.high,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: double.infinity,
+                  height: 292,
+                  color: Colors.grey[300],
+                  child: Icon(
+                    Icons.broken_image,
+                    color: Colors.grey[700],
+                    size: 80,
+                  ),
+                );
+              },
             ),
           ),
 
@@ -107,12 +119,14 @@ class DetailMakanan extends StatelessWidget {
                         karbohidrat: recipe.karbohidrat,
                       ),
                       SizedBox(height: 20),
+                      Ingredients(ingredients: recipe.bahan?.split(",") ?? []),
 
                      
 
                       /// **Bahan-bahan**
                       Ingredients(ingredients: recipe.bahan.split(",") ?? []),
                       SizedBox(height: 20),
+                      Steps(steps: recipe.steps?.split(".") ?? []),
 
                       /// **Langkah-langkah**
                       Steps(steps: recipe.steps.split(".") ?? []),
