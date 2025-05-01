@@ -1,7 +1,7 @@
-import 'package:autochef/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:autochef/login/login.dart';
 import 'package:autochef/models/intro.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -77,7 +77,7 @@ class IntroScreenState extends State<IntroScreen> {
                 child: ElevatedButton(
                   onPressed: nextPage,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
+                    backgroundColor: Color(0xFFF46A06),
                     foregroundColor: Colors.white,
                     minimumSize: const Size(234, 60),
                     shape: RoundedRectangleBorder(
@@ -111,7 +111,7 @@ class IntroScreenState extends State<IntroScreen> {
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: Colors.orange,
+            color: Color(0xFFF46A06),
           ),
         ),
         const SizedBox(height: 10),
@@ -134,7 +134,7 @@ class IntroScreenState extends State<IntroScreen> {
       height: currentPage == index ? 12 : 8,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: currentPage == index ? Colors.orange : Colors.grey[400],
+        color: currentPage == index ? Color(0xFFF46A06) : Colors.grey,
       ),
     );
   }

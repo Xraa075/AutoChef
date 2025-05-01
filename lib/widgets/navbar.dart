@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:autochef/views/input_ingredients/input_screen.dart';
-import 'package:autochef/views/profile/profile_screen.dart';
-import 'package:autochef/views/notifications/notification_screen.dart';
 import 'package:autochef/views/home/home_screen.dart';
+import 'package:autochef/views/profile/profile_screen.dart';
+import 'package:autochef/views/input_ingredients/input_screen.dart';
 
 class Navbar extends StatefulWidget {
   const Navbar({super.key});
@@ -14,12 +13,7 @@ class Navbar extends StatefulWidget {
 
 class NavbarState extends State<Navbar> {
   int selectedIndex = 0;
-  final List<Widget> pages = [
-    //Ini navigasi navbar ke halaman masing masing, jumlahnya sesuai dengan jumlah icon di navbar
-    HomeScreen(),
-    InputRecipe(),
-    ProfileScreen(),
-  ];
+  final List<Widget> pages = [HomeScreen(), InputRecipe(), ProfileScreen()];
 
   void onNavTapped(int index) {
     setState(() {
@@ -48,11 +42,11 @@ class NavbarState extends State<Navbar> {
           builder:
               (context) => AlertDialog(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
+                  borderRadius: BorderRadius.circular(30),
                 ),
                 title: Row(
                   children: [
-                    Icon(Icons.info, color: Colors.orange),
+                    Icon(Icons.info, color: Color(0xFFF46A06)),
                     SizedBox(width: 10),
                     Text("Konfirmasi Keluar"),
                   ],
@@ -77,20 +71,17 @@ class NavbarState extends State<Navbar> {
                   ),
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.3,
+                    height: 45,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        padding: EdgeInsets.symmetric(vertical: 10),
+                        backgroundColor: Color(0xFFF46A06),
                       ),
                       onPressed: () {
-                        SystemNavigator.pop(); // Keluar dari aplikasi
+                        SystemNavigator.pop();
                       },
                       child: Text(
                         "Keluar",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
@@ -131,11 +122,11 @@ class NavbarState extends State<Navbar> {
               selectedIndex: selectedIndex,
               destinations: const [
                 NavigationDestination(
-                  icon: Icon(Icons.home_filled, size: 30, color: Colors.white),
+                  icon: Icon(Icons.home_rounded, size: 30, color: Colors.white),
                   selectedIcon: Icon(
-                    Icons.home_filled,
+                    Icons.home_rounded,
                     size: 30,
-                    color: Colors.orange,
+                    color: Color(0xFFF46A06),
                   ),
                   label: '',
                 ),
@@ -148,7 +139,7 @@ class NavbarState extends State<Navbar> {
                   selectedIcon: Icon(
                     Icons.search_rounded,
                     size: 30,
-                    color: Colors.orange,
+                    color: Color(0xFFF46A06),
                   ),
                   label: '',
                 ),
@@ -157,7 +148,7 @@ class NavbarState extends State<Navbar> {
                   selectedIcon: Icon(
                     Icons.person,
                     size: 30,
-                    color: Colors.orange,
+                    color: Color(0xFFF46A06),
                   ),
                   label: '',
                 ),
@@ -169,58 +160,3 @@ class NavbarState extends State<Navbar> {
     );
   }
 }
-
-//Bagian ini akan digunakan untuk menampilkan halaman Home, Input Bahan, Notifikasi, dan Profil pada sprint selanjutnya
-
-// import 'package:flutter/material.dart';
-// import 'package:autochef/views/input_ingredients/input_screen.dart';
-// import 'package:autochef/views/profile/profile_screen.dart';
-// import 'package:autochef/views/notifications/notification_screen.dart';
-// import 'package:autochef/views/home/home_screen.dart';
-
-// class Navbar extends StatefulWidget {
-//   const Navbar({super.key});
-
-//   @override
-//   NavbarState createState() => NavbarState();
-// }
-
-// class NavbarState extends State<Navbar> {
-//   int selectedIndex = 0;
-
-//   final List<Widget> pages = [
-//     HomeScreen(),         // Halaman Home
-//     InputRecipe(),        // Halaman Input Bahan
-//     NotificationScreen(), // Halaman Notifikasi
-//     ProfileScreen(),      // Halaman Profil
-//   ];
-
-//   void onNavTapped(int index) {
-//     setState(() {
-//       selectedIndex = index;
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: pages[selectedIndex],
-//       bottomNavigationBar: BottomNavigationBar(
-//         currentIndex: selectedIndex,
-//         onTap: onNavTapped,
-//         backgroundColor: Colors.white,
-//         selectedItemColor: Colors.orange,
-//         unselectedItemColor: Colors.grey,
-//         type: BottomNavigationBarType.fixed,
-//         showSelectedLabels: false,
-//         showUnselectedLabels: false,
-//         items: const [
-//           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-//           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Bahan'),
-//           BottomNavigationBarItem(icon: Icon(Icons.notifications), label: 'Notifikasi'),
-//           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
-//         ],
-//       ),
-//     );
-//   }
-// }

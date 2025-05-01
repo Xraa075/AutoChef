@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'regis.dart';
 import 'package:autochef/widgets/navbar.dart';
 import 'package:http/http.dart' as http;
+import 'regis.dart';
+import 'dart:io';
 import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({super.key});
+  const LoginPage({super.key});
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -18,6 +19,29 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   String? errorMessage;
 
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+
+  void hideLoadingDialog() {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+  }
+
   Future<void> loginUser() async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       setState(() {
@@ -25,47 +49,62 @@ class _LoginPageState extends State<LoginPage> {
       });
       return;
     }
-
-    final response = await http.post(
-      Uri.parse('http://156.67.214.60/api/login'),
-      headers: {'Accept': 'application/json'},
-      body: {
-        'email': emailController.text,
-        'password': passwordController.text,
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-
-      String username = data['user']['name'];
-      String email = data['user']['email'];
-
-      await prefs.setBool('hasLoggedAsUser', true);
-      await prefs.setBool('hasLoggedAsGuest', false);
-      await prefs.setString('username', username);
-      await prefs.setString('email', data['user']['email']);
-      await prefs.setString('userImage', 'lib/assets/images/default_user.png');
-
-      print('Login berhasil: ${data['user']['name']}');
-      setState(() {
-        errorMessage = null; // Reset error message
-      });
-      // Arahkan ke halaman dashboard
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const Navbar()),
-        (route) => false,
+    showLoadingDialog();
+    try {
+      final response = await http.post(
+        Uri.parse('http://156.67.214.60/api/login'),
+        headers: {'Accept': 'application/json'},
+        body: {
+          'email': emailController.text,
+          'password': passwordController.text,
+        },
       );
-    } else if (response.statusCode == 401) {
+      hideLoadingDialog();
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+
+        String username = data['user']['name'];
+        String email = data['user']['email'];
+
+        await prefs.setBool('hasLoggedAsUser', true);
+        await prefs.setBool('hasLoggedAsGuest', false);
+        await prefs.setString('username', username);
+        await prefs.setString('email', email);
+        await prefs.setString(
+          'userImage',
+          'lib/assets/images/default_user.png',
+        );
+
+        setState(() {
+          errorMessage = null;
+        });
+
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const Navbar()),
+          (route) => false,
+        );
+      } else if (response.statusCode == 401) {
+        setState(() {
+          errorMessage = 'Akun tidak ditemukan atau password salah';
+        });
+      } else {
+        setState(() {
+          errorMessage = 'Terjadi kesalahan. Coba lagi nanti.';
+        });
+      }
+    } on SocketException {
+      hideLoadingDialog();
       setState(() {
-        errorMessage = 'Akun tidak ditemukan atau password salah';
+        errorMessage = 'Tidak ada koneksi internet. Periksa jaringan Anda.';
       });
-    } else {
+    } catch (e) {
+      hideLoadingDialog();
       setState(() {
-        errorMessage = 'Terjadi kesalahan. Coba lagi nanti.';
+        errorMessage = 'Terjadi kesalahan tak terduga.';
       });
+      debugPrint('Error saat login: $e');
     }
   }
 
@@ -89,101 +128,117 @@ class _LoginPageState extends State<LoginPage> {
         return false;
       },
       child: Scaffold(
-        body: SingleChildScrollView(
+        backgroundColor: const Color(0xFFFBC72A),
+        body: SafeArea(
           child: Column(
             children: [
-              Container(
-                height: 200,
-                decoration: const BoxDecoration(
-                  color: Colors.amber,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
-                ),
-                child: Center(
-                  child: Image.asset(
-                    'lib/assets/images/splashlogodark.png',
-                    height: 250,
-                    width: 250,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Sign in',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              if (errorMessage != null)
-                Padding(
+              Image.asset('lib/assets/images/splashlogodark.png', height: 200),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    errorMessage!,
-                    style: const TextStyle(color: Colors.red, fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              const SizedBox(height: 10),
-              _buildTextField('Email', controller: emailController),
-              _buildTextField(
-                'Password',
-                controller: passwordController,
-                isPassword: true,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-                onPressed: loginUser,
-                child: const Text(
-                  'Login',
-                  style: TextStyle(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Don’t have an account ? "),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => RegisterPage()),
-                      );
-                    },
-                    child: const Text(
-                      "Register Now",
-                      style: TextStyle(
-                        color: Colors.orange,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 30),
-              GestureDetector(
-                onTap: () => loginAsGuest(context),
-                child: const Text(
-                  "Login sebagai Guest",
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 16,
-                    decoration: TextDecoration.underline,
-                    fontStyle: FontStyle.italic,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 30),
+                        const Text(
+                          'Login',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        if (errorMessage != null)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: Text(
+                              errorMessage!,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 16,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        const SizedBox(height: 10),
+                        _buildTextField('Email', controller: emailController),
+                        _buildTextField(
+                          'Password',
+                          controller: passwordController,
+                          isPassword: true,
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          height: 45,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFFF46A06),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            onPressed: loginUser,
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Don’t have an account? "),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => RegisterPage(),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                "Register Now",
+                                style: TextStyle(
+                                  color: Color(0xFFF46A06),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 30),
+                        GestureDetector(
+                          onTap: () => loginAsGuest(context),
+                          child: const Text(
+                            "Login sebagai Guest",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                              decoration: TextDecoration.underline,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -200,7 +255,7 @@ class _LoginPageState extends State<LoginPage> {
     bool isPassword = false,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
@@ -227,7 +282,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: Colors.orange, width: 1),
+            borderSide: const BorderSide(color: Color(0xFFF46A06), width: 1),
           ),
         ),
       ),

@@ -247,6 +247,10 @@ class ProfileScreen extends StatelessWidget {
     await prefs.setBool('hasLoggedAsGuest', false);
     await prefs.setBool('hasLoggedAsUser', false);
 
+    await prefs.remove('username');
+    await prefs.remove('email');
+    await prefs.remove('userImage');
+
     Navigator.pushNamedAndRemoveUntil(context, Routes.login, (route) => false);
   }
 
@@ -299,7 +303,7 @@ class ProfileScreen extends StatelessWidget {
                         child: Center(
                           child: Text(
                             "Belum ada data",
-                            style: TextStyle(color: Colors.grey[400]),
+                            style: TextStyle(color: Colors.grey),
                           ),
                         ),
                       ),
@@ -317,23 +321,24 @@ class ProfileScreen extends StatelessWidget {
                         builder: (context) {
                           return AlertDialog(
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(25),
+                              borderRadius: BorderRadius.circular(30),
                             ),
                             title: Row(
                               children: [
-                                Icon(Icons.info, color: Colors.orange),
+                                Icon(Icons.info, color: Color(0xFFF46A06)),
                                 SizedBox(width: 10),
-                                Text("Logout"),
+                                Text("Konfirmasi Logout"),
                               ],
                             ),
                             content: Text(
-                              "Apakah anda yakin ingin logout?",
+                              "Apakah anda yakin ingin logout dari akun saat ini?",
                               style: TextStyle(fontSize: 15),
                             ),
                             actionsAlignment: MainAxisAlignment.spaceAround,
                             actions: [
                               SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.25,
+                                width: MediaQuery.of(context).size.width * 0.3,
+                                height: 45,
                                 child: OutlinedButton(
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: Colors.black,
@@ -345,24 +350,18 @@ class ProfileScreen extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.25,
+                                width: MediaQuery.of(context).size.width * 0.3,
+                                height: 45,
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orange,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(25),
-                                    ),
-                                    padding: EdgeInsets.symmetric(vertical: 10),
+                                    backgroundColor: Color(0xFFF46A06),
                                   ),
                                   onPressed: () {
                                     Navigator.pop(context, true);
                                   },
                                   child: Text(
                                     "Logout",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
+                                    style: TextStyle(color: Colors.white),
                                   ),
                                 ),
                               ),

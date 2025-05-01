@@ -1,8 +1,9 @@
-import 'package:autochef/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
+import 'login.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({super.key});
@@ -16,13 +17,57 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  String? successMessage;
+  String? errorMessage;
   String? passwordErrorText;
 
   bool isUsernameValid = true;
   bool isPasswordValid = true;
 
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+
+  void hideLoadingDialog() {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+  }
+
   Future<void> registerUser(BuildContext context) async {
+    // Pengecekan form kosong
+    if (nameController.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Username tidak boleh kosong';
+      });
+      return;
+    }
+    if (emailController.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Email tidak boleh kosong';
+      });
+      return;
+    }
+    if (passwordController.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Password tidak boleh kosong';
+      });
+      return;
+    }
+
     setState(() {
       isUsernameValid =
           nameController.text.isNotEmpty &&
@@ -36,44 +81,48 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (!isUsernameValid || !isPasswordValid) return;
 
-    if (nameController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Semua field harus diisi')));
-      return;
-    }
-
-    final response = await http.post(
-      Uri.parse('http://156.67.214.60/api/register'),
-      headers: {'Accept': 'application/json'},
-      body: {
-        'name': nameController.text,
-        'email': emailController.text,
-        'password': passwordController.text,
-      },
-    );
-
-    if (response.statusCode == 200) {
+    showLoadingDialog();
+    try {
+      final response = await http.post(
+        Uri.parse('http://156.67.214.60/api/register'),
+        headers: {'Accept': 'application/json'},
+        body: {
+          'name': nameController.text,
+          'email': emailController.text,
+          'password': passwordController.text,
+        },
+      );
+      hideLoadingDialog();
+      if (response.statusCode == 200) {
+        setState(() {
+          errorMessage = 'Registrasi berhasil';
+          nameController.clear();
+          emailController.clear();
+          passwordController.clear();
+          passwordErrorText = null;
+        });
+      } else if (response.statusCode == 422) {
+        final responseData = jsonDecode(response.body);
+        final errorMessage =
+            responseData['errors']['email']?.first ?? 'Gagal registrasi';
+        setState(() {
+          this.errorMessage = errorMessage;
+        });
+      } else {
+        setState(() {
+          errorMessage = 'Gagal: ${response.body}';
+        });
+      }
+    } on SocketException {
+      hideLoadingDialog();
       setState(() {
-        successMessage = 'Registrasi berhasil';
-        nameController.clear();
-        emailController.clear();
-        passwordController.clear();
-        passwordErrorText = null;
+        errorMessage = 'Tidak ada koneksi internet. Periksa jaringan Anda.';
       });
-    } else if (response.statusCode == 422) {
-      final responseData = jsonDecode(response.body);
-      final errorMessage =
-          responseData['errors']['email']?.first ?? 'Gagal registrasi';
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(errorMessage)));
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Gagal: ${response.body}')));
+    } catch (e) {
+      hideLoadingDialog();
+      setState(() {
+        errorMessage = 'Terjadi kesalahan tak terduga: $e';
+      });
     }
   }
 
@@ -85,89 +134,119 @@ class _RegisterPageState extends State<RegisterPage> {
         return false;
       },
       child: Scaffold(
-        body: SingleChildScrollView(
+        backgroundColor: const Color(0xFFFBC72A),
+        body: SafeArea(
           child: Column(
             children: [
-              Container(
-                height: 200,
-                decoration: const BoxDecoration(
-                  color: Colors.amber,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
-                ),
-                child: Center(
-                  child: Image.asset(
-                    'lib/assets/images/splashlogodark.png',
-                    height: 250,
-                    width: 250,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Register',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              if (successMessage != null)
-                Padding(
+              Image.asset('lib/assets/images/splashlogodark.png', height: 200),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    successMessage!,
-                    style: const TextStyle(color: Colors.green, fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              const SizedBox(height: 10),
-              _buildUsernameField(),
-              _buildTextField('Email', controller: emailController),
-              _buildPasswordField(),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 40,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-                onPressed: () => registerUser(context),
-                child: const Text(
-                  'Register',
-                  style: TextStyle(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Have an account already? "),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => LoginPage()),
-                      );
-                    },
-                    child: const Text(
-                      "Login Now",
-                      style: TextStyle(
-                        color: Colors.orange,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
                     ),
                   ),
-                ],
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 30),
+                        const Text(
+                          'Register',
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        if (errorMessage != null)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
+                            child: Text(
+                              errorMessage!,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 16,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        const SizedBox(height: 10),
+                        _buildTextField('Username', controller: nameController),
+                        _buildTextField('Email', controller: emailController),
+                        _buildTextField(
+                          'Password',
+                          controller: passwordController,
+                          isPassword: true,
+                        ),
+                        if (passwordErrorText != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4, left: 12),
+                            child: Text(
+                              passwordErrorText!,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          height: 45,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFF46A06),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            onPressed: () => registerUser(context),
+                            child: const Text(
+                              'Register',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Already have an account? "),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => LoginPage(),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                "Login Now",
+                                style: TextStyle(
+                                  color: Color(0xFFF46A06),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 30),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -175,97 +254,25 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildUsernameField() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: TextField(
-        controller: nameController,
-        maxLength: 10,
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
-        ],
-        decoration: InputDecoration(
-          counterText: '',
-          hintText: 'Username',
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 16,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: isUsernameValid ? Colors.grey : Colors.red,
-              width: 0.7,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: isUsernameValid ? Colors.orange : Colors.red,
-              width: 1,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPasswordField() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
-            controller: passwordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              hintText: 'Password',
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 16,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: isPasswordValid ? Colors.grey : Colors.red,
-                  width: 0.7,
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: isPasswordValid ? Colors.orange : Colors.red,
-                  width: 1,
-                ),
-              ),
-            ),
-          ),
-          if (passwordErrorText != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 4, left: 12),
-              child: Text(
-                passwordErrorText!,
-                style: const TextStyle(color: Colors.red, fontSize: 12),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildTextField(
     String hint, {
     required TextEditingController controller,
+    bool isPassword = false,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: TextField(
         controller: controller,
+        obscureText: isPassword,
         decoration: InputDecoration(
           hintText: hint,
           filled: true,
@@ -280,7 +287,7 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: Colors.orange, width: 1),
+            borderSide: const BorderSide(color: Color(0xFFF46A06), width: 1),
           ),
         ),
       ),

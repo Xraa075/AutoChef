@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Untuk keluar dari aplikasi
 import 'package:autochef/views/recipe/recommendation_screen.dart';
 import 'package:autochef/widgets/header.dart';
-import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class InputRecipe extends StatefulWidget {
   const InputRecipe({super.key});
@@ -60,8 +60,7 @@ class _InputRecipeState extends State<InputRecipe> {
 
     String bahanQuery = bahan.join(',');
 
-    String url =
-        'http://156.67.214.60/api/resepmakanan?bahan=$bahanQuery';
+    String url = 'http://156.67.214.60/api/resepmakanan?bahan=$bahanQuery';
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -103,26 +102,23 @@ class _InputRecipeState extends State<InputRecipe> {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
+            borderRadius: BorderRadius.circular(30),
           ),
           title: Row(
             children: [
-              Icon(Icons.info, color: Colors.orange),
+              Icon(Icons.info, color: Color(0xFFF46A06)),
               SizedBox(width: 10),
               Text("Informasi"),
             ],
           ),
-          content: Text(message, style: TextStyle(fontSize: 15)),
+          content: Text(message, style: TextStyle(fontSize: 16)),
           actions: [
             SizedBox(
               width: double.infinity,
+              height: 45,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  padding: EdgeInsets.symmetric(vertical: 10),
+                  backgroundColor: Color(0xFFF46A06),
                 ),
                 onPressed: () {
                   Navigator.pop(context);
@@ -143,7 +139,7 @@ class _InputRecipeState extends State<InputRecipe> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        SystemNavigator.pop(); // Tutup aplikasi jika user tekan back
+        SystemNavigator.pop();
         return false;
       },
       child: Scaffold(
@@ -165,8 +161,8 @@ class _InputRecipeState extends State<InputRecipe> {
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
                     ),
                   ),
                   child: Column(
@@ -191,7 +187,7 @@ class _InputRecipeState extends State<InputRecipe> {
                                 "Tuliskan bahan-bahanmu",
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.black54,
+                                  color: Colors.grey,
                                 ),
                               ),
                             ],
@@ -227,7 +223,7 @@ class _InputRecipeState extends State<InputRecipe> {
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.9),
                                   borderRadius: BorderRadius.circular(15),
-                                  border: Border.all(color: Colors.grey!),
+                                  border: Border.all(color: Colors.grey),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.grey.withOpacity(0.1),
@@ -260,7 +256,7 @@ class _InputRecipeState extends State<InputRecipe> {
                                       IconButton(
                                         icon: const Icon(
                                           Icons.delete,
-                                          color: Colors.red,
+                                          color: Color(0xFFF46A06),
                                         ),
                                         onPressed:
                                             () => _removeInputField(index),
@@ -276,11 +272,11 @@ class _InputRecipeState extends State<InputRecipe> {
                       Center(
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width * 0.5,
-                          height: 46,
+                          height: 45,
                           child: ElevatedButton(
                             onPressed: fetchRecipes,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
+                              backgroundColor: Color(0xFFF46A06),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15),
                               ),
