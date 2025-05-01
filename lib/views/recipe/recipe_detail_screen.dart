@@ -119,15 +119,10 @@ class DetailMakanan extends StatelessWidget {
                         karbohidrat: recipe.karbohidrat,
                       ),
                       SizedBox(height: 20),
-                      Ingredients(ingredients: recipe.bahan?.split(",") ?? []),
-
-                     
 
                       /// **Bahan-bahan**
                       Ingredients(ingredients: recipe.bahan.split(",") ?? []),
                       SizedBox(height: 20),
-                      Steps(steps: recipe.steps?.split(".") ?? []),
-
                       /// **Langkah-langkah**
                       Steps(steps: recipe.steps.split(".") ?? []),
                     ],
