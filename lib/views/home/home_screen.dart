@@ -59,9 +59,9 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     } catch (e) {
       print('Search error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Gagal mencari resep")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Gagal mencari resep")));
     }
   }
 
@@ -104,6 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _searchQuery = value;
                       });
                     },
+                    onSubmitted: (_) => handleSearch(context),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -148,11 +149,31 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  CategoryItemTap(title: "Snacks", kategori: "snack", imagePath: "lib/assets/images/snacks.jpg"),
-                  CategoryItemTap(title: "Meal", kategori: "meal", imagePath: "lib/assets/images/meal.jpg"),
-                  CategoryItemTap(title: "Vegan", kategori: "vegan", imagePath: "lib/assets/images/vegan.jpg"),
-                  CategoryItemTap(title: "Dessert", kategori: "dessert", imagePath: "lib/assets/images/dessert.jpg"),
-                  CategoryItemTap(title: "Drinks", kategori: "drink", imagePath: "lib/assets/images/drinks.jpg"),
+                  CategoryItemTap(
+                    title: "Snacks",
+                    kategori: "snack",
+                    imagePath: "lib/assets/images/snacks.jpg",
+                  ),
+                  CategoryItemTap(
+                    title: "Meal",
+                    kategori: "meal",
+                    imagePath: "lib/assets/images/meal.jpg",
+                  ),
+                  CategoryItemTap(
+                    title: "Vegan",
+                    kategori: "vegan",
+                    imagePath: "lib/assets/images/vegan.jpg",
+                  ),
+                  CategoryItemTap(
+                    title: "Dessert",
+                    kategori: "dessert",
+                    imagePath: "lib/assets/images/dessert.jpg",
+                  ),
+                  CategoryItemTap(
+                    title: "Drinks",
+                    kategori: "drink",
+                    imagePath: "lib/assets/images/drinks.jpg",
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -166,32 +187,34 @@ class _HomeScreenState extends State<HomeScreen> {
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: _rekomendasi.length,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 0.65,
-                      ),
-                      itemBuilder: (context, index) {
-                        final resep = _rekomendasi[index];
-                        return HealthyFoodItem(
-                          title: resep.namaResep,
-                          imagePath: resep.gambar,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DetailMakanan(recipe: resep),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: _rekomendasi.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                          childAspectRatio: 0.65,
+                        ),
+                    itemBuilder: (context, index) {
+                      final resep = _rekomendasi[index];
+                      return HealthyFoodItem(
+                        title: resep.namaResep,
+                        imagePath: resep.gambar,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => DetailMakanan(recipe: resep),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
               const SizedBox(height: 10),
             ],
           ),
