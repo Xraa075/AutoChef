@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HealthyFoodItem extends StatelessWidget {
   final String title;
@@ -46,32 +47,29 @@ class HealthyFoodItem extends StatelessWidget {
                   width: double.infinity,
                   height: 100,
                   fit: BoxFit.cover,
-                  errorBuilder:
-                      (context, error, stackTrace) => Container(
-                        width: double.infinity,
-                        height: 100,
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: Icon(
-                            Icons.fastfood,
-                            size: 40,
-                            color: Colors.grey,
-                          ),
-                        ),
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    width: double.infinity,
+                    height: 100,
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(
+                        Icons.fastfood,
+                        size: 40,
+                        color: Colors.grey,
                       ),
+                    ),
+                  ),
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
-                    return const SizedBox(
+                    return SizedBox(
                       width: double.infinity,
                       height: 100,
-                      child: Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
+                      child: buildShimmerPlaceholder(),
                     );
                   },
                 ),
               ),
-              // Bagian teks + ikon favorit
+              // Bagian teks
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(8),
@@ -84,12 +82,9 @@ class HealthyFoodItem extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const Spacer(), // Biar ikon di bawah
-                      // const Icon(
-                      //   Icons.favorite_border,
-                      //   size: 16,
-                      //   color: Colors.orange,
-                      // ),
+                      const Spacer(),
+                      // Tambahkan ikon favorit jika diperlukan
+                      // const Icon(Icons.favorite_border, size: 16, color: Colors.orange),
                     ],
                   ),
                 ),
@@ -97,6 +92,18 @@ class HealthyFoodItem extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget buildShimmerPlaceholder() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Container(
+        width: double.infinity,
+        height: 100,
+        color: Colors.white,
       ),
     );
   }
