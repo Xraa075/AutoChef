@@ -41,7 +41,7 @@ class HealthyFoodItem extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                 child: Image.network(
                   imagePath,
-                  width: 100,
+                  width: double.infinity,
                   height: 70,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) =>
