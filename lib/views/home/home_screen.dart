@@ -131,50 +131,104 @@ class _HomeScreenState extends State<HomeScreen> {
   ),
   const SizedBox(height: 10),
   SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
-    child: Row(
-      children: const [
-        SizedBox(width: 10),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          child: CategoryItem(
+  scrollDirection: Axis.horizontal,
+  child: Row(
+    children: [
+      const SizedBox(width: 10),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    RekomendationRecipe(kategori: "snack"),
+              ),
+            );
+          },
+          child: const CategoryItem(
             title: "Snacks",
             imagePath: "lib/assets/images/snacks.jpg",
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          child: CategoryItem(
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    RekomendationRecipe(kategori: "meal"),
+              ),
+            );
+          },
+          child: const CategoryItem(
             title: "Meal",
             imagePath: "lib/assets/images/meal.jpg",
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          child: CategoryItem(
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    RekomendationRecipe(kategori: "vegan"),
+              ),
+            );
+          },
+          child: const CategoryItem(
             title: "Vegan",
             imagePath: "lib/assets/images/vegan.jpg",
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          child: CategoryItem(
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    RekomendationRecipe(kategori: "dessert"),
+              ),
+            );
+          },
+          child: const CategoryItem(
             title: "Dessert",
             imagePath: "lib/assets/images/dessert.jpg",
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          child: CategoryItem(
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    RekomendationRecipe(kategori: "drink"),
+              ),
+            );
+          },
+          child: const CategoryItem(
             title: "Drinks",
             imagePath: "lib/assets/images/drinks.jpg",
           ),
         ),
-        SizedBox(width: 10),
-      ],
-    ),
+      ),
+      const SizedBox(width: 10),
+    ],
   ),
-
+),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(20.0),
