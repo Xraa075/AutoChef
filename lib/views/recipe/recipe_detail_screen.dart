@@ -29,11 +29,13 @@ class DetailMakanan extends StatelessWidget {
                 return Container(
                   width: double.infinity,
                   height: 292,
-                  color: Colors.grey[300],
-                  child: Icon(
-                    Icons.broken_image,
-                    color: Colors.grey[700],
-                    size: 80,
+                  color: Colors.grey[300], // Warna latar belakang abu-abu
+                  child: const Center(
+                    child: Icon(
+                      Icons.fastfood, // Ikon makanan
+                      size: 80, // Ukuran ikon
+                      color: Colors.grey, // Warna abu-abu
+                    ),
                   ),
                 );
               },
