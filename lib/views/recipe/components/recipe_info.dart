@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class RecipeInfo extends StatelessWidget {
   final int waktu;
   final int kalori;
-  final int protein;  
+  final int protein;
   final int karbohidrat;
 
   const RecipeInfo({
@@ -35,13 +35,13 @@ class RecipeInfo extends StatelessWidget {
           width: 70,
           height: 90,
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 255, 221, 118),
+            color: const Color(0xFFFBC72A),
             borderRadius: BorderRadius.circular(40),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: Colors.orange, size: 30),
+              Icon(icon, color: Color(0xFFF46A06), size: 30),
               SizedBox(height: 5),
               Text(
                 value,
@@ -51,10 +51,7 @@ class RecipeInfo extends StatelessWidget {
           ),
         ),
         SizedBox(height: 5),
-        Text(
-          label,
-          style: TextStyle(fontSize: 14, color: Colors.black87),
-        ),
+        Text(label, style: TextStyle(fontSize: 14, color: Colors.black87)),
       ],
     );
   }

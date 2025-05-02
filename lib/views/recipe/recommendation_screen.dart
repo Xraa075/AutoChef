@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:autochef/views/recipe/recipe_detail_screen.dart';
-import 'package:autochef/widgets/recipe_card.dart';
-import 'package:autochef/widgets/header.dart';
-import 'package:autochef/services/api_service.dart';
+import 'package:flutter/material.dart';
 import 'package:autochef/models/recipe.dart';
+import 'package:autochef/widgets/header.dart';
+import 'package:autochef/widgets/recipe_card.dart';
+import 'package:autochef/services/api_service.dart';
 import 'package:autochef/services/kategori_service.dart';
+import 'package:autochef/views/recipe/recipe_detail_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
-/// Widget utama untuk menampilkan daftar rekomendasi resep
+/// Widget utama untuk menampilkan daftar rekomendasi resepF
 /// berdasarkan bahan atau kategori yang dipilih pengguna
 class RekomendationRecipe extends StatefulWidget {
   final List<String>? bahan;
@@ -76,46 +76,44 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => WillPopScope(
-          onWillPop: () async => false,
-          child: AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25),
-            ),
-            title: Row(
-              children: [
-                Icon(Icons.info, color: Colors.orange),
-                SizedBox(width: 10),
-                Text("Informasi"),
-              ],
-            ),
-            content: Text(message, style: TextStyle(fontSize: 15)),
-            actions: [
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    if (Navigator.canPop(context)) {
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: Text(
-                    "Oke",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  ),
+        builder:
+            (context) => WillPopScope(
+              onWillPop: () async => false,
+              child: AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
                 ),
+                title: Row(
+                  children: [
+                    Icon(Icons.info, color: Color(0xFFF46A06)),
+                    SizedBox(width: 10),
+                    Text("Informasi"),
+                  ],
+                ),
+                content: Text(message, style: TextStyle(fontSize: 15)),
+                actions: [
+                  SizedBox(
+                    width: double.infinity,
+                    height: 45,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFFF46A06),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        if (Navigator.canPop(context)) {
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: Text(
+                        "Oke",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
       );
     });
   }
@@ -139,8 +137,8 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
                   ),
                 ),
                 child: Column(
@@ -161,9 +159,12 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                       child: FutureBuilder<List<Recipe>>(
                         future: _futureRecipes,
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return _buildShimmerLoading();
-                          } else if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
+                          } else if (snapshot.hasError ||
+                              snapshot.data == null ||
+                              snapshot.data!.isEmpty) {
                             return _buildErrorWidget();
                           }
 
@@ -186,7 +187,9 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => DetailMakanan(recipe: recipe),
+                                        builder:
+                                            (context) =>
+                                                DetailMakanan(recipe: recipe),
                                       ),
                                     );
                                   },
@@ -220,22 +223,24 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
 
     return CachedNetworkImage(
       imageUrl: Uri.encodeFull(imageUrl),
-      placeholder: (context, url) => Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
-        child: Container(
-          width: double.infinity,
-          height: 150,
-          color: Colors.white,
-        ),
-      ),
-      errorWidget: (context, url, error) => Container(
-        color: Colors.grey[200],
-        height: 150,
-        child: const Center(
-          child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
-        ),
-      ),
+      placeholder:
+          (context, url) => Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              width: double.infinity,
+              height: 150,
+              color: Colors.white,
+            ),
+          ),
+      errorWidget:
+          (context, url, error) => Container(
+            color: Colors.grey[200],
+            height: 150,
+            child: const Center(
+              child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
+            ),
+          ),
       fit: BoxFit.cover,
     );
   }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:autochef/models/recipe.dart';
+import 'package:autochef/views/recipe/components/steps.dart';
 import 'package:autochef/views/recipe/components/recipe_info.dart';
 import 'package:autochef/views/recipe/components/ingredients.dart';
-import 'package:autochef/views/recipe/components/steps.dart';
 
 class DetailMakanan extends StatelessWidget {
   final Recipe recipe;
@@ -44,11 +44,21 @@ class DetailMakanan extends StatelessWidget {
           Positioned(
             top: 40, // Jarak dari atas
             left: 10, // Jarak dari kiri
-            child: IconButton(
-              icon: Icon(Icons.arrow_back, color: Colors.white, size: 30),
-              onPressed: () {
-                Navigator.pop(context); // Kembali ke halaman sebelumnya
-              },
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey.withOpacity(0.5),
+              ),
+              child: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Colors.black,
+                  size: 25,
+                ),
+              ),
             ),
           ),
 
@@ -78,7 +88,7 @@ class DetailMakanan extends StatelessWidget {
                           width: 50,
                           height: 5,
                           decoration: BoxDecoration(
-                            color: Colors.grey[400],
+                            color: Colors.grey,
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
@@ -92,25 +102,23 @@ class DetailMakanan extends StatelessWidget {
                       ),
                       SizedBox(height: 15),
 
-
- /// **Kategori dan Negara**
-                        Row(
+                      /// **Kategori dan Negara**
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                          "${recipe.negara}",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: const Color.fromARGB(121, 0, 0, 0),
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 0.5,
-                          ),
+                            "${recipe.negara}",
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: const Color.fromARGB(121, 0, 0, 0),
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ],
-                        ),
-                        SizedBox(height: 20),
+                      ),
+                      SizedBox(height: 20),
 
-                      
                       /// **Informasi Resep**
                       RecipeInfo(
                         waktu: recipe.waktu,
@@ -123,6 +131,7 @@ class DetailMakanan extends StatelessWidget {
                       /// **Bahan-bahan**
                       Ingredients(ingredients: recipe.bahan.split(",") ?? []),
                       SizedBox(height: 20),
+
                       /// **Langkah-langkah**
                       Steps(steps: recipe.steps.split(".") ?? []),
                     ],

@@ -1,4 +1,3 @@
-import 'package:autochef/views/input_ingredients/input_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:autochef/widgets/header.dart';
@@ -8,7 +7,6 @@ import 'package:autochef/widgets/healthy_food_item.dart';
 import 'package:autochef/services/api_rekomendation.dart';
 import 'package:autochef/models/recipe.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
-import 'package:autochef/services/kategori_service.dart';
 import 'package:autochef/views/recipe/recommendation_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -73,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide.none,
                       ),
                       //prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -97,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.rectangle,
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                     padding: const EdgeInsets.all(8),
                     child: const Icon(Icons.search, color: Colors.black54),
@@ -116,119 +114,124 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
             ),
           ),
           child: ListView(
             children: [
               Padding(
-    padding: const EdgeInsets.all(20.0),
-    child: const Text(
-      "Categories",
-      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-    ),
-  ),
-  const SizedBox(height: 10),
-  SingleChildScrollView(
-  scrollDirection: Axis.horizontal,
-  child: Row(
-    children: [
-      const SizedBox(width: 10),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    RekomendationRecipe(kategori: "snack"),
+                padding: const EdgeInsets.all(20.0),
+                child: const Text(
+                  "Categories",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                ),
               ),
-            );
-          },
-          child: const CategoryItem(
-            title: "Snacks",
-            imagePath: "lib/assets/images/snacks.jpg",
-          ),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    RekomendationRecipe(kategori: "meal"),
+              const SizedBox(height: 10),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    const SizedBox(width: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      RekomendationRecipe(kategori: "snack"),
+                            ),
+                          );
+                        },
+                        child: const CategoryItem(
+                          title: "Snacks",
+                          imagePath: "lib/assets/images/snacks.jpg",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      RekomendationRecipe(kategori: "meal"),
+                            ),
+                          );
+                        },
+                        child: const CategoryItem(
+                          title: "Meal",
+                          imagePath: "lib/assets/images/meal.jpg",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      RekomendationRecipe(kategori: "vegan"),
+                            ),
+                          );
+                        },
+                        child: const CategoryItem(
+                          title: "Vegan",
+                          imagePath: "lib/assets/images/vegan.jpg",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      RekomendationRecipe(kategori: "dessert"),
+                            ),
+                          );
+                        },
+                        child: const CategoryItem(
+                          title: "Dessert",
+                          imagePath: "lib/assets/images/dessert.jpg",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) =>
+                                      RekomendationRecipe(kategori: "drink"),
+                            ),
+                          );
+                        },
+                        child: const CategoryItem(
+                          title: "Drinks",
+                          imagePath: "lib/assets/images/drinks.jpg",
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                  ],
+                ),
               ),
-            );
-          },
-          child: const CategoryItem(
-            title: "Meal",
-            imagePath: "lib/assets/images/meal.jpg",
-          ),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    RekomendationRecipe(kategori: "vegan"),
-              ),
-            );
-          },
-          child: const CategoryItem(
-            title: "Vegan",
-            imagePath: "lib/assets/images/vegan.jpg",
-          ),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    RekomendationRecipe(kategori: "dessert"),
-              ),
-            );
-          },
-          child: const CategoryItem(
-            title: "Dessert",
-            imagePath: "lib/assets/images/dessert.jpg",
-          ),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    RekomendationRecipe(kategori: "drink"),
-              ),
-            );
-          },
-          child: const CategoryItem(
-            title: "Drinks",
-            imagePath: "lib/assets/images/drinks.jpg",
-          ),
-        ),
-      ),
-      const SizedBox(width: 10),
-    ],
-  ),
-),
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.all(20.0),
