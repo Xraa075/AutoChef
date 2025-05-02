@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFFBC72A),
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(140),
+        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.2),
         child: CustomHeader(
           title: "Mau masak apa hari ini",
           child: Container(
@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(
         child: Container(
-          margin: const EdgeInsets.only(top: 1),
+          margin: const EdgeInsets.only(top: 20),
           padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
           decoration: const BoxDecoration(
             color: Colors.white,
