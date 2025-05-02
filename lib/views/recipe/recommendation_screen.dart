@@ -140,11 +140,10 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(120),
         child: CustomHeader(
-          title: "Ini adalah rekomendasi resep sesuai dengan bahanmu",
+          title: "Ini adalah rekkomendsi resep untukmu",
         ),
       ),
-      body: SafeArea(
-        child: Column(
+        body: Column(
           children: [
             Expanded(
               child: Container(
@@ -222,8 +221,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
             ),
           ],
         ),
-      ),
-    );
+      );
   }
 
   /// Widget gambar resep dengan validasi URL dan efek loading shimmer

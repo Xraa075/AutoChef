@@ -269,7 +269,8 @@ class ProfileScreen extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: const Color(0xFFFBC72A),
-          body: Stack(
+          body: SafeArea(
+            child: Stack(
               children: [
                 Column(
                   children: [
@@ -378,7 +379,8 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ],
             ),
-          );
+          ),
+        );
       },
     );
   }

@@ -125,7 +125,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-        body: Container(
+      body: SafeArea(
+        child: Container(
           margin: const EdgeInsets.only(top: 10),
           padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
           decoration: const BoxDecoration(
@@ -217,6 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 10),
             ],
           ),
+        ),
         ),
       );
   }
