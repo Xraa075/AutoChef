@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:autochef/models/recipe.dart';
 import 'package:autochef/widgets/header.dart';
 import 'package:autochef/widgets/category_item.dart';
+import 'package:autochef/services/search_service.dart';
 import 'package:autochef/widgets/healthy_food_item.dart';
 import 'package:autochef/services/api_rekomendation.dart';
-import 'package:autochef/services/search_service.dart';
-import 'package:autochef/models/recipe.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
 import 'package:autochef/views/recipe/recommendation_screen.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Recipe> _rekomendasi = [];
   bool _isLoading = true;
+  bool _isSearching = false;
   String _searchQuery = '';
 
   @override
@@ -42,16 +44,66 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _showPopup(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          title: Row(
+            children: const [
+              Icon(Icons.info, color: Color(0xFFF46A06)),
+              SizedBox(width: 10),
+              Text("Informasi"),
+            ],
+          ),
+          content: Text(message, style: const TextStyle(fontSize: 16)),
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              height: 45,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFFF46A06),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  "Oke",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> handleSearch(BuildContext context) async {
+    if (_isSearching) return;
+
     if (_searchQuery.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Masukkan kata kunci pencarian")),
-      );
+      _showPopup("Masukkan kata kunci pencarian");
       return;
     }
 
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      _showPopup("Periksa koneksi internet Anda dan coba lagi.");
+      return;
+    }
+
+    setState(() {
+      _isSearching = true;
+    });
+
     try {
       final results = await SearchService.searchResep(_searchQuery);
+      if (!mounted) return;
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -60,9 +112,13 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     } catch (e) {
       print('Search error: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Gagal mencari resep")));
+      _showPopup("Gagal mencari resep. Silakan coba lagi nanti.");
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSearching = false;
+        });
+      }
     }
   }
 
@@ -102,7 +158,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFFBC72A),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.2),
+        preferredSize: Size.fromHeight(
+          MediaQuery.of(context).size.height * 0.2,
+        ),
         child: CustomHeader(
           title: "Mau masak apa hari ini",
           child: Container(
@@ -140,18 +198,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () => handleSearch(context),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30),
+                _isSearching
+                    ? const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                    : GestureDetector(
+                      onTap: () => handleSearch(context),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(Icons.search, color: Colors.black54),
+                      ),
                     ),
-                    padding: const EdgeInsets.all(8),
-                    child: const Icon(Icons.search, color: Colors.black54),
-                  ),
-                ),
               ],
             ),
           ),
@@ -251,8 +321,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        ),
-      );
+      ),
+    );
   }
 }
 

@@ -232,7 +232,6 @@
 //     );
 //   }
 // }
-
 import 'package:flutter/material.dart';
 import 'package:autochef/models/user.dart';
 import 'package:autochef/data/dummy_user.dart';
@@ -246,11 +245,9 @@ class ProfileScreen extends StatelessWidget {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('hasLoggedAsGuest', false);
     await prefs.setBool('hasLoggedAsUser', false);
-
     await prefs.remove('username');
     await prefs.remove('email');
     await prefs.remove('userImage');
-
     Navigator.pushNamedAndRemoveUntil(context, Routes.login, (route) => false);
   }
 
@@ -310,70 +307,113 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ],
                 ),
+
+                // Bagian tombol login/logout + teks
                 Positioned(
                   top: 10,
                   right: 10,
-                  child: IconButton(
-                    icon: const Icon(Icons.logout_rounded, color: Colors.white),
-                    onPressed: () async {
-                      final shouldLogout = await showDialog<bool>(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            title: Row(
-                              children: [
-                                Icon(Icons.info, color: Color(0xFFF46A06)),
-                                SizedBox(width: 10),
-                                Text("Konfirmasi Logout"),
-                              ],
-                            ),
-                            content: Text(
-                              "Apakah anda yakin ingin logout dari akun saat ini?",
-                              style: TextStyle(fontSize: 15),
-                            ),
-                            actionsAlignment: MainAxisAlignment.spaceAround,
-                            actions: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.3,
-                                height: 45,
-                                child: OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: Colors.black,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context, false);
-                                  },
-                                  child: Text("Batal"),
-                                ),
-                              ),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.3,
-                                height: 45,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFFF46A06),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context, true);
-                                  },
-                                  child: Text(
-                                    "Logout",
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-
-                      if (shouldLogout == true) {
-                        logout(context);
-                        print("Logout ditekan");
+                  child: FutureBuilder<SharedPreferences>(
+                    future: SharedPreferences.getInstance(),
+                    builder: (context, prefsSnapshot) {
+                      if (!prefsSnapshot.hasData) {
+                        return SizedBox.shrink();
                       }
+
+                      final prefs = prefsSnapshot.data!;
+                      final isGuest =
+                          prefs.getBool('hasLoggedAsGuest') ?? false;
+                      final isUser = prefs.getBool('hasLoggedAsUser') ?? false;
+
+                      // Jika guest → tombol login
+                      if (isGuest && !isUser) {
+                        return TextButton.icon(
+                          onPressed: () {
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              Routes.login,
+                              (route) => false,
+                            );
+                          },
+                          icon: const Icon(Icons.login, color: Colors.white),
+                          label: const Text(
+                            "Login",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }
+
+                      // Jika user → tombol logout
+                      return TextButton.icon(
+                        onPressed: () async {
+                          final shouldLogout = await showDialog<bool>(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                title: Row(
+                                  children: const [
+                                    Icon(Icons.info, color: Color(0xFFF46A06)),
+                                    SizedBox(width: 10),
+                                    Text("Konfirmasi Logout"),
+                                  ],
+                                ),
+                                content: const Text(
+                                  "Apakah anda yakin ingin logout dari akun saat ini?",
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                                actionsAlignment: MainAxisAlignment.spaceAround,
+                                actions: [
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.3,
+                                    height: 45,
+                                    child: OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: Colors.black,
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context, false);
+                                      },
+                                      child: const Text("Batal"),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.3,
+                                    height: 45,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Color(0xFFF46A06),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context, true);
+                                      },
+                                      child: const Text(
+                                        "Logout",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+
+                          if (shouldLogout == true) {
+                            logout(context);
+                          }
+                        },
+                        icon: const Icon(
+                          Icons.logout_rounded,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          "Logout",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      );
                     },
                   ),
                 ),
