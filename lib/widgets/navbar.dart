@@ -107,8 +107,8 @@ class NavbarState extends State<Navbar> {
         body: pages[selectedIndex],
         bottomNavigationBar: ClipRRect(
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(36),
-            topRight: Radius.circular(36),
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
           ),
           child: NavigationBarTheme(
             data: NavigationBarThemeData(
