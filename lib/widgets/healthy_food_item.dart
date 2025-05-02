@@ -41,16 +41,16 @@ class HealthyFoodItem extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                 child: Image.network(
                   imagePath,
-                  width: 100,
-                  height: 70,
+                  width: double.infinity,
+                  height: 100,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) =>
                       const Icon(Icons.broken_image),
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return const SizedBox(
-                      width: 100,
-                      height: 70,
+                      width: double.infinity,
+                      height: 100,
                       child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
                     );
                   },
