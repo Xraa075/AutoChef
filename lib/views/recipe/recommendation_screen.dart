@@ -7,14 +7,17 @@ import 'package:autochef/services/api_service.dart';
 import 'package:autochef/services/kategori_service.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:autochef/services/search_service.dart';
 
 /// Widget utama untuk menampilkan daftar rekomendasi resepF
 /// berdasarkan bahan atau kategori yang dipilih pengguna
 class RekomendationRecipe extends StatefulWidget {
   final List<String>? bahan;
+ final List<Recipe>? results;
   final String? kategori;
+  final String? namaResep;
 
-  const RekomendationRecipe({super.key, this.bahan, this.kategori});
+  const RekomendationRecipe({super.key, this.bahan, this.kategori, this.namaResep, this.results});
 
   @override
   _RekomendationRecipeState createState() => _RekomendationRecipeState();
@@ -38,37 +41,49 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
 
   /// Mengambil data resep dari API berdasarkan bahan atau kategori
   Future<List<Recipe>> _fetchRecipes() async {
-    try {
-      List<dynamic> response = [];
+  try {
+    List<dynamic> response = [];
 
-      if (widget.bahan != null && widget.bahan!.isNotEmpty) {
-        final apiService = ApiService();
-        response = await apiService.searchRecipes(widget.bahan!);
-      } else if (widget.kategori != null && widget.kategori!.isNotEmpty) {
-        final kategoriService = KategoriService();
-        response = await kategoriService.getRecipesByKategori(widget.kategori!);
-      } else {
-        throw Exception("Bahan atau kategori harus diisi.");
-      }
+    final apiService = ApiService();
+    final kategoriService = KategoriService();
+    final searchService = SearchService();
 
-      if (response.isEmpty) {
-        throw Exception("Data kosong.");
-      }
-
-      if (response.any((item) => item is! Map<String, dynamic>)) {
-        throw Exception("Format data salah.");
-      }
-
-      return response.map<Recipe>((json) => Recipe.fromJson(json)).toList();
-    } catch (e, stacktrace) {
-      debugPrint("Error fetching recipes: $e");
-      debugPrint("Stacktrace: $stacktrace");
-      _showErrorDialog(
-        "Tidak ada data resep yang ditemukan dari bahan atau kategori yang kamu pilih.",
-      );
-      return Future.error(e.toString());
+    if (widget.results != null && widget.results!.isNotEmpty) {
+      // Jika sudah ada hasil (misalnya dari screen sebelumnya)
+      return widget.results!;
+    } else if (widget.bahan != null && widget.bahan!.isNotEmpty) {
+      // Pencarian berdasarkan bahan
+      response = await apiService.searchRecipes(widget.bahan!);
+    } else if (widget.kategori != null && widget.kategori!.isNotEmpty) {
+      // Pencarian berdasarkan kategori
+      response = await kategoriService.getRecipesByKategori(widget.kategori!);
+    } else if (widget.namaResep != null && widget.namaResep!.isNotEmpty) {
+      // Tambahan pencarian berdasarkan nama resep jika diperlukan
+      response = await SearchService.searchResep(widget.namaResep!);
+    } else {
+      throw Exception("Masukkan nama resep, bahan, atau kategori.");
     }
+
+    if (response.isEmpty) {
+      throw Exception("Data kosong.");
+    }
+
+    if (response.any((item) => item is! Map<String, dynamic>)) {
+      throw Exception("Format data salah.");
+    }
+
+    return response.map<Recipe>((json) => Recipe.fromJson(json)).toList();
+  } catch (e, stacktrace) {
+    debugPrint("Error fetching recipes: $e");
+    debugPrint("Stacktrace: $stacktrace");
+    _showErrorDialog(
+      "Tidak ada data resep yang ditemukan dari input yang kamu berikan.",
+    );
+    return Future.error(e.toString());
   }
+}
+
+
 
   /// Menampilkan dialog error jika terjadi kesalahan saat mengambil data
   void _showErrorDialog(String message) {
