@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:autochef/widgets/header.dart';
 import 'package:autochef/widgets/category_item.dart';
 import 'package:autochef/widgets/healthy_food_item.dart';
@@ -63,6 +64,37 @@ class _HomeScreenState extends State<HomeScreen> {
         context,
       ).showSnackBar(const SnackBar(content: Text("Gagal mencari resep")));
     }
+  }
+
+  Widget buildShimmerItem() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        height: 150,
+        width: 100,
+      ),
+    );
+  }
+
+  Widget buildShimmerGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 6,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 0.65,
+      ),
+      itemBuilder: (context, index) => buildShimmerItem(),
+    );
   }
 
   @override
@@ -185,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               _isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? buildShimmerGrid()
                   : GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),

@@ -170,6 +170,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 10),
                     Expanded(
                       child: FutureBuilder<List<Recipe>>(
                         future: _futureRecipes,
