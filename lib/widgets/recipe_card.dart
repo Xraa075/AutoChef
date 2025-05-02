@@ -50,7 +50,7 @@ class RecipeCard extends StatelessWidget {
                       height: 120,
                       color: Colors.grey[200],
                       child: const Icon(
-                        Icons.broken_image,
+                        Icons.fastfood,
                         size: 50,
                         color: Colors.grey,
                       ),

@@ -159,8 +159,7 @@ class _InputRecipeState extends State<InputRecipe> {
                 "AutoChef siap mecarikan rekomendasi resep sesuai bahan yang kamu miliki",
           ),
         ),
-        body: SafeArea(
-          child: Column(
+        body: Column(
             children: [
               Expanded(
                 child: Container(
@@ -311,7 +310,6 @@ class _InputRecipeState extends State<InputRecipe> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
