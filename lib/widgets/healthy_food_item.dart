@@ -38,20 +38,35 @@ class HealthyFoodItem extends StatelessWidget {
             children: [
               // Gambar
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(10),
+                ),
                 child: Image.network(
                   imagePath,
                   width: double.infinity,
                   height: 100,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Icon(Icons.broken_image),
+                  errorBuilder:
+                      (context, error, stackTrace) => Container(
+                        width: double.infinity,
+                        height: 100,
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: Icon(
+                            Icons.fastfood,
+                            size: 40,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return const SizedBox(
                       width: double.infinity,
                       height: 100,
-                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     );
                   },
                 ),
