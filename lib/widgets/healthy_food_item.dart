@@ -15,7 +15,7 @@ class HealthyFoodItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 20),
+      padding: const EdgeInsets.only(left: 0),
       child: InkWell(
         onTap: onTap,
         child: Container(
@@ -56,7 +56,6 @@ class HealthyFoodItem extends StatelessWidget {
                   },
                 ),
               ),
-        
               // Bagian teks + ikon favorit
               Expanded(
                 child: Padding(

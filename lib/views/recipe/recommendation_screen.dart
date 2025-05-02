@@ -247,7 +247,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
 
   /// Widget loading shimmer sebagai placeholder saat data sedang dimuat
   Widget _buildShimmerLoading() {
-    return ListView.builder(
+    return ListView.builder( 
       itemCount: 5,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       itemBuilder: (context, index) {

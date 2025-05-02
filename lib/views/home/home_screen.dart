@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: Container(
           margin: const EdgeInsets.only(top: 1),
-          padding: const EdgeInsets.fromLTRB(0, 20, 20, 20),
+          padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
@@ -121,118 +121,100 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ListView(
             children: [
               Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: const Text(
-                  "Categories",
+                  "Kategori",
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                 ),
               ),
-              const SizedBox(height: 10),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    const SizedBox(width: 10),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                                      RekomendationRecipe(kategori: "snack"),
-                            ),
-                          );
-                        },
-                        child: const CategoryItem(
-                          title: "Snacks",
-                          imagePath: "lib/assets/images/snacks.jpg",
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  RekomendationRecipe(kategori: "snack"),
                         ),
-                      ),
+                      );
+                    },
+                    child: const CategoryItem(
+                      title: "Snacks",
+                      imagePath: "lib/assets/images/snacks.jpg",
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                                      RekomendationRecipe(kategori: "meal"),
-                            ),
-                          );
-                        },
-                        child: const CategoryItem(
-                          title: "Meal",
-                          imagePath: "lib/assets/images/meal.jpg",
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  RekomendationRecipe(kategori: "meal"),
                         ),
-                      ),
+                      );
+                    },
+                    child: const CategoryItem(
+                      title: "Meal",
+                      imagePath: "lib/assets/images/meal.jpg",
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                                      RekomendationRecipe(kategori: "vegan"),
-                            ),
-                          );
-                        },
-                        child: const CategoryItem(
-                          title: "Vegan",
-                          imagePath: "lib/assets/images/vegan.jpg",
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  RekomendationRecipe(kategori: "vegan"),
                         ),
-                      ),
+                      );
+                    },
+                    child: const CategoryItem(
+                      title: "Vegan",
+                      imagePath: "lib/assets/images/vegan.jpg",
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                                      RekomendationRecipe(kategori: "dessert"),
-                            ),
-                          );
-                        },
-                        child: const CategoryItem(
-                          title: "Dessert",
-                          imagePath: "lib/assets/images/dessert.jpg",
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  RekomendationRecipe(kategori: "dessert"),
                         ),
-                      ),
+                      );
+                    },
+                    child: const CategoryItem(
+                      title: "Dessert",
+                      imagePath: "lib/assets/images/dessert.jpg",
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) =>
-                                      RekomendationRecipe(kategori: "drink"),
-                            ),
-                          );
-                        },
-                        child: const CategoryItem(
-                          title: "Drinks",
-                          imagePath: "lib/assets/images/drinks.jpg",
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  RekomendationRecipe(kategori: "drink"),
                         ),
-                      ),
+                      );
+                    },
+                    child: const CategoryItem(
+                      title: "Drinks",
+                      imagePath: "lib/assets/images/drinks.jpg",
                     ),
-                    const SizedBox(width: 10),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
+
+              const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: const Text(
@@ -240,86 +222,46 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                 ),
               ),
-              const SizedBox(height: 10),
+              // const SizedBox(height: 10),
               SizedBox(
-                height: 150,
                 child:
                     _isLoading
                         ? const Center(child: CircularProgressIndicator())
-                        : ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.only(right: 10),
+                        : GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
                           itemCount: _rekomendasi.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                childAspectRatio:
+                                    0.65, // atur ini biar tinggi & lebar card seimbang
+                              ),
                           itemBuilder: (context, index) {
                             final resep = _rekomendasi[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 10),
-                              child: RecommendationItem(
-                                title: resep.namaResep,
-                                imagePath: resep.gambar,
-                                onTap: () {
-                                  print("Tapped on recipe: ${resep.namaResep}");
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) =>
-                                              DetailMakanan(recipe: resep),
-                                    ),
-                                  );
-                                },
-                              ),
+                            return HealthyFoodItem(
+                              title: resep.namaResep,
+                              imagePath: resep.gambar,
+                              onTap: () {
+                                print("Tapped on recipe: ${resep.namaResep}");
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) =>
+                                            DetailMakanan(recipe: resep),
+                                  ),
+                                );
+                              },
                             );
                           },
                         ),
               ),
+
               const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: const Text(
-                  "Masakan Sehat",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 140,
-                child:
-                    _isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.only(right: 10),
-                          itemCount: _rekomendasi.length,
-                          itemBuilder: (context, index) {
-                            final resep = _rekomendasi[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(
-                                right: 10,
-                                bottom: 10,
-                              ),
-                              child: HealthyFoodItem(
-                                title: resep.namaResep,
-                                imagePath: resep.gambar,
-                                onTap: () {
-                                  print("Tapped on recipe: ${resep.namaResep}");
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) =>
-                                              DetailMakanan(recipe: resep),
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        ),
-              ),
-              const SizedBox(height: 30),
             ],
           ),
         ),
