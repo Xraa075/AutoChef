@@ -125,9 +125,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      body: SafeArea(
-        child: Container(
-          margin: const EdgeInsets.only(top: 20),
+        body: Container(
+          margin: const EdgeInsets.only(top: 10),
           padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -219,8 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
