@@ -108,8 +108,9 @@ class IntroScreenState extends State<IntroScreen> {
         const SizedBox(height: 20),
         Text(
           intro.title,
+          textAlign: TextAlign.center,
           style: const TextStyle(
-            fontSize: 28,
+            fontSize: 25,
             fontWeight: FontWeight.bold,
             color: Color(0xFFF46A06),
           ),
