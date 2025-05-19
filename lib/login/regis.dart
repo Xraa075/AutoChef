@@ -22,6 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool isUsernameValid = true;
   bool isPasswordValid = true;
+  bool _obscurePassword = true; // Tambahan: kontrol visibilitas password
 
   @override
   void dispose() {
@@ -48,7 +49,6 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> registerUser(BuildContext context) async {
-    // Pengecekan form kosong
     if (nameController.text.isEmpty) {
       setState(() {
         errorMessage = 'Username tidak boleh kosong';
@@ -164,17 +164,14 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 20),
                         if (errorMessage != null)
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
                               errorMessage!,
                               style: TextStyle(
-                                color:
-                                    errorMessage ==
-                                            'Registrasi berhasil, silahkan login dengan akun anda'
-                                        ? Colors.green
-                                        : Colors.red,
+                                color: errorMessage ==
+                                        'Registrasi berhasil, silahkan login dengan akun anda'
+                                    ? Colors.green
+                                    : Colors.red,
                                 fontSize: 16,
                               ),
                               textAlign: TextAlign.center,
@@ -286,7 +283,7 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
       child: TextField(
         controller: controller,
-        obscureText: isPassword,
+        obscureText: isPassword ? _obscurePassword : false,
         inputFormatters: inputFormatters,
         decoration: InputDecoration(
           hintText: hint,
@@ -304,6 +301,20 @@ class _RegisterPageState extends State<RegisterPage> {
             borderRadius: BorderRadius.circular(15),
             borderSide: const BorderSide(color: Color(0xFFF46A06), width: 1),
           ),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    _obscurePassword
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                )
+              : null,
         ),
       ),
     );
