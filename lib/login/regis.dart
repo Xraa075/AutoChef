@@ -22,6 +22,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool isUsernameValid = true;
   bool isPasswordValid = true;
+  bool _obscurePassword = true; // Tambahan: kontrol visibilitas password
 
   @override
   void dispose() {
@@ -48,7 +49,6 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> registerUser(BuildContext context) async {
-    // Pengecekan form kosong
     if (nameController.text.isEmpty) {
       setState(() {
         errorMessage = 'Username tidak boleh kosong';
@@ -95,7 +95,7 @@ class _RegisterPageState extends State<RegisterPage> {
       hideLoadingDialog();
       if (response.statusCode == 200) {
         setState(() {
-          errorMessage = 'Registrasi berhasil';
+          errorMessage = 'Registrasi berhasil, silahkan login dengan akun anda';
           nameController.clear();
           emailController.clear();
           passwordController.clear();
@@ -164,20 +164,30 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 20),
                         if (errorMessage != null)
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
                               errorMessage!,
-                              style: const TextStyle(
-                                color: Colors.red,
+                              style: TextStyle(
+                                color: errorMessage ==
+                                        'Registrasi berhasil, silahkan login dengan akun anda'
+                                    ? Colors.green
+                                    : Colors.red,
                                 fontSize: 16,
                               ),
                               textAlign: TextAlign.center,
                             ),
                           ),
                         const SizedBox(height: 10),
-                        _buildTextField('Username', controller: nameController),
+                        _buildTextField(
+                          'Username',
+                          controller: nameController,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                              RegExp(r'[a-zA-Z0-9]'),
+                            ),
+                            LengthLimitingTextInputFormatter(10),
+                          ],
+                        ),
                         _buildTextField('Email', controller: emailController),
                         _buildTextField(
                           'Password',
@@ -258,6 +268,7 @@ class _RegisterPageState extends State<RegisterPage> {
     String hint, {
     required TextEditingController controller,
     bool isPassword = false,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
@@ -272,7 +283,8 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
       child: TextField(
         controller: controller,
-        obscureText: isPassword,
+        obscureText: isPassword ? _obscurePassword : false,
+        inputFormatters: inputFormatters,
         decoration: InputDecoration(
           hintText: hint,
           filled: true,
@@ -289,6 +301,20 @@ class _RegisterPageState extends State<RegisterPage> {
             borderRadius: BorderRadius.circular(15),
             borderSide: const BorderSide(color: Color(0xFFF46A06), width: 1),
           ),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    _obscurePassword
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                )
+              : null,
         ),
       ),
     );
