@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:autochef/models/recipe.dart';
 
 class RecipeCard extends StatelessWidget {
@@ -9,7 +10,6 @@ class RecipeCard extends StatelessWidget {
     super.key,
     required this.recipe,
     this.onTap,
-    required String image,
   });
 
   @override
@@ -17,7 +17,7 @@ class RecipeCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(top: 15),
+        margin: const EdgeInsets.only(top: 15),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
@@ -26,7 +26,7 @@ class RecipeCard extends StatelessWidget {
               color: Colors.black.withOpacity(0.2),
               spreadRadius: 0.1,
               blurRadius: 6,
-              offset: Offset(1.5, 1),
+              offset: const Offset(1.5, 1),
             ),
           ],
         ),
@@ -35,27 +35,39 @@ class RecipeCard extends StatelessWidget {
           child: Row(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(10),
                   bottomLeft: Radius.circular(10),
                 ),
-                child: Image.network(
-                  recipe.gambar,
-                  width: 120,
-                  height: 120,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
+                child: Stack(
+                  children: [
+                    buildShimmerPlaceholder(width: 120, height: 120),
+                    Image.network(
+                      recipe.gambar,
                       width: 120,
                       height: 120,
-                      color: Colors.grey[200],
-                      child: const Icon(
-                        Icons.fastfood,
-                        size: 50,
-                        color: Colors.grey,
-                      ),
-                    );
-                  },
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        } else {
+                          return Opacity(opacity: 0, child: child);
+                        }
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 120,
+                          height: 120,
+                          color: Colors.grey[200],
+                          child: const Icon(
+                            Icons.fastfood,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 10),
@@ -78,17 +90,24 @@ class RecipeCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        const SizedBox(width: 10),
-                      ],
-                    ),
                   ],
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget buildShimmerPlaceholder({double width = double.infinity, double height = 100}) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Container(
+        width: width,
+        height: height,
+        color: Colors.white,
       ),
     );
   }
