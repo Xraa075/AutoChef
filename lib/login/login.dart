@@ -62,21 +62,21 @@ class _LoginPageState extends State<LoginPage> {
         },
       );
       hideLoadingDialog();
+      // Di bagian loginUser(), ketika login berhasil
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         SharedPreferences prefs = await SharedPreferences.getInstance();
 
         String username = data['user']['name'];
         String email = data['user']['email'];
+        String token = data['token']; // Ambil token dari respons API
 
         await prefs.setBool('hasLoggedAsUser', true);
         await prefs.setBool('hasLoggedAsGuest', false);
         await prefs.setString('username', username);
         await prefs.setString('email', email);
-        await prefs.setString(
-          'userImage',
-          'lib/assets/images/default_user.png',
-        );
+        await prefs.setString('token', token); // Simpan token
+        await prefs.setString('userImage', 'lib/assets/images/avatar1.png');
 
         setState(() {
           errorMessage = null;
@@ -286,20 +286,21 @@ class _LoginPageState extends State<LoginPage> {
             borderRadius: BorderRadius.circular(15),
             borderSide: const BorderSide(color: Color(0xFFF46A06), width: 1),
           ),
-          suffixIcon: isPassword
-              ? IconButton(
-                  icon: Icon(
-                    _obscurePassword
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                )
-              : null,
+          suffixIcon:
+              isPassword
+                  ? IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  )
+                  : null,
         ),
       ),
     );
