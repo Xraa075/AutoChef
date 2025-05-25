@@ -99,15 +99,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     // Periksa token terlebih dahulu
     bool tokenValid = await ApiProfile.checkAndRefreshToken();
-    if (!tokenValid) {
-      _showNotification(
-        icon: Icons.warning_amber_rounded,
-        title: 'Sesi Berakhir',
-        message: 'Silakan login kembali untuk menyimpan perubahan ke server',
-        isError: true,
-      );
-      return;
-    }
 
     setState(() {
       _isLoading = true;
@@ -140,7 +131,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       } else {
         String errorMsg = result['message'] ?? 'Gagal memperbarui profil';
 
-        if (result['isOffline'] == true) {
+        // Khusus untuk guest
+        if (result['isGuest'] == true) {
+          _showLoginDialog();
+        } else if (result['isOffline'] == true) {
           _showNotification(
             icon: Icons.cloud_off,
             title: 'Disimpan Lokal',
@@ -170,6 +164,59 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  // Tambahkan metode untuk menampilkan dialog login
+  void _showLoginDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.login, color: Color(0xFFF46A06)),
+              SizedBox(width: 10),
+              Text("Login Diperlukan"),
+            ],
+          ),
+          content: Text(
+            "Silahkan login terlebih dahulu untuk menyimpan perubahan profil Anda.",
+            style: TextStyle(fontSize: 15),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Tutup dialog
+              },
+              child: Text('Batal', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFF46A06),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () {
+                Navigator.pop(context); // Tutup dialog
+                // Redirect ke halaman login
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login',
+                  (route) => false,
+                );
+              },
+              child: Text('Login Sekarang'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Update password

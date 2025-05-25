@@ -40,6 +40,20 @@ class ApiProfile {
     String? avatar,
   }) async {
     try {
+      // Cek dulu apakah user adalah guest
+      final prefs = await SharedPreferences.getInstance();
+      bool isGuest = prefs.getBool('hasLoggedAsGuest') ?? false;
+      bool isUser = prefs.getBool('hasLoggedAsUser') ?? false;
+
+      // Jika user adalah guest, kembalikan pesan untuk login
+      if (isGuest && !isUser) {
+        return {
+          'success': false,
+          'message': 'Silahkan login terlebih dahulu untuk menyimpan perubahan',
+          'isGuest': true,
+        };
+      }
+
       final token = await getToken();
 
       // Debug info
@@ -282,6 +296,16 @@ class ApiProfile {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
+      // Tambahkan cek guest
+      final isGuest = prefs.getBool('hasLoggedAsGuest') ?? false;
+      final isUser = prefs.getBool('hasLoggedAsUser') ?? false;
+
+      // Jika guest, langsung return false
+      if (isGuest && !isUser) {
+        debugPrint('User is guest, no token needed');
+        return true; // Return true karena kita akan handle di updateProfile
+      }
+
       debugPrint(
         'Checking token: ${token != null ? token.substring(0, 10) + "..." : "null"}',
       );
@@ -290,6 +314,8 @@ class ApiProfile {
         debugPrint('Token is null or empty');
         return false;
       }
+
+      // Rest of the code...
 
       // Coba validasi token dengan hit endpoint sederhana
       try {
