@@ -49,6 +49,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> registerUser(BuildContext context) async {
+    // Pengecekan form kosong
     if (nameController.text.isEmpty) {
       setState(() {
         errorMessage = 'Username tidak boleh kosong';
@@ -92,15 +93,43 @@ class _RegisterPageState extends State<RegisterPage> {
           'password': passwordController.text,
         },
       );
+
       hideLoadingDialog();
       if (response.statusCode == 200) {
         setState(() {
-          errorMessage = 'Registrasi berhasil, silahkan login dengan akun anda';
+          errorMessage = 'Registrasi berhasil';
           nameController.clear();
           emailController.clear();
           passwordController.clear();
           passwordErrorText = null;
         });
+        // Memindahkan showDialog ke sini agar hanya muncul setelah registrasi berhasil
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Registrasi Berhasil'),
+              content: const Text('Akun Anda telah berhasil dibuat. Silakan login untuk melanjutkan.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => LoginPage(),
+                      ),
+                    ); // Perbaikan: Menggunakan pushReplacement
+                  },
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(color: Color(0xFFF46A06)),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
       } else if (response.statusCode == 422) {
         final responseData = jsonDecode(response.body);
         final errorMessage =
@@ -164,12 +193,13 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 20),
                         if (errorMessage != null)
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
                             child: Text(
                               errorMessage!,
                               style: TextStyle(
-                                color: errorMessage ==
-                                        'Registrasi berhasil, silahkan login dengan akun anda'
+                                color: errorMessage == 'Registrasi berhasil'
                                     ? Colors.green
                                     : Colors.red,
                                 fontSize: 16,
@@ -178,16 +208,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                         const SizedBox(height: 10),
-                        _buildTextField(
-                          'Username',
-                          controller: nameController,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                              RegExp(r'[a-zA-Z0-9]'),
-                            ),
-                            LengthLimitingTextInputFormatter(10),
-                          ],
-                        ),
+                        _buildTextField('Username', controller: nameController),
                         _buildTextField('Email', controller: emailController),
                         _buildTextField(
                           'Password',
@@ -239,7 +260,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   MaterialPageRoute(
                                     builder: (_) => LoginPage(),
                                   ),
-                                );
+                                ); 
                               },
                               child: const Text(
                                 "Login Now",
@@ -268,7 +289,6 @@ class _RegisterPageState extends State<RegisterPage> {
     String hint, {
     required TextEditingController controller,
     bool isPassword = false,
-    List<TextInputFormatter>? inputFormatters,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
@@ -284,7 +304,6 @@ class _RegisterPageState extends State<RegisterPage> {
       child: TextField(
         controller: controller,
         obscureText: isPassword ? _obscurePassword : false,
-        inputFormatters: inputFormatters,
         decoration: InputDecoration(
           hintText: hint,
           filled: true,
