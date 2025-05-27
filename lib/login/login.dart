@@ -45,20 +45,41 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> loginUser() async {
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+    String email = emailController.text.trim();
+    String password = passwordController.text;
+
+    // Validasi kosong
+    if (email.isEmpty || password.isEmpty) {
       setState(() {
         errorMessage = 'Semua field harus diisi';
       });
       return;
     }
+
+    // Validasi email mengandung @
+    if (!email.contains('@')) {
+      setState(() {
+        errorMessage = 'Masukkan Email dengan Benar';
+      });
+      return;
+    }
+
+    // Validasi panjang password minimal 5 karakter
+    if (password.length < 5) {
+      setState(() {
+        errorMessage = 'Password minimal 5 karakter';
+      });
+      return;
+    }
+
     showLoadingDialog();
     try {
       final response = await http.post(
         Uri.parse('http://156.67.214.60/api/login'),
         headers: {'Accept': 'application/json'},
         body: {
-          'email': emailController.text,
-          'password': passwordController.text,
+          'email': email,
+          'password': password,
         },
       );
       hideLoadingDialog();
