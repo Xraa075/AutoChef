@@ -90,6 +90,30 @@ class RecipeCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 5),
+                    // Added calorie information
+                    Text(
+                      "Kalori : ${recipe.kalori} kalori",
+                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                    ),
+                    const SizedBox(height: 5),
+                    // Added cooking time and difficulty level
+                    Row(
+                      children: [
+                        Icon(Icons.local_fire_department, color: Colors.orange, size: 16),
+                        const SizedBox(width: 2),
+                        Text(
+                          "${recipe.waktu} Menit",
+                          style: TextStyle(fontSize: 12, color: Colors.orange),
+                        ),
+                        const SizedBox(width: 10),
+                        Icon(Icons.restaurant_menu, color: Colors.red[300], size: 16),
+                        const SizedBox(width: 2),
+                        Text(
+                          "Mudah", // You can replace this with actual difficulty if available
+                          style: TextStyle(fontSize: 12, color: Colors.red[300]),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

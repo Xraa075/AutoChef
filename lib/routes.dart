@@ -3,10 +3,12 @@ import 'package:autochef/widgets/navbar.dart';
 import 'package:autochef/views/recipe/recommendation_screen.dart';
 import 'package:autochef/views/input_ingredients/input_screen.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
+import 'package:autochef/views/profile/edit_profile.dart';
 import 'package:autochef/models/recipe.dart';
 import 'package:autochef/views/intro/intro_screen.dart';
 import 'package:autochef/login/login.dart';
 import 'package:autochef/login/regis.dart';
+import 'package:autochef/models/user.dart';
 
 class Routes {
   static const String introScreen = '/intro-screen';
@@ -16,6 +18,7 @@ class Routes {
   static const String detailMakanan = '/detail-makanan';
   static const String login = '/login';
   static const String register = '/register';
+  static const String editProfile = '/edit-profile';
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -44,6 +47,15 @@ class Routes {
           final recipe = settings.arguments as Recipe;
           return MaterialPageRoute(
             builder: (_) => DetailMakanan(recipe: recipe),
+          );
+        }
+        return MaterialPageRoute(builder: (_) => const Navbar());
+
+      case editProfile:
+        if (settings.arguments is User) {
+          final user = settings.arguments as User;
+          return MaterialPageRoute(
+            builder: (_) => EditProfileScreen(currentUser: user),
           );
         }
         return MaterialPageRoute(builder: (_) => const Navbar());
