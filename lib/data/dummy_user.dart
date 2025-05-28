@@ -11,7 +11,7 @@ Future<User> getActiveUser() async {
     return User(
       username: 'Guest',
       email: 'guest@autochef.com',
-      userImage: 'lib/assets/images/default_user.png',
+      userImage: 'lib/assets/images/avatar1.png',
     );
   }
 

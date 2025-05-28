@@ -19,39 +19,69 @@ class RecipeInfo extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildInfoItem(Icons.restaurant, "$waktu", "menit"),
-        _buildInfoItem(Icons.local_fire_department, "$kalori", "kalori"),
-        _buildInfoItem(Icons.fastfood, "$protein g", "protein"),
-        _buildInfoItem(Icons.lunch_dining, "$karbohidrat g", "karbohidrat"),
+        _buildInfoItem(Icons.access_time_outlined, "$waktu", "menit"),
+        _buildInfoItem(Icons.local_fire_department_outlined, "$kalori", "kalori"),
+        _buildInfoItem(Icons.set_meal_outlined, "$protein g", "protein"),
+        _buildInfoItem(Icons.breakfast_dining_outlined, "$karbohidrat g", "karbohidrat"),
       ],
     );
   }
 
-  /// Widget untuk setiap item informasi
   Widget _buildInfoItem(IconData icon, String value, String label) {
     return Column(
       children: [
-        Container(
-          width: 70,
-          height: 90,
-          decoration: BoxDecoration(
-            color: const Color(0xFFFBC72A),
-            borderRadius: BorderRadius.circular(40),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: Color(0xFFF46A06), size: 30),
-              SizedBox(height: 5),
-              Text(
-                value,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            // Kapsul kuning
+            Container(
+              width: 70,
+              height: 125,
+              decoration: BoxDecoration(
+                color: Color(0xFFFBC72A),
+                borderRadius: BorderRadius.circular(40),
               ),
-            ],
-          ),
+              padding: const EdgeInsets.only(top: 55),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Lingkaran putih ikon
+            Positioned(
+              top: 3,
+              child: Container(
+                width: 65,
+                height: 65,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  color: Color(0xFFF46A06),
+                  size: 26,
+                ),
+              ),
+            ),
+          ],
         ),
-        SizedBox(height: 5),
-        Text(label, style: TextStyle(fontSize: 14, color: Colors.black87)),
       ],
     );
   }
