@@ -98,11 +98,11 @@ class DetailMakanan extends StatelessWidget {
                       Text(
                         recipe.namaResep,
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      SizedBox(height: 6),
 
                       /// **Kategori dan Negara**
                       Row(
@@ -111,7 +111,7 @@ class DetailMakanan extends StatelessWidget {
                           Text(
                             "${recipe.negara}",
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 18,
                               color: const Color.fromARGB(121, 0, 0, 0),
                               fontWeight: FontWeight.w500,
                               letterSpacing: 0.5,
