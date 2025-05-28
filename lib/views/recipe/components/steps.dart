@@ -21,7 +21,7 @@ class Steps extends StatelessWidget {
             final step = steps[index].trim();
             if (step.isEmpty) return SizedBox(); // skip langkah kosong
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              padding: const EdgeInsets.symmetric(vertical: 6),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

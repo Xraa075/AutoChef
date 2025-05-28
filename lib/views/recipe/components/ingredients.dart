@@ -11,6 +11,7 @@ class Ingredients extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("Bahan-bahan", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        SizedBox(height: 10),
         ...ingredients.map((step) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Row(

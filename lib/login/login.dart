@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:autochef/widgets/navbar.dart'; // Pastikan path ini benar
+import 'package:autochef/widgets/navbar.dart';
 import 'package:http/http.dart' as http;
-import 'regis.dart'; // Pastikan path ini benar
-import 'dart:io'; // Untuk SocketException
-import 'dart:convert'; // Untuk jsonDecode
-import 'dart:async'; // Untuk TimeoutException
+import 'regis.dart'; 
+import 'dart:io';
+import 'dart:convert'; 
+import 'dart:async'; 
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
