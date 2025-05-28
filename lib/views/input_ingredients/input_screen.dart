@@ -15,7 +15,7 @@ class InputRecipe extends StatefulWidget {
 
 class _InputRecipeState extends State<InputRecipe> {
   final List<TextEditingController> controllers = [];
-  final List<FocusNode> focusNodes = [];  
+  final List<FocusNode> focusNodes = [];
   bool isLoading = false;
 
   @override
@@ -31,11 +31,11 @@ class _InputRecipeState extends State<InputRecipe> {
     }
     setState(() {
       controllers.add(TextEditingController());
-      focusNodes.add(FocusNode());  
+      focusNodes.add(FocusNode());
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (focusNodes.isNotEmpty) {
-        FocusScope.of(context).requestFocus(focusNodes.last);  
+        FocusScope.of(context).requestFocus(focusNodes.last);
       }
     });
   }
@@ -46,8 +46,8 @@ class _InputRecipeState extends State<InputRecipe> {
         controllers[index].dispose();
         controllers.removeAt(index);
 
-        focusNodes[index].dispose();  
-        focusNodes.removeAt(index);   
+        focusNodes[index].dispose();
+        focusNodes.removeAt(index);
       });
     }
   }
@@ -57,7 +57,7 @@ class _InputRecipeState extends State<InputRecipe> {
     for (var controller in controllers) {
       controller.dispose();
     }
-    for (var node in focusNodes) {  
+    for (var node in focusNodes) {
       node.dispose();
     }
     super.dispose();
@@ -266,7 +266,7 @@ class _InputRecipeState extends State<InputRecipe> {
                                     Expanded(
                                       child: TextField(
                                         controller: controllers[index],
-                                        focusNode: focusNodes[index],  
+                                        focusNode: focusNodes[index],
                                         inputFormatters: [
                                           FilteringTextInputFormatter.allow(
                                             RegExp(r'[a-zA-Z\s]'),
@@ -307,18 +307,19 @@ class _InputRecipeState extends State<InputRecipe> {
                                 borderRadius: BorderRadius.circular(15),
                               ),
                             ),
-                            child: isLoading
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2.5,
-                                  )
-                                : const Text(
-                                    'Cari',
-                                    style: TextStyle(
-                                      fontSize: 16,
+                            child:
+                                isLoading
+                                    ? const CircularProgressIndicator(
                                       color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    )
+                                    : const Text(
+                                      'Cari',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                  ),
                           ),
                         ),
                       ),
