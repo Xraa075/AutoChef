@@ -21,6 +21,7 @@ dependencies:
   flutter_native_splash: ^2.4.6
   connectivity_plus: ^5.0.2
   provider: ^6.1.5
+  phosphor_flutter: ^2.1.0
 
 dev_dependencies:
   flutter_test:

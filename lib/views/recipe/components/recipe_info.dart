@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class RecipeInfo extends StatelessWidget {
   final int waktu;
@@ -19,10 +20,10 @@ class RecipeInfo extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildInfoItem(Icons.access_time_outlined, "$waktu", "menit"),
-        _buildInfoItem(Icons.local_fire_department_outlined, "$kalori", "kalori"),
-        _buildInfoItem(Icons.set_meal_outlined, "$protein g", "protein"),
-        _buildInfoItem(Icons.breakfast_dining_outlined, "$karbohidrat g", "karbohidrat"),
+        _buildInfoItem(PhosphorIcons.timer(), "$waktu", "menit"),
+        _buildInfoItem(PhosphorIcons.fire(), "$kalori", "kalori"),
+        _buildInfoItem(PhosphorIcons.fishSimple(), "$protein g", "protein"),
+        _buildInfoItem(PhosphorIcons.bread(), "$karbohidrat g", "karbohidrat"),
       ],
     );
   }
@@ -36,7 +37,7 @@ class RecipeInfo extends StatelessWidget {
             // Kapsul kuning
             Container(
               width: 70,
-              height: 125,
+              height: 120,
               decoration: BoxDecoration(
                 color: Color(0xFFFBC72A),
                 borderRadius: BorderRadius.circular(40),
@@ -48,7 +49,7 @@ class RecipeInfo extends StatelessWidget {
                   Text(
                     value,
                     style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -56,7 +57,7 @@ class RecipeInfo extends StatelessWidget {
                   Text(
                     label,
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 10,
                       color: Colors.black87,
                     ),
                   ),
