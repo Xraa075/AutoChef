@@ -186,7 +186,6 @@ class ApiProfile {
   static Future<Map<String, dynamic>> changePassword({
     required String currentPassword,
     required String newPassword,
-    required String confirmPassword,
   }) async {
     try {
       // Validasi password
@@ -195,10 +194,6 @@ class ApiProfile {
           'success': false,
           'message': 'Password baru minimal 5 karakter',
         };
-      }
-
-      if (newPassword != confirmPassword) {
-        return {'success': false, 'message': 'Konfirmasi password tidak cocok'};
       }
 
       final token = await getToken();
@@ -223,7 +218,7 @@ class ApiProfile {
             body: jsonEncode({
               'current_password': currentPassword,
               'password': newPassword,
-              'password_confirmation': confirmPassword,
+              'password_confirmation': newPassword,
             }),
           )
           .timeout(const Duration(seconds: 10));
