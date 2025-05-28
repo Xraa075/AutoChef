@@ -99,7 +99,7 @@ class RecipeCard extends StatelessWidget {
                     // Added cooking time and difficulty level
                     Row(
                       children: [
-                        Icon(Icons.local_fire_department, color: Colors.orange, size: 16),
+                        Icon(Icons.access_time, color: Colors.orange, size: 16),
                         const SizedBox(width: 2),
                         Text(
                           "${recipe.waktu} Menit",
