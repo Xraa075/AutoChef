@@ -22,7 +22,7 @@ class RecipeInfo extends StatelessWidget {
         _buildInfoItem(Icons.access_time_outlined, "$waktu", "menit"),
         _buildInfoItem(Icons.local_fire_department_outlined, "$kalori", "kalori"),
         _buildInfoItem(Icons.set_meal_outlined, "$protein g", "protein"),
-        _buildInfoItem(Icons.rice_bowl_outlined, "$karbohidrat g", "karbohidrat"),
+        _buildInfoItem(Icons.breakfast_dining_outlined, "$karbohidrat g", "karbohidrat"),
       ],
     );
   }
