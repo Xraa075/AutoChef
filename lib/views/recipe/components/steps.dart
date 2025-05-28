@@ -12,23 +12,23 @@ class Steps extends StatelessWidget {
       children: [
         Text(
           'Langkah-langkah',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 10),
+        SizedBox(height: 6),
         ...List.generate(
           steps.length,
           (index) {
             final step = steps[index].trim();
             if (step.isEmpty) return SizedBox(); // skip langkah kosong
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              padding: const EdgeInsets.symmetric(vertical: 1),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     '${index + 1}.',
                     style: const TextStyle(
-                      fontSize: 16, // Ukuran teks untuk nomor
+                      fontSize: 12, // Ukuran teks untuk nomor
                       color: Colors.black,
                     ),
                   ),
@@ -37,7 +37,7 @@ class Steps extends StatelessWidget {
                     child: Text(
                       step,
                       style: const TextStyle(
-                        fontSize: 16, // Ukuran teks untuk langkah
+                        fontSize: 12, // Ukuran teks untuk langkah
                         color: Colors.black,
                       ),
                     ),

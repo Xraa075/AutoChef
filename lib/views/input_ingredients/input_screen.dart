@@ -15,6 +15,7 @@ class InputRecipe extends StatefulWidget {
 
 class _InputRecipeState extends State<InputRecipe> {
   final List<TextEditingController> controllers = [];
+  final List<FocusNode> focusNodes = [];
   bool isLoading = false;
 
   @override
@@ -30,6 +31,12 @@ class _InputRecipeState extends State<InputRecipe> {
     }
     setState(() {
       controllers.add(TextEditingController());
+      focusNodes.add(FocusNode());
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (focusNodes.isNotEmpty) {
+        FocusScope.of(context).requestFocus(focusNodes.last);
+      }
     });
   }
 
@@ -38,6 +45,9 @@ class _InputRecipeState extends State<InputRecipe> {
       setState(() {
         controllers[index].dispose();
         controllers.removeAt(index);
+
+        focusNodes[index].dispose();
+        focusNodes.removeAt(index);
       });
     }
   }
@@ -47,6 +57,9 @@ class _InputRecipeState extends State<InputRecipe> {
     for (var controller in controllers) {
       controller.dispose();
     }
+    for (var node in focusNodes) {
+      node.dispose();
+    }
     super.dispose();
   }
 
@@ -54,8 +67,8 @@ class _InputRecipeState extends State<InputRecipe> {
     List<String> bahan =
         controllers.map((controller) => controller.text.trim()).toList();
 
-    if (bahan.isEmpty || bahan.every((element) => element.isEmpty)) {
-      _showPopup("Harap masukkan minimal satu bahan.");
+    if (bahan.isEmpty || bahan.any((element) => element.isEmpty)) {
+      _showPopup("Harap isi seluruh form dengan bahan yang kamu miliki");
       return;
     }
 
@@ -109,8 +122,9 @@ class _InputRecipeState extends State<InputRecipe> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(16),
           ),
           title: Row(
             children: [
@@ -127,11 +141,15 @@ class _InputRecipeState extends State<InputRecipe> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFFF46A06),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  )
                 ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
                 child: Text(
+                  
                   "Oke",
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
@@ -230,7 +248,7 @@ class _InputRecipeState extends State<InputRecipe> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.9),
-                                  borderRadius: BorderRadius.circular(15),
+                                  borderRadius: BorderRadius.circular(16),
                                   border: Border.all(color: Colors.grey),
                                   boxShadow: [
                                     BoxShadow(
@@ -253,6 +271,12 @@ class _InputRecipeState extends State<InputRecipe> {
                                     Expanded(
                                       child: TextField(
                                         controller: controllers[index],
+                                        focusNode: focusNodes[index],
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                            RegExp(r'[a-zA-Z\s]'),
+                                          ),
+                                        ],
                                         decoration: const InputDecoration(
                                           hintText: "Masukkan Bahan Makanan",
                                           border: InputBorder.none,
@@ -285,7 +309,7 @@ class _InputRecipeState extends State<InputRecipe> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Color(0xFFF46A06),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
+                                borderRadius: BorderRadius.circular(16),
                               ),
                             ),
                             child:

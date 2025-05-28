@@ -4,10 +4,19 @@ import 'package:autochef/views/recipe/components/steps.dart';
 import 'package:autochef/views/recipe/components/recipe_info.dart';
 import 'package:autochef/views/recipe/components/ingredients.dart';
 
-class DetailMakanan extends StatelessWidget {
+class DetailMakanan extends StatefulWidget {
+  // Mengubah menjadi StatefulWidget
   final Recipe recipe;
 
   const DetailMakanan({super.key, required this.recipe});
+
+  @override
+  State<DetailMakanan> createState() => _DetailMakananState();
+}
+
+class _DetailMakananState extends State<DetailMakanan> {
+  // Membuat State
+  bool isFavorite = false; // Menambahkan state untuk status favorit
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +29,7 @@ class DetailMakanan extends StatelessWidget {
             left: 0,
             right: 0,
             child: Image.network(
-              recipe.gambar,
+              widget.recipe.gambar, // Menggunakan widget.recipe
               width: double.infinity,
               height: 292,
               fit: BoxFit.cover,
@@ -85,7 +94,10 @@ class DetailMakanan extends StatelessWidget {
                     children: [
                       Container(
                         alignment: Alignment.center,
-                        margin: EdgeInsets.only(bottom: 10),
+                        margin: EdgeInsets.only(
+                          bottom: 10,
+                          top: 10,
+                        ), // Menambahkan margin top
                         child: Container(
                           width: 50,
                           height: 5,
@@ -95,23 +107,60 @@ class DetailMakanan extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Text(
-                        recipe.namaResep,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        // Menggunakan Row untuk menampung nama resep dan ikon
+                        mainAxisAlignment:
+                            MainAxisAlignment
+                                .spaceBetween, // Agar ikon di paling kanan
+                        crossAxisAlignment:
+                            CrossAxisAlignment
+                                .start, // Agar text dan icon align di atas
+                        children: [
+                          Expanded(
+                            // Agar teks nama resep bisa wrap jika panjang
+                            child: Text(
+                              widget
+                                  .recipe
+                                  .namaResep, // Menggunakan widget.recipe
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              isFavorite
+                                  ? Icons.favorite
+                                  : Icons
+                                      .favorite_border, // Menggunakan state isFavorite
+                              color:
+                                  isFavorite
+                                      ? Colors.red
+                                      : Colors
+                                          .grey, // Warna ikon berdasarkan status
+                              size: 30, // Ukuran ikon
+                            ),
+                            onPressed: () {
+                              // Logika untuk menambahkan/menghapus dari favorit akan ditambahkan di sini nanti
+                              // Untuk sekarang, kita ubah state nya saja untuk demo UI
+                              setState(() {
+                                isFavorite = !isFavorite;
+                              });
+                            },
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 15),
+                      SizedBox(height: 4),
 
                       /// **Kategori dan Negara**
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "${recipe.negara}",
+                            "${widget.recipe.negara}", // Menggunakan widget.recipe
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 13,
                               color: const Color.fromARGB(121, 0, 0, 0),
                               fontWeight: FontWeight.w500,
                               letterSpacing: 0.5,
@@ -123,19 +172,28 @@ class DetailMakanan extends StatelessWidget {
 
                       /// **Informasi Resep**
                       RecipeInfo(
-                        waktu: recipe.waktu,
-                        kalori: recipe.kalori,
-                        protein: recipe.protein,
-                        karbohidrat: recipe.karbohidrat,
+                        waktu: widget.recipe.waktu, // Menggunakan widget.recipe
+                        kalori:
+                            widget.recipe.kalori, // Menggunakan widget.recipe
+                        protein:
+                            widget.recipe.protein, // Menggunakan widget.recipe
+                        karbohidrat:
+                            widget
+                                .recipe
+                                .karbohidrat, // Menggunakan widget.recipe
                       ),
                       SizedBox(height: 20),
 
                       /// **Bahan-bahan**
-                      Ingredients(ingredients: recipe.bahan.split(",") ?? []),
+                      Ingredients(
+                        ingredients: widget.recipe.bahan.split(",") ?? [],
+                      ), // Menggunakan widget.recipe
                       SizedBox(height: 20),
 
                       /// **Langkah-langkah**
-                      Steps(steps: recipe.steps.split(".") ?? []),
+                      Steps(
+                        steps: widget.recipe.steps.split(".") ?? [],
+                      ), // Menggunakan widget.recipe
                     ],
                   ),
                 ),

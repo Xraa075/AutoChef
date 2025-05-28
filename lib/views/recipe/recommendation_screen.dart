@@ -13,11 +13,17 @@ import 'package:autochef/services/search_service.dart';
 /// berdasarkan bahan atau kategori yang dipilih pengguna
 class RekomendationRecipe extends StatefulWidget {
   final List<String>? bahan;
- final List<Recipe>? results;
+  final List<Recipe>? results;
   final String? kategori;
   final String? namaResep;
 
-  const RekomendationRecipe({super.key, this.bahan, this.kategori, this.namaResep, this.results});
+  const RekomendationRecipe({
+    super.key,
+    this.bahan,
+    this.kategori,
+    this.namaResep,
+    this.results,
+  });
 
   @override
   _RekomendationRecipeState createState() => _RekomendationRecipeState();
@@ -41,49 +47,47 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
 
   /// Mengambil data resep dari API berdasarkan bahan atau kategori
   Future<List<Recipe>> _fetchRecipes() async {
-  try {
-    List<dynamic> response = [];
+    try {
+      List<dynamic> response = [];
 
-    final apiService = ApiService();
-    final kategoriService = KategoriService();
-    final searchService = SearchService();
+      final apiService = ApiService();
+      final kategoriService = KategoriService();
+      final searchService = SearchService();
 
-    if (widget.results != null && widget.results!.isNotEmpty) {
-      // Jika sudah ada hasil (misalnya dari screen sebelumnya)
-      return widget.results!;
-    } else if (widget.bahan != null && widget.bahan!.isNotEmpty) {
-      // Pencarian berdasarkan bahan
-      response = await apiService.searchRecipes(widget.bahan!);
-    } else if (widget.kategori != null && widget.kategori!.isNotEmpty) {
-      // Pencarian berdasarkan kategori
-      response = await kategoriService.getRecipesByKategori(widget.kategori!);
-    } else if (widget.namaResep != null && widget.namaResep!.isNotEmpty) {
-      // Tambahan pencarian berdasarkan nama resep jika diperlukan
-      response = await SearchService.searchResep(widget.namaResep!);
-    } else {
-      throw Exception("Masukkan nama resep, bahan, atau kategori.");
+      if (widget.results != null && widget.results!.isNotEmpty) {
+        // Jika sudah ada hasil (misalnya dari screen sebelumnya)
+        return widget.results!;
+      } else if (widget.bahan != null && widget.bahan!.isNotEmpty) {
+        // Pencarian berdasarkan bahan
+        response = await apiService.searchRecipes(widget.bahan!);
+      } else if (widget.kategori != null && widget.kategori!.isNotEmpty) {
+        // Pencarian berdasarkan kategori
+        response = await kategoriService.getRecipesByKategori(widget.kategori!);
+      } else if (widget.namaResep != null && widget.namaResep!.isNotEmpty) {
+        // Tambahan pencarian berdasarkan nama resep jika diperlukan
+        response = await SearchService.searchResep(widget.namaResep!);
+      } else {
+        throw Exception("Masukkan nama resep, bahan, atau kategori.");
+      }
+
+      if (response.isEmpty) {
+        throw Exception("Data kosong.");
+      }
+
+      if (response.any((item) => item is! Map<String, dynamic>)) {
+        throw Exception("Format data salah.");
+      }
+
+      return response.map<Recipe>((json) => Recipe.fromJson(json)).toList();
+    } catch (e, stacktrace) {
+      debugPrint("Error fetching recipes: $e");
+      debugPrint("Stacktrace: $stacktrace");
+      _showErrorDialog(
+        "Tidak ada data resep yang ditemukan dari input yang kamu berikan.",
+      );
+      return Future.error(e.toString());
     }
-
-    if (response.isEmpty) {
-      throw Exception("Data kosong.");
-    }
-
-    if (response.any((item) => item is! Map<String, dynamic>)) {
-      throw Exception("Format data salah.");
-    }
-
-    return response.map<Recipe>((json) => Recipe.fromJson(json)).toList();
-  } catch (e, stacktrace) {
-    debugPrint("Error fetching recipes: $e");
-    debugPrint("Stacktrace: $stacktrace");
-    _showErrorDialog(
-      "Tidak ada data resep yang ditemukan dari input yang kamu berikan.",
-    );
-    return Future.error(e.toString());
   }
-}
-
-
 
   /// Menampilkan dialog error jika terjadi kesalahan saat mengambil data
   void _showErrorDialog(String message) {
@@ -139,90 +143,88 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
       backgroundColor: const Color(0xFFFBC72A),
       appBar: const PreferredSize(
         preferredSize: Size.fromHeight(120),
-        child: CustomHeader(
-          title: "Ini adalah rekkomendsi resep untukmu",
-        ),
+        child: CustomHeader(title: "Ini adalah rekkomendsi resep untukmu"),
       ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.only(top: 30),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-                      child: Text(
-                        "Rekomendasi",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: FutureBuilder<List<Recipe>>(
-                        future: _futureRecipes,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return _buildShimmerLoading();
-                          } else if (snapshot.hasError ||
-                              snapshot.data == null ||
-                              snapshot.data!.isEmpty) {
-                            return _buildErrorWidget();
-                          }
-
-                          final recipes = snapshot.data!;
-                          return Scrollbar(
-                            controller: _scrollController,
-                            thumbVisibility: true,
-                            radius: Radius.circular(8),
-                            interactive: true,
-                            thickness: 8,
-                            child: ListView.builder(
-                              controller: _scrollController,
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                              itemCount: recipes.length,
-                              itemBuilder: (context, index) {
-                                final recipe = recipes[index];
-                                return RecipeCard(
-                                  recipe: recipe,
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (context) =>
-                                                DetailMakanan(recipe: recipe),
-                                      ),
-                                    );
-                                  },
-                                  image: recipe.gambar,
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(top: 30),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
                 ),
               ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: Text(
+                      "Rekomendasi",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: FutureBuilder<List<Recipe>>(
+                      future: _futureRecipes,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return _buildShimmerLoading();
+                        } else if (snapshot.hasError ||
+                            snapshot.data == null ||
+                            snapshot.data!.isEmpty) {
+                          return _buildErrorWidget();
+                        }
+
+                        final recipes = snapshot.data!;
+                        return Scrollbar(
+                          controller: _scrollController,
+                          thumbVisibility: true,
+                          radius: Radius.circular(8),
+                          interactive: true,
+                          thickness: 8,
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            itemCount: recipes.length,
+                            itemBuilder: (context, index) {
+                              final recipe = recipes[index];
+                              return RecipeCard(
+                                recipe: recipe,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              DetailMakanan(recipe: recipe),
+                                    ),
+                                  );
+                                },
+                                // image: recipe.gambar,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 
   /// Widget gambar resep dengan validasi URL dan efek loading shimmer
@@ -261,7 +263,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
 
   /// Widget loading shimmer sebagai placeholder saat data sedang dimuat
   Widget _buildShimmerLoading() {
-    return ListView.builder( 
+    return ListView.builder(
       itemCount: 5,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       itemBuilder: (context, index) {
