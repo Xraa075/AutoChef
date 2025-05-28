@@ -208,7 +208,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                                       ),
                                     );
                                   },
-                                  image: recipe.gambar,
+                                  // image: recipe.gambar,
                                 );
                               },
                             ),

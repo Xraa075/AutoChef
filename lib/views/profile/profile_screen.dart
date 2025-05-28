@@ -1,246 +1,18 @@
-// //Ini versi tanpa tombol logout
-// import 'package:flutter/material.dart';
-// import 'package:autochef/models/user.dart';
-// import 'package:autochef/data/dummy_user.dart';
-
-// class ProfileScreen extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     User currentUser = getActiveUser();
-//     return Scaffold(
-//       backgroundColor: Color(0xFFFBC72A),
-//       body: SafeArea(
-//         child: Column(
-//           children: [
-//             const SizedBox(height: 30),
-//             // Foto profil
-//             CircleAvatar(
-//               backgroundImage: AssetImage(currentUser.userImage),
-//               radius: 45,
-//               backgroundColor: Colors.white,
-//             ),
-//             const SizedBox(height: 10),
-//             // Nama user
-//             Text(
-//               "${currentUser.username}",
-//               style: TextStyle(
-//                 fontSize: 24,
-//                 fontWeight: FontWeight.bold,
-//                 color: Colors.black,
-//               ),
-//             ),
-//             const SizedBox(height: 30),
-//             // Section putih di bawah (kosong)
-//             Expanded(
-//               child: Container(
-//                 width: double.infinity,
-//                 decoration: const BoxDecoration(
-//                   color: Colors.white,
-//                   borderRadius: BorderRadius.only(
-//                     topLeft: Radius.circular(30),
-//                     topRight: Radius.circular(30),
-//                   ),
-//                 ),
-//                 child: Center(
-//                   child: Text(
-//                     "Belum ada data",
-//                     style: TextStyle(color: Colors.grey[400]),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// //ini versi dengan favorite
-// import 'package:flutter/material.dart';
-// import 'package:autochef/models/user.dart';
-// import 'package:autochef/data/dummy_user.dart';
-
-// class ProfileScreen extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     User currentUser = getActiveUser();
-//     return Scaffold(
-//       backgroundColor: const Color(0xFFFBC72A),
-//       body: SafeArea(
-//         child: Stack(
-//           children: [
-//             Column(
-//               children: [
-//                 const SizedBox(height: 30),
-//                 CircleAvatar(
-//                   backgroundImage: AssetImage(currentUser.userImage),
-//                   radius: 45,
-//                   backgroundColor: Colors.white,
-//                 ),
-//                 const SizedBox(height: 10),
-//                 Text(
-//                   "${currentUser.username}",
-//                   style: const TextStyle(
-//                     fontSize: 24,
-//                     fontWeight: FontWeight.bold,
-//                     color: Colors.black,
-//                   ),
-//                 ),
-//                 const SizedBox(height: 30),
-//                 Expanded(
-//                   child: Container(
-//                     width: double.infinity,
-//                     decoration: const BoxDecoration(
-//                       color: Colors.white,
-//                       borderRadius: BorderRadius.only(
-//                         topLeft: Radius.circular(30),
-//                         topRight: Radius.circular(30),
-//                       ),
-//                     ),
-//                     child: Padding(
-//                       padding: const EdgeInsets.symmetric(
-//                         horizontal: 20,
-//                         vertical: 24,
-//                       ),
-//                       child: Column(
-//                         crossAxisAlignment: CrossAxisAlignment.start,
-//                         children: [
-//                           Center(
-//                             child: Text(
-//                               "Favorite",
-//                               style: TextStyle(
-//                                 fontSize: 20,
-//                                 fontWeight: FontWeight.bold,
-//                                 color: Colors.black,
-//                               ),
-//                             ),
-//                           ),
-//                           const SizedBox(height: 20),
-//                           Center(
-//                             child: Text(
-//                               "Anda harus login untuk menggunakan fitur favorite.",
-//                               textAlign: TextAlign.center,
-//                               style: TextStyle(
-//                                 color: Colors.grey[400],
-//                                 fontSize: 16,
-//                               ),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//             Positioned(
-//               top: 10,
-//               right: 10,
-//               child: IconButton(
-//                 icon: const Icon(Icons.logout, color: Colors.white),
-//                 onPressed: () {
-//                   // TODO: Hubungkan ke backend logout kamu di sini
-//                   print("Logout ditekan");
-//                 },
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-//ini versi tanpa favorite
-// import 'package:flutter/material.dart';
-// import 'package:autochef/models/user.dart';
-// import 'package:autochef/data/dummy_user.dart';
-// import 'package:autochef/routes.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-
-// class ProfileScreen extends StatelessWidget {
-//   Future<void> logout(BuildContext context) async {
-//     final prefs = await SharedPreferences.getInstance();
-//     await prefs.setBool('hasLoggedAsGuest', false);
-//     await prefs.setBool('hasLoggedAsUser', false);
-
-//     Navigator.pushNamedAndRemoveUntil(context, Routes.login, (route) => false);
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     Future<User> currentUser = getActiveUser();
-//     return Scaffold(
-//       backgroundColor: const Color(0xFFFBC72A),
-//       body: SafeArea(
-//         child: Stack(
-//           children: [
-//             Column(
-//               children: [
-//                 const SizedBox(height: 30),
-//                 CircleAvatar(
-//                   backgroundImage: AssetImage(currentUser.userImage),
-//                   radius: 45,
-//                   backgroundColor: Colors.white,
-//                 ),
-//                 const SizedBox(height: 10),
-//                 Text(
-//                   "${currentUser.username}",
-//                   style: const TextStyle(
-//                     fontSize: 24,
-//                     fontWeight: FontWeight.bold,
-//                     color: Colors.black,
-//                   ),
-//                 ),
-//                 const SizedBox(height: 30),
-//                 Expanded(
-//                   child: Container(
-//                     width: double.infinity,
-//                     decoration: const BoxDecoration(
-//                       color: Colors.white,
-//                       borderRadius: BorderRadius.only(
-//                         topLeft: Radius.circular(30),
-//                         topRight: Radius.circular(30),
-//                       ),
-//                     ),
-//                     child: Center(
-//                       child: Text(
-//                         "Belum ada data",
-//                         style: TextStyle(color: Colors.grey[400]),
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//             Positioned(
-//               top: 10,
-//               right: 10,
-//               child: IconButton(
-//                 icon: const Icon(Icons.logout_rounded, color: Colors.white),
-//                 onPressed: () {
-//                   // Koneksi ke Backend untuk logout
-//                   logout(context);
-//                   print("Logout ditekan");
-//                 },
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:autochef/models/user.dart';
 import 'package:autochef/data/dummy_user.dart';
 import 'package:autochef/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:autochef/views/profile/edit_profile.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> logout(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('hasLoggedAsGuest', false);
@@ -249,6 +21,23 @@ class ProfileScreen extends StatelessWidget {
     await prefs.remove('email');
     await prefs.remove('userImage');
     Navigator.pushNamedAndRemoveUntil(context, Routes.login, (route) => false);
+  }
+
+  // Add this method to navigate to edit profile screen
+  Future<void> _navigateToEditProfile(User currentUser) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProfileScreen(currentUser: currentUser),
+      ),
+    );
+
+    // Refresh profile if changes were made
+    if (result == true) {
+      setState(() {
+        // This will trigger a rebuild to show updated data
+      });
+    }
   }
 
   @override
@@ -286,7 +75,21 @@ class ProfileScreen extends StatelessWidget {
                         color: Colors.black,
                       ),
                     ),
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 10),
+                    // Add Edit Profile Button
+                    ElevatedButton.icon(
+                      onPressed: () => _navigateToEditProfile(currentUser),
+                      icon: const Icon(Icons.edit),
+                      label: const Text("Edit Profil"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     Expanded(
                       child: Container(
                         width: double.infinity,
@@ -297,12 +100,7 @@ class ProfileScreen extends StatelessWidget {
                             topRight: Radius.circular(30),
                           ),
                         ),
-                        child: Center(
-                          child: Text(
-                            "Belum ada data",
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ),
+                        
                       ),
                     ),
                   ],
@@ -422,6 +220,36 @@ class ProfileScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+  
+  Widget _buildInfoItem(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Icon(icon, color: Color(0xFFF46A06), size: 24),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

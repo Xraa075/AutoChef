@@ -45,38 +45,59 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> loginUser() async {
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+    String email = emailController.text.trim();
+    String password = passwordController.text;
+
+    // Validasi kosong
+    if (email.isEmpty || password.isEmpty) {
       setState(() {
         errorMessage = 'Semua field harus diisi';
       });
       return;
     }
+
+    // Validasi email mengandung @
+    if (!email.contains('@')) {
+      setState(() {
+        errorMessage = 'Masukkan Email dengan Benar';
+      });
+      return;
+    }
+
+    // Validasi panjang password minimal 5 karakter
+    if (password.length < 5) {
+      setState(() {
+        errorMessage = 'Password minimal 5 karakter';
+      });
+      return;
+    }
+
     showLoadingDialog();
     try {
       final response = await http.post(
         Uri.parse('http://156.67.214.60/api/login'),
         headers: {'Accept': 'application/json'},
         body: {
-          'email': emailController.text,
-          'password': passwordController.text,
+          'email': email,
+          'password': password,
         },
       );
       hideLoadingDialog();
+      // Di bagian loginUser(), ketika login berhasil
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         SharedPreferences prefs = await SharedPreferences.getInstance();
 
         String username = data['user']['name'];
         String email = data['user']['email'];
+        String token = data['token']; // Ambil token dari respons API
 
         await prefs.setBool('hasLoggedAsUser', true);
         await prefs.setBool('hasLoggedAsGuest', false);
         await prefs.setString('username', username);
         await prefs.setString('email', email);
-        await prefs.setString(
-          'userImage',
-          'lib/assets/images/default_user.png',
-        );
+        await prefs.setString('token', token); // Simpan token
+        await prefs.setString('userImage', 'lib/assets/images/avatar1.png');
 
         setState(() {
           errorMessage = null;
@@ -286,20 +307,21 @@ class _LoginPageState extends State<LoginPage> {
             borderRadius: BorderRadius.circular(15),
             borderSide: const BorderSide(color: Color(0xFFF46A06), width: 1),
           ),
-          suffixIcon: isPassword
-              ? IconButton(
-                  icon: Icon(
-                    _obscurePassword
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                )
-              : null,
+          suffixIcon:
+              isPassword
+                  ? IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  )
+                  : null,
         ),
       ),
     );

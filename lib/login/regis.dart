@@ -19,6 +19,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   String? errorMessage;
   String? passwordErrorText;
+  String? emailErrorText;
 
   bool isUsernameValid = true;
   bool isPasswordValid = true;
@@ -49,6 +50,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future<void> registerUser(BuildContext context) async {
+    // Pengecekan form kosong
     if (nameController.text.isEmpty) {
       setState(() {
         errorMessage = 'Username tidak boleh kosong';
@@ -61,6 +63,18 @@ class _RegisterPageState extends State<RegisterPage> {
       });
       return;
     }
+
+    if (!emailController.text.contains('@')) {
+      setState(() {
+        emailErrorText = 'Masukkan Email dengan Benar';
+      });
+      return;
+    } else {
+      setState(() {
+        emailErrorText = null;
+      });
+    }
+
     if (passwordController.text.isEmpty) {
       setState(() {
         errorMessage = 'Password tidak boleh kosong';
@@ -81,6 +95,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (!isUsernameValid || !isPasswordValid) return;
 
+    final passwordRegex = RegExp(r'^[a-zA-Z0-9]+$');
+    final isPasswordFormatValid =
+        passwordRegex.hasMatch(passwordController.text);
+    if (!isPasswordFormatValid) {
+      setState(() {
+        passwordErrorText = 'Password hanya boleh huruf dan angka';
+      });
+      return;
+    }
+
     showLoadingDialog();
     try {
       final response = await http.post(
@@ -92,15 +116,44 @@ class _RegisterPageState extends State<RegisterPage> {
           'password': passwordController.text,
         },
       );
+
       hideLoadingDialog();
       if (response.statusCode == 200) {
         setState(() {
-          errorMessage = 'Registrasi berhasil, silahkan login dengan akun anda';
+          errorMessage = 'Registrasi berhasil';
           nameController.clear();
           emailController.clear();
           passwordController.clear();
           passwordErrorText = null;
+          emailErrorText = null;
         });
+        // Memindahkan showDialog ke sini agar hanya muncul setelah registrasi berhasil
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Registrasi Berhasil'),
+              content: const Text('Akun Anda telah berhasil dibuat. Silakan login untuk melanjutkan.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => LoginPage(),
+                      ),
+                    ); // Perbaikan: Menggunakan pushReplacement
+                  },
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(color: Color(0xFFF46A06)),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
       } else if (response.statusCode == 422) {
         final responseData = jsonDecode(response.body);
         final errorMessage =
@@ -164,12 +217,13 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 20),
                         if (errorMessage != null)
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
                             child: Text(
                               errorMessage!,
                               style: TextStyle(
-                                color: errorMessage ==
-                                        'Registrasi berhasil, silahkan login dengan akun anda'
+                                color: errorMessage == 'Registrasi berhasil'
                                     ? Colors.green
                                     : Colors.red,
                                 fontSize: 16,
@@ -178,16 +232,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                         const SizedBox(height: 10),
-                        _buildTextField(
-                          'Username',
-                          controller: nameController,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                              RegExp(r'[a-zA-Z0-9]'),
-                            ),
-                            LengthLimitingTextInputFormatter(10),
-                          ],
-                        ),
+                        _buildTextField('Username', controller: nameController),
                         _buildTextField('Email', controller: emailController),
                         _buildTextField(
                           'Password',
@@ -239,7 +284,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   MaterialPageRoute(
                                     builder: (_) => LoginPage(),
                                   ),
-                                );
+                                ); 
                               },
                               child: const Text(
                                 "Login Now",
@@ -268,55 +313,75 @@ class _RegisterPageState extends State<RegisterPage> {
     String hint, {
     required TextEditingController controller,
     bool isPassword = false,
-    List<TextInputFormatter>? inputFormatters,
   }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+    final isUsername = hint.toLowerCase() == 'username';
+    final isEmail = hint.toLowerCase() == 'email';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: isPassword ? _obscurePassword : false,
-        inputFormatters: inputFormatters,
-        decoration: InputDecoration(
-          hintText: hint,
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 16,
+          child: TextField(
+            controller: controller,
+            obscureText: isPassword ? _obscurePassword : false,
+            inputFormatters: isUsername
+                ? [
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-z]')),
+                    LengthLimitingTextInputFormatter(10),
+                  ]
+                : null,
+            decoration: InputDecoration(
+              hintText: hint,
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: const BorderSide(color: Colors.grey, width: 0.7),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: const BorderSide(color: Color(0xFFF46A06), width: 1),
+              ),
+              suffixIcon: isPassword
+                  ? IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    )
+                  : null,
+            ),
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: Colors.grey, width: 0.7),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: Color(0xFFF46A06), width: 1),
-          ),
-          suffixIcon: isPassword
-              ? IconButton(
-                  icon: Icon(
-                    _obscurePassword
-                        ? Icons.visibility_off
-                        : Icons.visibility,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                )
-              : null,
         ),
-      ),
+        if (isEmail && emailErrorText != null)
+          Padding(
+            padding: const EdgeInsets.only(left: 12, top: 4),
+            child: Text(
+              emailErrorText!,
+              style: const TextStyle(color: Colors.red, fontSize: 12),
+            ),
+          ),
+      ],
     );
   }
 }

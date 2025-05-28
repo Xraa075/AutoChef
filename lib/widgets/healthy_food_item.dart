@@ -27,7 +27,7 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
       child: InkWell(
         onTap: widget.onTap,
         child: Container(
-          width: 100,
+          width: 150,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
@@ -44,41 +44,42 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Gambar
+              // Gambar diperpanjang dengan rasio tinggi
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(10),
                 ),
-                child: Stack(
-                  children: [
-                    buildShimmerPlaceholder(),
-                    Image.network(
-                      widget.imagePath,
-                      width: double.infinity,
-                      height: 100,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) {
-                          return child;
-                        } else {
-                          return Opacity(opacity: 0, child: child);
-                        }
-                      },
-                      errorBuilder:
-                          (context, error, stackTrace) => Container(
-                            width: double.infinity,
-                            height: 100,
-                            color: Colors.grey[200],
-                            child: const Center(
-                              child: Icon(
-                                Icons.fastfood,
-                                size: 40,
-                                color: Colors.grey,
+                child: AspectRatio(
+                  aspectRatio: 1.1, // membuat gambar lebih tinggi (kotak)
+                  child: Stack(
+                    children: [
+                      buildShimmerPlaceholder(),
+                      Image.network(
+                        widget.imagePath,
+                        width: double.infinity,
+                        height: 100,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) {
+                            return child;
+                          } else {
+                            return Opacity(opacity: 0, child: child);
+                          }
+                        },
+                        errorBuilder:
+                            (context, error, stackTrace) => Container(
+                              color: Colors.grey[200],
+                              child: const Center(
+                                child: Icon(
+                                  Icons.fastfood,
+                                  size: 40,
+                                  color: Colors.grey,
+                                ),
                               ),
                             ),
-                          ),
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -86,7 +87,6 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
               Padding(
                 padding: const EdgeInsets.all(8),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -125,11 +125,7 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade300,
       highlightColor: Colors.grey.shade100,
-      child: Container(
-        width: double.infinity,
-        height: 100,
-        color: Colors.white,
-      ),
+      child: Container(width: double.infinity, height: 100,color: Colors.white),
     );
   }
 }
