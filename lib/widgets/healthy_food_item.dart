@@ -107,7 +107,7 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
                         child: Icon(
                           isFavorite ? Icons.favorite : Icons.favorite_border,
                           size: 18,
-                          color: Colors.orange,
+                          color: Colors.red,
                         ),
                       ),
                     ),
