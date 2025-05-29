@@ -41,8 +41,9 @@ class NavbarState extends State<Navbar> {
           context: context,
           builder:
               (context) => AlertDialog(
+                backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(28),
                 ),
                 title: Row(
                   children: [
@@ -59,8 +60,12 @@ class NavbarState extends State<Navbar> {
                 actions: [
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.3,
+                    height: 45,
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
                         foregroundColor: Colors.black,
                       ),
                       onPressed: () {
@@ -74,6 +79,9 @@ class NavbarState extends State<Navbar> {
                     height: 45,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
                         backgroundColor: Color(0xFFF46A06),
                       ),
                       onPressed: () {
@@ -132,12 +140,12 @@ class NavbarState extends State<Navbar> {
                 ),
                 NavigationDestination(
                   icon: Icon(
-                    Icons.search_rounded,
+                    Icons.menu_book_rounded,
                     size: 30,
                     color: Colors.white,
                   ),
                   selectedIcon: Icon(
-                    Icons.search_rounded,
+                    Icons.menu_book_rounded,
                     size: 30,
                     color: Color(0xFFF46A06),
                   ),

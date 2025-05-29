@@ -23,7 +23,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.pushNamedAndRemoveUntil(context, Routes.login, (route) => false);
   }
 
-  // Add this method to navigate to edit profile screen
   Future<void> _navigateToEditProfile(User currentUser) async {
     final result = await Navigator.push(
       context,
@@ -96,11 +95,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30),
+                            topLeft: Radius.circular(28),
+                            topRight: Radius.circular(28),
                           ),
                         ),
-                        
                       ),
                     ),
                   ],
@@ -132,10 +130,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               (route) => false,
                             );
                           },
-                          icon: const Icon(Icons.login, color: Colors.white),
+                          icon: const Icon(Icons.login, color: Colors.black),
                           label: const Text(
                             "Login",
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: Colors.black),
                           ),
                         );
                       }
@@ -147,8 +145,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             context: context,
                             builder: (context) {
                               return AlertDialog(
+                                backgroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(28),
                                 ),
                                 title: Row(
                                   children: const [
@@ -169,6 +168,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     height: 45,
                                     child: OutlinedButton(
                                       style: OutlinedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
+                                        ),
                                         foregroundColor: Colors.black,
                                       ),
                                       onPressed: () {
@@ -183,6 +187,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     height: 45,
                                     child: ElevatedButton(
                                       style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
+                                        ),
                                         backgroundColor: Color(0xFFF46A06),
                                       ),
                                       onPressed: () {
@@ -205,11 +214,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                         icon: const Icon(
                           Icons.logout_rounded,
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                         label: const Text(
                           "Logout",
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black),
                         ),
                       );
                     },

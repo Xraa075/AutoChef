@@ -30,7 +30,7 @@ class IntroScreenState extends State<IntroScreen> {
     if (currentPage < introData.length - 1) {
       pageController.animateToPage(
         currentPage + 1,
-        duration: const Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 600),
         curve: Curves.ease,
       );
     } else {
@@ -81,7 +81,7 @@ class IntroScreenState extends State<IntroScreen> {
                     foregroundColor: Colors.white,
                     minimumSize: const Size(234, 60),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(28),
                     ),
                   ),
                   child: Text(
@@ -131,8 +131,8 @@ class IntroScreenState extends State<IntroScreen> {
   Widget buildDot(int index) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
-      width: currentPage == index ? 12 : 8,
-      height: currentPage == index ? 12 : 8,
+      width: currentPage == index ? 12 : 6,
+      height: currentPage == index ? 12 : 6,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: currentPage == index ? Color(0xFFF46A06) : Colors.grey,

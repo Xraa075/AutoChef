@@ -49,8 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(28),
           ),
           title: Row(
             children: const [
@@ -66,6 +67,9 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 45,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
                   backgroundColor: Color(0xFFF46A06),
                 ),
                 onPressed: () {
@@ -177,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         vertical: 10,
                         horizontal: 20.0,
                       ),
-                      hintText: 'Cari resep...',
+                      hintText: 'Cari nama resep...',
                       hintStyle: TextStyle(
                         color: Colors.grey[500],
                         fontStyle: FontStyle.italic,
@@ -185,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(18),
                         borderSide: BorderSide.none,
                       ),
                     ),
@@ -234,8 +238,8 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
+              topLeft: Radius.circular(28),
+              topRight: Radius.circular(28),
             ),
           ),
           child: ListView(

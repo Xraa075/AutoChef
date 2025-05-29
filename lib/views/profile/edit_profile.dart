@@ -382,8 +382,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       decoration: const BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30),
+                          topLeft: Radius.circular(28),
+                          topRight: Radius.circular(28),
                         ),
                       ),
                       padding: const EdgeInsets.all(20),
