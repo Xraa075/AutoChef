@@ -7,6 +7,7 @@ import 'package:autochef/views/recipe/components/recipe_info.dart'; // Pastikan 
 import 'package:autochef/views/recipe/components/ingredients.dart'; // Pastikan path ini benar
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:autochef/services/api_rekomendation.dart'; // Pastikan path ini benar
 import 'dart:convert';
 import 'dart:async';
 
@@ -30,7 +31,26 @@ class _DetailMakananState extends State<DetailMakanan> {
   void initState() {
     super.initState();
     _initializeAndCheckFavoriteStatus();
+    _logRecipeView();
   }
+
+  Future<void> _logRecipeView() async {
+  // Delay logging slightly to avoid competing with UI initialization
+  await Future.delayed(Duration(milliseconds: 300));
+  if (!mounted) return;
+  
+  try {
+    // Check if user is logged in before logging
+    final bool userLoggedIn = await _isUserLoggedIn();
+    if (userLoggedIn) {
+      // Log the recipe view
+      await ApiRekomendasi.logRecipeView(widget.recipe.id);
+    }
+  } catch (e) {
+    // Silently handle errors to avoid affecting user experience
+    debugPrint('Error when logging recipe view: $e');
+  }
+}
 
   Future<void> _initializeAndCheckFavoriteStatus() async {
     _prefs = await SharedPreferences.getInstance();

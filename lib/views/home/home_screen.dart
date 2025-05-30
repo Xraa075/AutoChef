@@ -52,24 +52,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> getRekomendasi() async {
-    try {
-      final data = await ApiRekomendasi.fetchRekomendasi();
-      if (mounted) {
-        setState(() {
-          _rekomendasi = data;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      print('Error mendapatkan rekomendasi: $e');
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        _showPopup("Gagal memuat rekomendasi. Periksa koneksi Anda.");
-      }
+  try {
+    debugPrint('Starting to fetch recommendations');
+    final data = await ApiRekomendasi.fetchRekomendasi();
+    debugPrint('Received ${data.length} recommendations');
+    
+    if (mounted) {
+      setState(() {
+        _rekomendasi = data;
+        _isLoading = false;
+      });
+    }
+  } catch (e) {
+    debugPrint('Error getting recommendations: $e');
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showPopup("Gagal memuat rekomendasi: ${e.toString().split(':').last}");
     }
   }
+}
 
   void _showPopup(String message) {
     if (!mounted) return;
