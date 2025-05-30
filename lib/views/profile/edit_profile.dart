@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:autochef/models/user.dart'; // Assuming User model exists
-import 'package:autochef/services/api_profile.dart'; // Assuming ApiProfile service exists
+import 'package:autochef/models/user.dart';
+import 'package:autochef/services/api_profile.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final User currentUser;
@@ -22,7 +22,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool _avatarChanged = false;
   bool _passwordFieldsNotEmpty = false;
 
-  // List of available avatars
   final List<String> _avatars = [
     'lib/assets/images/avatar1.png',
     'lib/assets/images/avatar2.png',
@@ -58,7 +57,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     } else {
       if (_nameChanged) setState(() => _nameChanged = false);
     }
-    // Update header text immediately
     setState(() {});
   }
 
@@ -71,14 +69,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     } else {
       if (_emailChanged) setState(() => _emailChanged = false);
     }
-    // Update header text immediately
     setState(() {});
   }
 
   void _handlePasswordFieldsChange() {
     final bool currentlyNotEmpty =
         _currentPasswordController.text.isNotEmpty ||
-            _newPasswordController.text.isNotEmpty;
+        _newPasswordController.text.isNotEmpty;
     if (_passwordFieldsNotEmpty != currentlyNotEmpty) {
       setState(() {
         _passwordFieldsNotEmpty = currentlyNotEmpty;
@@ -105,7 +102,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _nameChanged || _emailChanged || _avatarChanged;
     final bool passwordFieldsAreFilled =
         _currentPasswordController.text.isNotEmpty ||
-            _newPasswordController.text.isNotEmpty;
+        _newPasswordController.text.isNotEmpty;
 
     if (!profileDataHasChanged && !passwordFieldsAreFilled) {
       _showNotification(
@@ -131,7 +128,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       String successDetails = "";
       List<String> errorMessages = [];
 
-      // 1. Update Profile (if changes exist)
       if (profileDataHasChanged) {
         final result = await ApiProfile.updateProfile(
           name: _nameController.text.trim(),
@@ -148,10 +144,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _emailChanged = false;
             _avatarChanged = false;
           });
-        } 
+        }
       }
 
-      // 2. Change Password (if fields are filled)
       if (passwordFieldsAreFilled) {
         if (_currentPasswordController.text.isEmpty ||
             _newPasswordController.text.isEmpty) {
@@ -170,7 +165,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _currentPasswordController.clear();
             _newPasswordController.clear();
             setState(() {
-              _passwordFieldsNotEmpty = false; // Reset flag after clearing
+              _passwordFieldsNotEmpty = false;
             });
           } else {
             errorMessages.add(
@@ -185,14 +180,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _showNotification(
           icon: Icons.check_circle_outline,
           title: 'Berhasil',
-          message: successDetails.trim().isEmpty
-              ? 'Perubahan berhasil disimpan.'
-              : successDetails.trim(),
+          message:
+              successDetails.trim().isEmpty
+                  ? 'Perubahan berhasil disimpan.'
+                  : successDetails.trim(),
           isError: false,
         );
-        await Future.delayed(
-          const Duration(seconds: 2),
-        ); 
+        await Future.delayed(const Duration(seconds: 2));
         if (mounted) {
           Navigator.pop(context, true); // Return true to indicate success
         }
@@ -259,21 +253,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       title,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text(
-                      message,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    Text(message, maxLines: 3, overflow: TextOverflow.ellipsis),
                   ],
                 ),
               ),
             ],
           ),
-          backgroundColor: isError
-              ? Colors.red.shade800
-              : (showWarning
-                  ? Colors.amber.shade800
-                  : Colors.green.shade800),
+          backgroundColor:
+              isError
+                  ? Colors.red.shade800
+                  : (showWarning
+                      ? Colors.amber.shade800
+                      : Colors.green.shade800),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -287,7 +278,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool hasOverallChanges = _nameChanged ||
+    bool hasOverallChanges =
+        _nameChanged ||
         _emailChanged ||
         _avatarChanged ||
         _passwordFieldsNotEmpty;
@@ -306,34 +298,37 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             if (hasOverallChanges) {
               showDialog(
                 context: context,
-                builder: (context) => AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  title: const Text('Perubahan Belum Disimpan'),
-                  content: const Text(
-                    'Anda memiliki perubahan yang belum disimpan. Yakin ingin keluar?',
-                  ),
-                  actions: [
-                    TextButton(
-                      child: const Text(
-                        'Batal',
-                        style: TextStyle(color: Colors.grey),
+                builder:
+                    (context) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    TextButton(
-                      child: const Text(
-                        'Ya, Keluar',
-                        style: TextStyle(color: Color(0xFFF46A06)),
+                      title: const Text('Perubahan Belum Disimpan'),
+                      content: const Text(
+                        'Anda memiliki perubahan yang belum disimpan. Yakin ingin keluar?',
                       ),
-                      onPressed: () {
-                        Navigator.pop(context); // tutup dialog
-                        Navigator.pop(context); // kembali ke halaman sebelumnya
-                      },
+                      actions: [
+                        TextButton(
+                          child: const Text(
+                            'Batal',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        TextButton(
+                          child: const Text(
+                            'Ya, Keluar',
+                            style: TextStyle(color: Color(0xFFF46A06)),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context); // tutup dialog
+                            Navigator.pop(
+                              context,
+                            ); // kembali ke halaman sebelumnya
+                          },
+                        ),
+                      ],
                     ),
-                  ],
-                ),
               );
             } else {
               Navigator.pop(context);
@@ -342,91 +337,101 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         actions: [], // Removed the save button from here
       ),
-      body: _isLoading
-          ? Container(
-              color: Colors.white.withOpacity(0.8),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 80,
-                      height: 80,
-                      child: CircularProgressIndicator(
-                        color: const Color(0xFFF46A06),
-                        backgroundColor: Colors.grey.withOpacity(0.2),
-                        strokeWidth: 6,
+      body:
+          _isLoading
+              ? Container(
+                color: Colors.white.withOpacity(0.8),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 80,
+                        height: 80,
+                        child: CircularProgressIndicator(
+                          color: const Color(0xFFF46A06),
+                          backgroundColor: Colors.grey.withOpacity(0.2),
+                          strokeWidth: 6,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'Menyimpan perubahan...',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF333333),
+                      const SizedBox(height: 24),
+                      const Text(
+                        'Menyimpan perubahan...',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF333333),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+              : Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    _buildHeader(),
+                    Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(28),
+                            topRight: Radius.circular(28),
+                          ),
+                        ),
+                        padding: const EdgeInsets.all(20),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildProfileSection(),
+                              const SizedBox(height: 16),
+                              _buildPasswordSection(),
+                              const SizedBox(
+                                height: 30,
+                              ), // Spacing before the button
+                              if (hasOverallChanges)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    bottom: 10.0,
+                                  ), // Optional: add some bottom padding if needed
+                                  child: ElevatedButton.icon(
+                                    onPressed:
+                                        _isLoading
+                                            ? null
+                                            : _updateProfileAndOrPassword,
+                                    label: const Text('Simpan Perubahan'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFFF46A06),
+                                      foregroundColor: Colors.white,
+                                      minimumSize: const Size(
+                                        double.infinity,
+                                        50,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      textStyle: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            )
-          : Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  _buildHeader(),
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(28),
-                          topRight: Radius.circular(28),
-                        ),
-                      ),
-                      padding: const EdgeInsets.all(20),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildProfileSection(),
-                            const SizedBox(height: 16),
-                            _buildPasswordSection(),
-                            const SizedBox(height: 30), // Spacing before the button
-                            if (hasOverallChanges)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 10.0), // Optional: add some bottom padding if needed
-                                child: ElevatedButton.icon(
-                                  onPressed: _isLoading
-                                      ? null
-                                      : _updateProfileAndOrPassword,
-                                  label: const Text('Simpan Perubahan'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFF46A06),
-                                    foregroundColor: Colors.white,
-                                    minimumSize:
-                                        const Size(double.infinity, 50),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    textStyle: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
     );
   }
 
@@ -777,101 +782,105 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _showAvatarSelectionDialog() {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Color(0xFFFBC72A),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.face, color: Colors.black),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Pilih Avatar',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+      builder:
+          (context) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFBC72A),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
                     ),
                   ),
-                  const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.face, color: Colors.black),
+                      const SizedBox(width: 10),
+                      const Text(
+                        'Pilih Avatar',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics:
-                    const NeverScrollableScrollPhysics(), // If content might overflow
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
                 ),
-                itemCount: _avatars.length,
-                itemBuilder: (context, index) {
-                  final avatar = _avatars[index];
-                  final bool isSelected = _selectedAvatar == avatar;
-                  return InkWell(
-                    onTap: () {
-                      _updateAvatar(avatar);
-                      Navigator.pop(context);
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics:
+                        const NeverScrollableScrollPhysics(), // If content might overflow
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                        ),
+                    itemCount: _avatars.length,
+                    itemBuilder: (context, index) {
+                      final avatar = _avatars[index];
+                      final bool isSelected = _selectedAvatar == avatar;
+                      return InkWell(
+                        onTap: () {
+                          _updateAvatar(avatar);
+                          Navigator.pop(context);
+                        },
+                        borderRadius: BorderRadius.circular(50),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border:
+                                isSelected
+                                    ? Border.all(
+                                      color: const Color(0xFFF46A06),
+                                      width: 3,
+                                    )
+                                    : Border.all(
+                                      color: Colors.grey.shade300,
+                                      width: 2,
+                                    ),
+                            boxShadow:
+                                isSelected
+                                    ? [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFFF46A06,
+                                        ).withOpacity(0.3),
+                                        blurRadius: 10,
+                                        spreadRadius: 2,
+                                      ),
+                                    ]
+                                    : null,
+                          ),
+                          child: CircleAvatar(
+                            backgroundImage: AssetImage(avatar),
+                            backgroundColor: Colors.white,
+                          ),
+                        ),
+                      );
                     },
-                    borderRadius: BorderRadius.circular(50),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: isSelected
-                            ? Border.all(
-                                color: const Color(0xFFF46A06),
-                                width: 3,
-                              )
-                            : Border.all(
-                                color: Colors.grey.shade300,
-                                width: 2,
-                              ),
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: const Color(
-                                    0xFFF46A06,
-                                  ).withOpacity(0.3),
-                                  blurRadius: 10,
-                                  spreadRadius: 2,
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: CircleAvatar(
-                        backgroundImage: AssetImage(avatar),
-                        backgroundColor: Colors.white,
-                      ),
-                    ),
-                  );
-                },
-              ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 }
