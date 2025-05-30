@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/models/user.dart';
 import 'package:autochef/models/recipe.dart';
 import 'package:autochef/data/dummy_user.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:autochef/routes.dart';
 import 'package:autochef/views/profile/edit_profile.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
+import 'package:autochef/routes.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:math';
@@ -463,7 +463,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     if (_isUserActuallyLoggedIn && activeUser != null)
                       ElevatedButton.icon(
                         onPressed: () => _navigateToEditProfile(activeUser),
-                        icon: const Icon(Icons.edit, size: 18),
+                        icon: const Icon(Icons.edit, color: Colors.black),
                         label: const Text("Edit Profil"),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
@@ -618,6 +618,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
 
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 16.0, top: 20.0, bottom: 10.0),
+          child: Text(
+            "Resep Favorite Kamu",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        Expanded(child: _buildFavoriteContent()),
+      ],
+    );
+  }
+
+  Widget _buildFavoriteContent() {
     if (_isLoadingFavorites) {
       return _buildShimmerGridFavorite();
     }
@@ -691,16 +711,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return FavoriteRecipeItem(
             recipe: recipe,
             onItemTap: () async {
-              // <<< Implementasi onItemTap di sini
               final result = await Navigator.push<bool>(
                 context,
                 MaterialPageRoute(
                   builder: (context) => DetailMakanan(recipe: recipe),
                 ),
               );
-              // Jika DetailMakanan mengembalikan true (artinya ada perubahan favorit)
               if (result == true && mounted) {
-                _fetchFavoriteRecipes(); // Maka refresh daftar favorit
+                _fetchFavoriteRecipes();
               }
             },
             onToggleFavorite: () => _toggleFavoriteStatus(recipe.id),

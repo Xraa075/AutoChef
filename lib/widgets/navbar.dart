@@ -140,12 +140,12 @@ class NavbarState extends State<Navbar> {
                 ),
                 NavigationDestination(
                   icon: Icon(
-                    Icons.menu_book_rounded,
+                    Icons.search_rounded,
                     size: 30,
                     color: Colors.white,
                   ),
                   selectedIcon: Icon(
-                    Icons.menu_book_rounded,
+                    Icons.search_rounded,
                     size: 30,
                     color: Color(0xFFF46A06),
                   ),

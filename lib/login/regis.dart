@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'login.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
+import 'login.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({super.key});

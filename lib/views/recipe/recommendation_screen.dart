@@ -9,8 +9,6 @@ import 'package:autochef/views/recipe/recipe_detail_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:autochef/services/search_service.dart';
 
-/// Widget utama untuk menampilkan daftar rekomendasi resepF
-/// berdasarkan bahan atau kategori yang dipilih pengguna
 class RekomendationRecipe extends StatefulWidget {
   final List<String>? bahan;
   final List<Recipe>? results;
@@ -32,7 +30,7 @@ class RekomendationRecipe extends StatefulWidget {
 class _RekomendationRecipeState extends State<RekomendationRecipe> {
   late Future<List<Recipe>> _futureRecipes;
   final ScrollController _scrollController = ScrollController();
-  bool _hasAnyFavoriteChanges = false; // Track perubahan favorit
+  bool _hasAnyFavoriteChanges = false;
 
   @override
   void initState() {
@@ -46,13 +44,11 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
     super.dispose();
   }
 
-  // Method untuk handle back button dengan return value
   Future<bool> _onWillPop() async {
     Navigator.pop(context, _hasAnyFavoriteChanges);
     return false;
   }
 
-  /// Mengambil data resep dari API berdasarkan bahan atau kategori
   Future<List<Recipe>> _fetchRecipes() async {
     try {
       List<dynamic> response = [];
@@ -62,16 +58,12 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
       final searchService = SearchService();
 
       if (widget.results != null && widget.results!.isNotEmpty) {
-        // Jika sudah ada hasil (misalnya dari screen sebelumnya)
         return widget.results!;
       } else if (widget.bahan != null && widget.bahan!.isNotEmpty) {
-        // Pencarian berdasarkan bahan
         response = await apiService.searchRecipes(widget.bahan!);
       } else if (widget.kategori != null && widget.kategori!.isNotEmpty) {
-        // Pencarian berdasarkan kategori
         response = await kategoriService.getRecipesByKategori(widget.kategori!);
       } else if (widget.namaResep != null && widget.namaResep!.isNotEmpty) {
-        // Tambahan pencarian berdasarkan nama resep jika diperlukan
         response = await SearchService.searchResep(widget.namaResep!);
       } else {
         throw Exception("Masukkan nama resep, bahan, atau kategori.");
@@ -96,7 +88,6 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
     }
   }
 
-  /// Menampilkan dialog error jika terjadi kesalahan saat mengambil data
   void _showErrorDialog(String message) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       showDialog(
@@ -107,7 +98,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
               onWillPop: () async => false,
               child: AlertDialog(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(28),
                 ),
                 title: Row(
                   children: [
@@ -162,8 +153,8 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
+                    topLeft: Radius.circular(28),
+                    topRight: Radius.circular(28),
                   ),
                 ),
                 child: Column(
@@ -198,7 +189,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                           return Scrollbar(
                             controller: _scrollController,
                             thumbVisibility: true,
-                            radius: Radius.circular(8),
+                            radius: Radius.circular(18),
                             interactive: true,
                             thickness: 8,
                             child: ListView.builder(
@@ -210,20 +201,18 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                                 return RecipeCard(
                                   recipe: recipe,
                                   onTap: () async {
-                                    // Tangkap hasil dari DetailMakanan
                                     final result = await Navigator.push<bool>(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => DetailMakanan(recipe: recipe),
+                                        builder:
+                                            (context) =>
+                                                DetailMakanan(recipe: recipe),
                                       ),
                                     );
-                                    
-                                    // Jika ada perubahan favorit, tandai
                                     if (result == true && mounted) {
                                       _hasAnyFavoriteChanges = true;
                                     }
                                   },
-                                  // image: recipe.gambar,
                                 );
                               },
                             ),
@@ -241,7 +230,6 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
     );
   }
 
-  /// Widget gambar resep dengan validasi URL dan efek loading shimmer
   Widget _buildImage(String? imageUrl) {
     if (imageUrl == null || imageUrl.isEmpty) {
       return Container(
@@ -275,7 +263,6 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
     );
   }
 
-  /// Widget loading shimmer sebagai placeholder saat data sedang dimuat
   Widget _buildShimmerLoading() {
     return ListView.builder(
       itemCount: 5,
@@ -289,7 +276,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
             height: 100,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(18),
             ),
           ),
         );
@@ -297,7 +284,6 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
     );
   }
 
-  /// Widget fallback saat terjadi error atau data kosong
   Widget _buildErrorWidget() {
     return Center(
       child: Column(

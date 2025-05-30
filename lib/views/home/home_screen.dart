@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:autochef/models/recipe.dart';
 import 'package:autochef/widgets/header.dart';
-import 'package:autochef/widgets/category_item.dart'; // <<< PENTING: Impor ini dipertahankan untuk CategoryItem
+import 'package:autochef/widgets/category_item.dart';
 import 'package:autochef/services/search_service.dart';
 import 'package:autochef/widgets/healthy_food_item.dart';
 import 'package:autochef/services/api_rekomendation.dart';
@@ -30,20 +30,22 @@ class _HomeScreenState extends State<HomeScreen> {
     _fetchInitialData();
   }
 
-  // Buat method public untuk refresh data
   Future<void> refreshData() async {
     await _fetchInitialData();
   }
 
-  // Ubah _fetchInitialData menjadi public juga
   Future<void> _fetchInitialData() async {
     if (!mounted) return;
-    setState(() { _isLoading = true; });
+    setState(() {
+      _isLoading = true;
+    });
 
     final connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none && mounted) {
       _showPopup("Tidak ada koneksi internet. Gagal memuat data.");
-      setState(() { _isLoading = false; });
+      setState(() {
+        _isLoading = false;
+      });
       return;
     }
     await getRekomendasi();
@@ -61,32 +63,48 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print('Error mendapatkan rekomendasi: $e');
       if (mounted) {
-        setState(() { _isLoading = false; });
+        setState(() {
+          _isLoading = false;
+        });
         _showPopup("Gagal memuat rekomendasi. Periksa koneksi Anda.");
       }
     }
   }
 
   void _showPopup(String message) {
-    if(!mounted) return;
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-          title: Row(children: const [ Icon(Icons.info, color: Color(0xFFF46A06)), SizedBox(width: 10), Text("Informasi")]),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
+          title: Row(
+            children: const [
+              Icon(Icons.info, color: Color(0xFFF46A06)),
+              SizedBox(width: 10),
+              Text("Informasi"),
+            ],
+          ),
           content: Text(message, style: const TextStyle(fontSize: 16)),
           actions: [
             SizedBox(
-              width: double.infinity, height: 45,
+              width: double.infinity,
+              height: 45,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
                   backgroundColor: const Color(0xFFF46A06),
                 ),
                 onPressed: () => Navigator.pop(context),
-                child: const Text("Oke", style: TextStyle(color: Colors.white, fontSize: 16)),
+                child: const Text(
+                  "Oke",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
               ),
             ),
           ],
@@ -107,18 +125,20 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
     if (!mounted) return;
-    setState(() { _isSearching = true; });
+    setState(() {
+      _isSearching = true;
+    });
     try {
       final results = await SearchService.searchResep(_searchQuery);
       if (!mounted) return;
-      
-      // Tangkap hasil dari RekomendationRecipe
+
       final hasChanges = await Navigator.push<bool>(
         context,
-        MaterialPageRoute(builder: (context) => RekomendationRecipe(results: results)),
+        MaterialPageRoute(
+          builder: (context) => RekomendationRecipe(results: results),
+        ),
       );
-      
-      // Jika ada perubahan favorit, refresh data
+
       if (hasChanges == true && mounted) {
         await _fetchInitialData();
       }
@@ -126,7 +146,10 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Search error: $e');
       _showPopup("Gagal mencari resep. Silakan coba lagi nanti.");
     } finally {
-      if (mounted) setState(() { _isSearching = false; });
+      if (mounted)
+        setState(() {
+          _isSearching = false;
+        });
     }
   }
 
@@ -135,17 +158,25 @@ class _HomeScreenState extends State<HomeScreen> {
       baseColor: Colors.grey.shade300,
       highlightColor: Colors.grey.shade100,
       child: Container(
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)), // Sesuaikan radius jika CategoryItem berbeda
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+        ),
       ),
     );
   }
 
   Widget buildShimmerGrid() {
     return GridView.builder(
-      shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), itemCount: 6,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 6,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 0.65,
+        crossAxisCount: 3,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 0.65,
       ),
       itemBuilder: (context, index) => buildShimmerItem(),
     );
@@ -156,39 +187,72 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFFBC72A),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.2),
+        preferredSize: Size.fromHeight(
+          MediaQuery.of(context).size.height * 0.2,
+        ),
         child: CustomHeader(
           title: "Mau masak apa hari ini",
           child: Container(
-            height: 40, padding: const EdgeInsets.symmetric(horizontal: 5),
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-            child: Row(children: [
-              Expanded(
-                child: TextField(
-                  style: const TextStyle(fontSize: 18, color: Colors.black87),
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20.0),
-                    hintText: 'Cari nama resep...',
-                    hintStyle: TextStyle(color: Colors.grey[500], fontStyle: FontStyle.italic),
-                    filled: true, fillColor: Colors.white,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
-                  ),
-                  onChanged: (value) { setState(() { _searchQuery = value; }); },
-                  onSubmitted: (_) => handleSearch(context),
-                ),
-              ),
-              const SizedBox(width: 8),
-              _isSearching
-                  ? const Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white)))
-                  : GestureDetector(
-                      onTap: () => handleSearch(context),
-                      child: Container(
-                        decoration: BoxDecoration(shape: BoxShape.rectangle, color: Colors.white, borderRadius: BorderRadius.circular(30)),
-                        padding: const EdgeInsets.all(8),
-                        child: const Icon(Icons.search, color: Colors.black54),
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(18)),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    style: const TextStyle(fontSize: 18, color: Colors.black87),
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 20.0,
+                      ),
+                      hintText: 'Cari nama resep...',
+                      hintStyle: TextStyle(
+                        color: Colors.grey[500],
+                        fontStyle: FontStyle.italic,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(18),
+                        borderSide: BorderSide.none,
                       ),
                     ),
-            ]),
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
+                    onSubmitted: (_) => handleSearch(context),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                _isSearching
+                    ? const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                    : GestureDetector(
+                      onTap: () => handleSearch(context),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(Icons.search, color: Colors.black),
+                      ),
+                    ),
+              ],
+            ),
           ),
         ),
       ),
@@ -198,7 +262,10 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
           decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(28), topRight: Radius.circular(28)),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(28),
+              topRight: Radius.circular(28),
+            ),
           ),
           child: RefreshIndicator(
             onRefresh: _fetchInitialData,
@@ -207,64 +274,110 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text("Kategori", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                  child: Text(
+                    "Kategori",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                  ),
                 ),
                 const SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [ 
-                    CategoryItemTap(title: "Snacks", kategori: "snack", imagePath: "lib/assets/images/snacks.jpg"),
-                    CategoryItemTap(title: "Meal", kategori: "meal", imagePath: "lib/assets/images/meal.jpg"),
-                    CategoryItemTap(title: "Vegan", kategori: "vegan", imagePath: "lib/assets/images/vegan.jpg"),
-                    CategoryItemTap(title: "Dessert", kategori: "dessert", imagePath: "lib/assets/images/dessert.jpg"),
-                    CategoryItemTap(title: "Drinks", kategori: "drink", imagePath: "lib/assets/images/drinks.jpg"),
+                  children: [
+                    CategoryItemTap(
+                      title: "Snacks",
+                      kategori: "snack",
+                      imagePath: "lib/assets/images/snacks.jpg",
+                    ),
+                    CategoryItemTap(
+                      title: "Meal",
+                      kategori: "meal",
+                      imagePath: "lib/assets/images/meal.jpg",
+                    ),
+                    CategoryItemTap(
+                      title: "Vegan",
+                      kategori: "vegan",
+                      imagePath: "lib/assets/images/vegan.jpg",
+                    ),
+                    CategoryItemTap(
+                      title: "Dessert",
+                      kategori: "dessert",
+                      imagePath: "lib/assets/images/dessert.jpg",
+                    ),
+                    CategoryItemTap(
+                      title: "Drinks",
+                      kategori: "drink",
+                      imagePath: "lib/assets/images/drinks.jpg",
+                    ),
                   ],
                 ),
                 const SizedBox(height: 10),
                 const Padding(
                   padding: EdgeInsets.all(20.0),
-                  child: Text("Rekomendasi", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                  child: Text(
+                    "Rekomendasi",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                  ),
                 ),
                 _isLoading
                     ? buildShimmerGrid()
                     : _rekomendasi.isEmpty
-                        ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 50.0, horizontal: 20.0),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.ramen_dining_outlined, size: 60, color: Colors.grey.shade400),
-                                  const SizedBox(height: 10),
-                                  const Text("Belum ada rekomendasi saat ini.", style: TextStyle(fontSize: 16, color: Colors.grey)),
-                                ],
+                    ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 50.0,
+                          horizontal: 20.0,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.ramen_dining_outlined,
+                              size: 60,
+                              color: Colors.grey.shade400,
+                            ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              "Belum ada rekomendasi saat ini.",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
                               ),
                             ),
-                          )
-                        : GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            itemCount: _rekomendasi.length,
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 0.65,
-                            ),
-                            itemBuilder: (context, index) {
-                              final resep = _rekomendasi[index];
-                              return HealthyFoodItem(
-                                recipe: resep,
-                                onTap: () async { 
-                                  final result = await Navigator.push<bool>(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => DetailMakanan(recipe: resep)),
-                                  );
-                                  if (result == true && mounted) {
-                                    await _fetchInitialData();
-                                  }
-                                },
-                              );
-                            },
+                          ],
+                        ),
+                      ),
+                    )
+                    : GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: _rekomendasi.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.65,
                           ),
+                      itemBuilder: (context, index) {
+                        final resep = _rekomendasi[index];
+                        return HealthyFoodItem(
+                          recipe: resep,
+                          onTap: () async {
+                            final result = await Navigator.push<bool>(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => DetailMakanan(recipe: resep),
+                              ),
+                            );
+                            if (result == true && mounted) {
+                              await _fetchInitialData();
+                            }
+                          },
+                        );
+                      },
+                    ),
                 const SizedBox(height: 10),
               ],
             ),
@@ -274,12 +387,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-// +--------------------------------------------------------------------------+
-// | DEFINISI CategoryItemTap Diletakkan DI SINI (DI BAWAH CLASS _HomeScreenState) |
-// | Pastikan CategoryItem (yang digunakan oleh CategoryItemTap) sudah di-import |
-// | dari 'package:autochef/widgets/category_item.dart'                      |
-// +--------------------------------------------------------------------------+
 
 class CategoryItemTap extends StatelessWidget {
   final String title;
@@ -297,18 +404,16 @@ class CategoryItemTap extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        // Tangkap hasil dari RekomendationRecipe
         final hasChanges = await Navigator.push<bool>(
           context,
           MaterialPageRoute(
             builder: (context) => RekomendationRecipe(kategori: kategori),
           ),
         );
-        
-        // Jika ada perubahan favorit, refresh data HomeScreen
+
         if (hasChanges == true && context.mounted) {
-          // Akses _HomeScreenState untuk memanggil refreshData
-          final homeScreenState = context.findAncestorStateOfType<_HomeScreenState>();
+          final homeScreenState =
+              context.findAncestorStateOfType<_HomeScreenState>();
           if (homeScreenState != null) {
             await homeScreenState.refreshData();
           }

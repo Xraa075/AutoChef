@@ -1,19 +1,18 @@
+import 'package:autochef/models/recipe.dart';
 import 'package:flutter/material.dart';
-import 'package:autochef/models/recipe.dart'; // Sesuaikan path
-// import 'package:autochef/views/recipe/recipe_detail_screen.dart'; // Navigasi dikontrol oleh parent (ProfileScreen)
 import 'package:shimmer/shimmer.dart';
 
 class FavoriteRecipeItem extends StatelessWidget {
   final Recipe recipe;
   final VoidCallback onToggleFavorite;
   final Future<void> Function()?
-  onItemTap; // Callback untuk navigasi yang dikontrol parent
+  onItemTap;
 
   const FavoriteRecipeItem({
     super.key,
     required this.recipe,
     required this.onToggleFavorite,
-    this.onItemTap, // Jadikan opsional jika tidak selalu digunakan, atau required jika selalu
+    this.onItemTap,
   });
 
   Widget _buildImageShimmerPlaceholder(BuildContext context) {
@@ -27,11 +26,11 @@ class FavoriteRecipeItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onItemTap, // Gunakan callback onItemTap
+      onTap: onItemTap,
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(18),
           boxShadow: const [
             BoxShadow(
               color: Colors.black12,
@@ -47,7 +46,7 @@ class FavoriteRecipeItem extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(10.0),
+                top: Radius.circular(18),
               ),
               child: AspectRatio(
                 aspectRatio: 1.1,
@@ -89,7 +88,7 @@ class FavoriteRecipeItem extends StatelessWidget {
                   Text(
                     recipe.namaResep,
                     style: const TextStyle(
-                      fontSize: 14 /* fontWeight: FontWeight.w600 */,
+                      fontSize: 14,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

@@ -222,10 +222,10 @@ class _InputRecipeState extends State<InputRecipe> {
                             child: Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.grey[300],
+                                color: Color(0xFFF46A06),
                               ),
                               padding: const EdgeInsets.all(8),
-                              child: const Icon(Icons.add, color: Colors.black),
+                              child: const Icon(Icons.add, color: Colors.white),
                             ),
                           ),
                         ],

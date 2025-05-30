@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:autochef/widgets/navbar.dart';
 import 'package:autochef/views/recipe/recommendation_screen.dart';
 import 'package:autochef/views/input_ingredients/input_screen.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
 import 'package:autochef/views/profile/edit_profile.dart';
-import 'package:autochef/models/recipe.dart';
 import 'package:autochef/views/intro/intro_screen.dart';
+import 'package:autochef/widgets/navbar.dart';
+import 'package:autochef/models/recipe.dart';
 import 'package:autochef/login/login.dart';
 import 'package:autochef/login/regis.dart';
 import 'package:autochef/models/user.dart';
