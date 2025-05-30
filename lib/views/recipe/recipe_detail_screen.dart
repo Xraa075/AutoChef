@@ -151,7 +151,7 @@ class _DetailMakananState extends State<DetailMakanan> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 4),
+                      SizedBox(height: 6),
 
                       /// **Kategori dan Negara**
                       Row(
@@ -160,7 +160,7 @@ class _DetailMakananState extends State<DetailMakanan> {
                           Text(
                             "${widget.recipe.negara}", // Menggunakan widget.recipe
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 18,
                               color: const Color.fromARGB(121, 0, 0, 0),
                               fontWeight: FontWeight.w500,
                               letterSpacing: 0.5,

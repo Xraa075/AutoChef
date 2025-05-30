@@ -10,15 +10,15 @@ class Ingredients extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Bahan-bahan", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-        SizedBox(height: 6),
+        Text("Bahan-bahan", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        SizedBox(height: 10),
         ...ingredients.map((step) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 1),
+              padding: const EdgeInsets.symmetric(vertical: 5),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("●   ", ),
-                  Expanded(child: Text(step, style: TextStyle(fontSize: 12))),
+                  Expanded(child: Text(step, style: TextStyle(fontSize: 16))),
                 ],
               ),
             )),
