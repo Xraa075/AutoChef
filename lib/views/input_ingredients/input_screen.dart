@@ -143,7 +143,7 @@ class _InputRecipeState extends State<InputRecipe> {
                   backgroundColor: Color(0xFFF46A06),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18),
-                  )
+                  ),
                 ),
                 onPressed: () {
                   Navigator.pop(context);

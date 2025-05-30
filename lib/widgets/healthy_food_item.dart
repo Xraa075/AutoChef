@@ -140,12 +140,12 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
             _isFavorite = false;
           });
         print(
-          "HealthyFoodItem (${widget.recipe.namaResep}): Gagal cek status favorit awal: ${response.statusCode}",
+          "HealthyFoodItem (${widget.recipe.namaResep}): Gagal cek status favorite awal: ${response.statusCode}",
         );
       }
     } catch (e) {
       print(
-        "HealthyFoodItem (${widget.recipe.namaResep}): Error cek status favorit awal: $e",
+        "HealthyFoodItem (${widget.recipe.namaResep}): Error cek status favorite awal: $e",
       );
       if (mounted)
         setState(() {
@@ -228,8 +228,8 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
         final bool newFavoriteState = !_isFavorite;
         String message =
             newFavoriteState
-                ? "Resep ditambahkan ke favorit!"
-                : "Resep dihapus dari favorit.";
+                ? "Resep ditambahkan ke favorite!"
+                : "Resep dihapus dari favorite.";
         if (response.body.isNotEmpty &&
             (response.statusCode == 200 || response.statusCode == 201)) {
           try {
@@ -253,14 +253,14 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
             SnackBar(content: Text(message), backgroundColor: Colors.green),
           );
       } else {
-        String errorMessage = "Gagal mengubah status favorit.";
+        String errorMessage = "Gagal mengubah status favorite.";
         try {
           final responseData = jsonDecode(response.body);
           if (responseData is Map<String, dynamic> &&
               responseData.containsKey('message')) {
             errorMessage = responseData['message'];
           } else if (response.statusCode == 409 && !_isFavorite) {
-            errorMessage = "Resep ini sudah ada di favorit Anda.";
+            errorMessage = "Resep ini sudah ada di favorite Anda.";
           } else if (response.body.isNotEmpty) {
             errorMessage =
                 response.body.length > 100
@@ -396,41 +396,47 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    // Added cooking time similar to RecipeCard
+                    const SizedBox(height: 10),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Icon(Icons.access_time, color: Colors.orange, size: 12),
-                        const SizedBox(width: 2),
-                        Text(
-                          "${widget.recipe.waktu} Menit",
-                          style: const TextStyle(fontSize: 10, color: Colors.orange),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child:
-                          _isLoadingInitialStatus || _isTogglingFavorite
-                              ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2.0,
-                                  color: Colors.red,
-                                ),
-                              )
-                              : GestureDetector(
-                                onTap: _handleToggleFavorite,
-                                child: Icon(
-                                  _isFavorite
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
-                                  size: 18,
-                                  color: Colors.red,
-                                ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.access_time,
+                              color: Colors.orange,
+                              size: 12,
+                            ),
+                            const SizedBox(width: 2),
+                            Text(
+                              "${widget.recipe.waktu} Menit",
+                              style: const TextStyle(
+                                fontSize: 10,
+                                color: Colors.orange,
                               ),
+                            ),
+                          ],
+                        ),
+                        _isLoadingInitialStatus || _isTogglingFavorite
+                            ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.0,
+                                color: Colors.red,
+                              ),
+                            )
+                            : GestureDetector(
+                              onTap: _handleToggleFavorite,
+                              child: Icon(
+                                _isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                size: 18,
+                                color: Colors.red,
+                              ),
+                            ),
+                      ],
                     ),
                   ],
                 ),

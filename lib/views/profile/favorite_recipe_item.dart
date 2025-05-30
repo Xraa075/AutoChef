@@ -5,8 +5,7 @@ import 'package:shimmer/shimmer.dart';
 class FavoriteRecipeItem extends StatelessWidget {
   final Recipe recipe;
   final VoidCallback onToggleFavorite;
-  final Future<void> Function()?
-  onItemTap;
+  final Future<void> Function()? onItemTap;
 
   const FavoriteRecipeItem({
     super.key,
@@ -87,31 +86,40 @@ class FavoriteRecipeItem extends StatelessWidget {
                 children: [
                   Text(
                     recipe.namaResep,
-                    style: const TextStyle(
-                      fontSize: 14,
-                    ),
+                    style: const TextStyle(fontSize: 14),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
-                  // Added cooking time icon same as HealthyFoodItem
+                  const SizedBox(height: 10),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Icon(Icons.access_time, color: Colors.orange, size: 12),
-                      const SizedBox(width: 2),
-                      Text(
-                        "${recipe.waktu} Menit",
-                        style: const TextStyle(fontSize: 10, color: Colors.orange),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time,
+                            color: Colors.orange,
+                            size: 12,
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            "${recipe.waktu} Menit",
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.orange,
+                            ),
+                          ),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: onToggleFavorite,
+                        child: Icon(
+                          Icons.favorite,
+                          size: 18,
+                          color: Colors.red,
+                        ),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 4),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: onToggleFavorite,
-                      child: Icon(Icons.favorite, size: 18, color: Colors.red),
-                    ),
                   ),
                 ],
               ),

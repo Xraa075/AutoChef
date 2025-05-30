@@ -143,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   .toList();
         });
       } else {
-        String serverMessage = "Gagal memuat resep favorit.";
+        String serverMessage = "Gagal memuat resep favorite.";
         try {
           final errorData = jsonDecode(response.body);
           if (errorData is Map<String, dynamic> &&
@@ -188,7 +188,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Silakan login untuk mengubah favorit."),
+            content: Text("Silakan login untuk mengubah favorite."),
           ),
         );
       }
@@ -211,7 +211,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (!mounted) return;
 
       if (response.statusCode == 200 || response.statusCode == 204) {
-        String successMessage = "Resep berhasil dihapus dari favorit.";
+        String successMessage = "Resep berhasil dihapus dari favorite.";
         if (response.body.isNotEmpty && response.statusCode == 200) {
           try {
             final responseData = jsonDecode(response.body);
@@ -234,7 +234,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
         await _fetchFavoriteRecipes();
       } else {
-        String errorMessage = "Gagal menghapus dari favorit.";
+        String errorMessage = "Gagal menghapus dari favorite.";
         try {
           final responseData = jsonDecode(response.body);
           if (responseData is Map<String, dynamic> &&
@@ -284,7 +284,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              "Gagal mengubah status favorit. Masalah pada koneksi.",
+              "Gagal mengubah status favorite. Masalah pada koneksi.",
             ),
             backgroundColor: Colors.orange,
           ),
@@ -608,7 +608,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 16),
               const Text(
-                "Login untuk melihat resep favorit kamu.",
+                "Login untuk melihat resep favorite kamu.",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
@@ -684,7 +684,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icon(Icons.bookmarks_outlined, size: 60, color: Colors.grey),
               SizedBox(height: 16),
               Text(
-                "Kamu belum memiliki resep favorit.\nCari dan tambahkan resep kesukaanmu!",
+                "Kamu belum memiliki resep favorite.\nCari dan tambahkan resep kesukaanmu!",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),

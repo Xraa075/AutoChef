@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:autochef/models/user.dart';
 import 'package:autochef/services/api_profile.dart';
 
@@ -21,6 +22,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool _emailChanged = false;
   bool _avatarChanged = false;
   bool _passwordFieldsNotEmpty = false;
+  bool _isCurrentPasswordVisible = false;
+  bool _isNewPasswordVisible = false;
 
   final List<String> _avatars = [
     'lib/assets/images/avatar1.png',
@@ -34,6 +37,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   String _selectedAvatar = '';
   final _formKey = GlobalKey<FormState>();
+
+  final emailRegex = RegExp(
+    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+  );
 
   @override
   void initState() {
@@ -137,7 +144,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
         if (result['success']) {
           anySuccess = true;
-          successDetails += "Profil berhasil diperbarui. ";
+          successDetails += "Profile berhasil diperbarui. ";
 
           setState(() {
             _nameChanged = false;
@@ -175,7 +182,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
       }
 
-      // 3. Consolidate notifications and navigation
       if (anySuccess && errorMessages.isEmpty) {
         _showNotification(
           icon: Icons.check_circle_outline,
@@ -186,9 +192,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   : successDetails.trim(),
           isError: false,
         );
-        await Future.delayed(const Duration(seconds: 2));
+        await Future.delayed(const Duration(seconds: 1));
         if (mounted) {
-          Navigator.pop(context, true); // Return true to indicate success
+          Navigator.pop(context, true);
         }
       } else if (errorMessages.isNotEmpty) {
         _showNotification(
@@ -233,9 +239,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (mounted) {
       setState(() {
         if (isError) {
-        } else if (!showWarning) {
-          // Don't overwrite success message if it's just a warning
-        }
+        } else if (!showWarning) {}
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -276,6 +280,69 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  Future<bool> _showUnsavedChangesDialog() async {
+    return await showDialog(
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                title: Row(
+                  children: [
+                    Icon(Icons.info_outline_rounded, color: Color(0xFFF46A06)),
+                    SizedBox(width: 10),
+                    Text("Peringatan"),
+                  ],
+                ),
+                content: Text(
+                  "Anda memiliki perubahan yang belum disimpan. Yakin ingin keluar?",
+                  style: TextStyle(fontSize: 15),
+                ),
+                actionsAlignment: MainAxisAlignment.spaceAround,
+                actions: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    height: 45,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        foregroundColor: Colors.black,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context, false);
+                      },
+                      child: Text("Batal"),
+                    ),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    height: 45,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        backgroundColor: Color(0xFFF46A06),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context, true);
+                      },
+                      child: Text(
+                        "Ya, Keluar",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+        ) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
     bool hasOverallChanges =
@@ -284,160 +351,140 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _avatarChanged ||
         _passwordFieldsNotEmpty;
 
-    return Scaffold(
-      backgroundColor: Color(0xFFFBC72A),
-      appBar: AppBar(
-        title: const Text('Edit Profil'),
-        backgroundColor: const Color(0xFFFBC72A),
-        foregroundColor: Colors.black,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            if (hasOverallChanges) {
-              showDialog(
-                context: context,
-                builder:
-                    (context) => AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      title: const Text('Perubahan Belum Disimpan'),
-                      content: const Text(
-                        'Anda memiliki perubahan yang belum disimpan. Yakin ingin keluar?',
-                      ),
-                      actions: [
-                        TextButton(
-                          child: const Text(
-                            'Batal',
-                            style: TextStyle(color: Colors.grey),
+    return WillPopScope(
+      onWillPop: () async {
+        if (hasOverallChanges) {
+          return await _showUnsavedChangesDialog();
+        }
+        return true;
+      },
+      child: Scaffold(
+        backgroundColor: Color(0xFFFBC72A),
+        appBar: AppBar(
+          title: const Text('Edit Profile'),
+          backgroundColor: const Color(0xFFFBC72A),
+          foregroundColor: Colors.black,
+          elevation: 0,
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            onPressed: () async {
+              if (hasOverallChanges) {
+                final shouldPop = await _showUnsavedChangesDialog();
+                if (shouldPop) {
+                  Navigator.pop(context);
+                }
+              } else {
+                Navigator.pop(context);
+              }
+            },
+          ),
+          actions: [],
+        ),
+        body:
+            _isLoading
+                ? Container(
+                  color: Colors.white.withOpacity(0.8),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 80,
+                          height: 80,
+                          child: CircularProgressIndicator(
+                            color: const Color(0xFFF46A06),
+                            backgroundColor: Colors.grey.withOpacity(0.2),
+                            strokeWidth: 6,
                           ),
-                          onPressed: () => Navigator.pop(context),
                         ),
-                        TextButton(
-                          child: const Text(
-                            'Ya, Keluar',
-                            style: TextStyle(color: Color(0xFFF46A06)),
+                        const SizedBox(height: 24),
+                        const Text(
+                          'Menyimpan perubahan...',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF333333),
                           ),
-                          onPressed: () {
-                            Navigator.pop(context); // tutup dialog
-                            Navigator.pop(
-                              context,
-                            ); // kembali ke halaman sebelumnya
-                          },
                         ),
                       ],
                     ),
-              );
-            } else {
-              Navigator.pop(context);
-            }
-          },
-        ),
-        actions: [], // Removed the save button from here
-      ),
-      body:
-          _isLoading
-              ? Container(
-                color: Colors.white.withOpacity(0.8),
-                child: Center(
+                  ),
+                )
+                : Form(
+                  key: _formKey,
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      SizedBox(
-                        width: 80,
-                        height: 80,
-                        child: CircularProgressIndicator(
-                          color: const Color(0xFFF46A06),
-                          backgroundColor: Colors.grey.withOpacity(0.2),
-                          strokeWidth: 6,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      const Text(
-                        'Menyimpan perubahan...',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF333333),
+                      _buildHeader(),
+                      Expanded(
+                        child: Container(
+                          width: double.infinity,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(28),
+                              topRight: Radius.circular(28),
+                            ),
+                          ),
+                          padding: const EdgeInsets.all(20),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildProfileSection(),
+                                const SizedBox(height: 16),
+                                _buildPasswordSection(),
+                                const SizedBox(height: 30),
+                                if (hasOverallChanges)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      bottom: 10.0,
+                                    ),
+                                    child: ElevatedButton.icon(
+                                      onPressed:
+                                          _isLoading
+                                              ? null
+                                              : _updateProfileAndOrPassword,
+                                      label: const Text('Simpan Perubahan'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFFF46A06,
+                                        ),
+                                        foregroundColor: Colors.white,
+                                        minimumSize: const Size(
+                                          double.infinity,
+                                          50,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
+                                        ),
+                                        textStyle: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 12,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              )
-              : Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    _buildHeader(),
-                    Expanded(
-                      child: Container(
-                        width: double.infinity,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(28),
-                            topRight: Radius.circular(28),
-                          ),
-                        ),
-                        padding: const EdgeInsets.all(20),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildProfileSection(),
-                              const SizedBox(height: 16),
-                              _buildPasswordSection(),
-                              const SizedBox(
-                                height: 30,
-                              ), // Spacing before the button
-                              if (hasOverallChanges)
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    bottom: 10.0,
-                                  ), // Optional: add some bottom padding if needed
-                                  child: ElevatedButton.icon(
-                                    onPressed:
-                                        _isLoading
-                                            ? null
-                                            : _updateProfileAndOrPassword,
-                                    label: const Text('Simpan Perubahan'),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFFF46A06),
-                                      foregroundColor: Colors.white,
-                                      minimumSize: const Size(
-                                        double.infinity,
-                                        50,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      textStyle: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 12,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+      ),
     );
   }
 
   Widget _buildHeader() {
     return Container(
-      color: Color(0xFFFBC72A), // Ensure header background is consistent
+      color: Color(0xFFFBC72A),
       height: 200,
       child: Center(
         child: Column(
@@ -469,7 +516,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ),
                 ),
-                if (_avatarChanged) // Indicator for avatar change
+                if (_avatarChanged)
                   Positioned(
                     top: 0,
                     right: 0,
@@ -487,7 +534,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              _nameController.text, // Dynamically update from controller
+              _nameController.text,
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -495,7 +542,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
             Text(
-              _emailController.text, // Dynamically update from controller
+              _emailController.text,
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.black.withOpacity(0.7),
@@ -511,13 +558,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withOpacity(0.3),
             spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            blurRadius: 3,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
@@ -530,7 +577,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Color.fromARGB(255, 230, 230, 230), // Softer border
+                  color: Color.fromARGB(255, 230, 230, 230),
                   width: 1,
                 ),
               ),
@@ -540,7 +587,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 const Icon(Icons.person, color: Color(0xFFF46A06), size: 22),
                 const SizedBox(width: 10),
                 const Text(
-                  'Informasi Profil',
+                  'Data Diri',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -548,8 +595,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                 ),
                 const Spacer(),
-                if (_nameChanged ||
-                    _emailChanged) // Show "Diubah" if name or email changed
+                if (_nameChanged || _emailChanged)
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
@@ -557,7 +603,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF46A06).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(28),
                       border: Border.all(
                         color: const Color(0xFFF46A06).withOpacity(0.3),
                       ),
@@ -583,7 +629,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Nama Lengkap',
+                      'Username',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -593,6 +639,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _nameController,
+                      keyboardType: TextInputType.text,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'[a-zA-Z0-9]'),
+                        ),
+                        FilteringTextInputFormatter.deny(RegExp(r'[ ]')),
+                        LengthLimitingTextInputFormatter(10),
+                      ],
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: const Color(0xFFF5F5F5),
@@ -602,20 +656,37 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                         hintText: 'Masukkan nama lengkap',
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(18),
                           borderSide: BorderSide.none,
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(18),
                           borderSide: const BorderSide(
                             color: Color(0xFFF46A06),
                           ),
                         ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: const BorderSide(
+                            color: Colors.red,
+                            width: 1,
+                          ),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: const BorderSide(
+                            color: Colors.red,
+                            width: 1,
+                          ),
+                        ),
+                        errorStyle: const TextStyle(fontSize: 12, height: 1),
+                        errorMaxLines: 2,
                       ),
                       style: const TextStyle(fontSize: 16),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Nama tidak boleh kosong';
+                          return 'Username tidak boleh kosong';
                         }
                         return null;
                       },
@@ -639,6 +710,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      inputFormatters: [LengthLimitingTextInputFormatter(30)],
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: const Color(0xFFF5F5F5),
@@ -648,23 +721,40 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                         hintText: 'Masukkan email',
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(18),
                           borderSide: BorderSide.none,
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(18),
                           borderSide: const BorderSide(
                             color: Color(0xFFF46A06),
                           ),
                         ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: const BorderSide(
+                            color: Colors.red,
+                            width: 1,
+                          ),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(18),
+                          borderSide: const BorderSide(
+                            color: Colors.red,
+                            width: 1,
+                          ),
+                        ),
+                        errorStyle: const TextStyle(fontSize: 12, height: 1),
+                        errorMaxLines: 2,
                       ),
                       style: const TextStyle(fontSize: 16),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Email tidak boleh kosong';
                         }
-                        if (!value.contains('@') || !value.contains('.')) {
-                          return 'Email tidak valid';
+                        if (!emailRegex.hasMatch(value)) {
+                          return 'Format email tidak valid';
                         }
                         return null;
                       },
@@ -683,13 +773,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withOpacity(0.4),
             spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            blurRadius: 3,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
@@ -699,7 +789,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Container(
             padding: const EdgeInsets.only(bottom: 10),
-            margin: const EdgeInsets.only(bottom: 10), // Add margin for spacing
+            margin: const EdgeInsets.only(bottom: 10),
             decoration: const BoxDecoration(
               border: Border(
                 bottom: BorderSide(color: Color(0xFFEEEEEE), width: 1),
@@ -710,7 +800,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 Icon(Icons.lock, color: Color(0xFFF46A06), size: 22),
                 SizedBox(width: 10),
                 Text(
-                  'Ubah Password (Opsional)', // Make it clear it's optional
+                  'Ubah Password (Opsional)',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -725,7 +815,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             labelText: 'Password Saat Ini',
             hintText: 'Masukkan password saat ini',
           ),
-          const SizedBox(height: 12), // Consistent spacing
+          const SizedBox(height: 12),
           _buildPasswordTextField(
             controller: _newPasswordController,
             labelText: 'Password Baru',
@@ -741,6 +831,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     required String labelText,
     required String hintText,
   }) {
+    bool isCurrentPassword = labelText == 'Password Saat Ini';
+    bool isPasswordVisible =
+        isCurrentPassword ? _isCurrentPasswordVisible : _isNewPasswordVisible;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -755,7 +849,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
-          obscureText: true,
+          obscureText: !isPasswordVisible,
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+          ],
           decoration: InputDecoration(
             filled: true,
             fillColor: const Color(0xFFF5F5F5),
@@ -764,16 +861,69 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               vertical: 14,
             ),
             hintText: hintText,
+            suffixIcon: IconButton(
+              icon: Icon(
+                isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                color: const Color(0xFF666666),
+              ),
+              onPressed: () {
+                setState(() {
+                  if (isCurrentPassword) {
+                    _isCurrentPasswordVisible = !_isCurrentPasswordVisible;
+                  } else {
+                    _isNewPasswordVisible = !_isNewPasswordVisible;
+                  }
+                });
+              },
+            ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(18),
               borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(18),
               borderSide: const BorderSide(color: Color(0xFFF46A06)),
             ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: const BorderSide(color: Colors.red, width: 1),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(18),
+              borderSide: const BorderSide(color: Colors.red, width: 1),
+            ),
+            errorStyle: const TextStyle(fontSize: 12, height: 1),
+            errorMaxLines: 2,
           ),
           style: const TextStyle(fontSize: 16),
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          validator: (value) {
+            // Validasi hanya jika field password diisi
+            if (value != null && value.isNotEmpty && value.length < 5) {
+              return 'Password minimal 5 karakter';
+            }
+            // Validasi khusus untuk password baru
+            if (labelText == 'Password Baru' &&
+                value != null &&
+                value.isNotEmpty) {
+              if (_currentPasswordController.text.isEmpty) {
+                return 'Masukkan password saat ini terlebih dahulu';
+              }
+              // Validasi password baru tidak boleh sama dengan password saat ini
+              if (value == _currentPasswordController.text) {
+                return 'Password baru harus berbeda dengan password saat ini';
+              }
+            }
+            // Validasi khusus untuk password saat ini
+            if (labelText == 'Password Saat Ini' &&
+                value != null &&
+                value.isNotEmpty) {
+              if (_newPasswordController.text.isNotEmpty && value.isEmpty) {
+                return 'Password saat ini wajib diisi';
+              }
+            }
+            return null;
+          },
         ),
       ],
     );
@@ -785,7 +935,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       builder:
           (context) => Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(28),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -795,8 +945,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   decoration: const BoxDecoration(
                     color: Color(0xFFFBC72A),
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+                      topLeft: Radius.circular(28),
+                      topRight: Radius.circular(28),
                     ),
                   ),
                   child: Row(
@@ -824,8 +974,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   padding: const EdgeInsets.all(16),
                   child: GridView.builder(
                     shrinkWrap: true,
-                    physics:
-                        const NeverScrollableScrollPhysics(), // If content might overflow
+                    physics: const NeverScrollableScrollPhysics(),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
