@@ -396,7 +396,19 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
+                    // Added cooking time similar to RecipeCard
+                    Row(
+                      children: [
+                        Icon(Icons.access_time, color: Colors.orange, size: 12),
+                        const SizedBox(width: 2),
+                        Text(
+                          "${widget.recipe.waktu} Menit",
+                          style: const TextStyle(fontSize: 10, color: Colors.orange),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
                     Align(
                       alignment: Alignment.centerRight,
                       child:

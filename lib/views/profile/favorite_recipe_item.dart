@@ -93,7 +93,19 @@ class FavoriteRecipeItem extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
+                  // Added cooking time icon same as HealthyFoodItem
+                  Row(
+                    children: [
+                      Icon(Icons.access_time, color: Colors.orange, size: 12),
+                      const SizedBox(width: 2),
+                      Text(
+                        "${recipe.waktu} Menit",
+                        style: const TextStyle(fontSize: 10, color: Colors.orange),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
                   Align(
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
