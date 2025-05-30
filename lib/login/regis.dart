@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'login.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
-import 'login.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({super.key});
@@ -167,22 +167,53 @@ class _RegisterPageState extends State<RegisterPage> {
             barrierDismissible: false,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: const Text('Registrasi Berhasil'),
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                title: Row(
+                  children: [
+                    const Icon(
+                      Icons.check_circle_outline,
+                      color: Color(0xFFF46A06),
+                      size: 28,
+                    ),
+                    const SizedBox(width: 10),
+                    const Text(
+                      'Registrasi Berhasil',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
                 content: Text(
                   'Akun untuk $userName telah berhasil dibuat. Silakan login.',
+                  style: const TextStyle(fontSize: 16),
                 ),
                 actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => LoginPage()),
-                      );
-                    },
-                    child: const Text(
-                      'OK',
-                      style: TextStyle(color: Color(0xFFF46A06)),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 45,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        backgroundColor: const Color(0xFFF46A06),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => LoginPage()),
+                        );
+                      },
+                      child: const Text(
+                        'Oke',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                     ),
                   ),
                 ],

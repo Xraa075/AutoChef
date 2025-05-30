@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/widgets/navbar.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'regis.dart';
-import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
+import 'dart:io';
+import 'regis.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -20,7 +20,6 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   String? apiErrorMessage;
-
   bool _obscurePassword = true;
 
   final emailRegex = RegExp(
@@ -57,6 +56,9 @@ class _LoginPageState extends State<LoginPage> {
   String? _validateEmailLogin(String? value) {
     if (value == null || value.isEmpty) {
       return 'Email tidak boleh kosong';
+    }
+    if (value.length > 30) {
+      return 'Email maksimal 30 karakter';
     }
     if (!emailRegex.hasMatch(value)) {
       return 'Format email tidak valid';
@@ -115,15 +117,22 @@ class _LoginPageState extends State<LoginPage> {
         if (response.statusCode == 200 && responseData != null) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           String? token = responseData['token'];
-          Map<String, dynamic>? userData = responseData['user'];
+          Map<String, dynamic>? userDataFromApi = responseData['user'];
 
-          if (token != null && userData != null) {
+          if (token != null && userDataFromApi != null) {
             await prefs.setBool('hasLoggedAsUser', true);
-            await prefs.setBool('hasLoggedAsGuest', false);
-            await prefs.setString('username', userData['name'] ?? 'Pengguna');
-            await prefs.setString('email', userData['email'] ?? '');
+            await prefs.setString(
+              'username',
+              userDataFromApi['name'] ?? 'Pengguna',
+            );
+            await prefs.setString('email', userDataFromApi['email'] ?? '');
             await prefs.setString('token', token);
-            await prefs.setString('userImage', 'lib/assets/images/avatar1.png');
+            await prefs.setString(
+              'userImage',
+              userDataFromApi['userImage'] ??
+                  userDataFromApi['profile_photo_path'] ??
+                  'lib/assets/images/avatar1.png',
+            );
 
             emailController.clear();
             passwordController.clear();
@@ -144,19 +153,17 @@ class _LoginPageState extends State<LoginPage> {
         } else if (response.statusCode == 401 && responseData != null) {
           setState(() {
             apiErrorMessage =
-                responseData?['message'] ?? 'Email atau password salah.';
+                (responseData?['message'] as String?) ??
+                'Email atau password salah.';
           });
         } else {
           String messageFromServer = "Gagal login.";
           if (responseData != null && responseData.containsKey('message')) {
             messageFromServer = responseData['message'];
           } else if (response.body.isNotEmpty) {
-            // Jika tidak ada 'message' tapi body tidak kosong, tampilkan body (mungkin error HTML atau teks)
-            // Ini kurang ideal, tapi lebih baik daripada tidak ada info.
-            // Batasi panjangnya agar tidak terlalu besar.
             messageFromServer =
                 response.body.length > 100
-                    ? response.body.substring(0, 100) + "..."
+                    ? "${response.body.substring(0, 100)}..."
                     : response.body;
           }
           setState(() {
@@ -166,58 +173,45 @@ class _LoginPageState extends State<LoginPage> {
         }
       } on SocketException {
         hideLoadingDialog();
-        if (mounted)
+        if (mounted) {
           setState(() {
             apiErrorMessage = 'Tidak ada koneksi internet.';
           });
+        }
       } on TimeoutException {
         hideLoadingDialog();
-        if (mounted)
+        if (mounted) {
           setState(() {
             apiErrorMessage = 'Koneksi ke server terputus atau terlalu lama.';
           });
+        }
       } on http.ClientException {
         hideLoadingDialog();
-        if (mounted)
+        if (mounted) {
           setState(() {
             apiErrorMessage = 'Tidak dapat terhubung ke server.';
           });
+        }
       } on FormatException {
         hideLoadingDialog();
-        if (mounted)
+        if (mounted) {
           setState(() {
             apiErrorMessage = 'Format respons server tidak valid.';
           });
+        }
       } catch (e) {
         hideLoadingDialog();
-        if (mounted)
+        if (mounted) {
           setState(() {
             apiErrorMessage = 'Terjadi kesalahan: ${e.toString()}';
           });
+        }
         debugPrint('Error saat login: $e');
       }
     } else {
       setState(() {
         apiErrorMessage = "Harap perbaiki semua kesalahan pada form.";
       });
-    }
-  }
-
-  Future<void> loginAsGuest(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('hasLoggedAsGuest', true);
-    await prefs.setBool('hasLoggedAsUser', false);
-    await prefs.remove('username');
-    await prefs.remove('email');
-    await prefs.remove('token');
-    await prefs.remove('userImage');
-
-    if (mounted) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const Navbar()),
-        (route) => false,
-      );
     }
   }
 
@@ -289,7 +283,7 @@ class _LoginPageState extends State<LoginPage> {
                             validator: _validateEmailLogin,
                             keyboardType: TextInputType.emailAddress,
                             inputFormatters: [
-                              LengthLimitingTextInputFormatter(20),
+                              LengthLimitingTextInputFormatter(30),
                             ],
                           ),
                           _buildTextFormField(
@@ -349,20 +343,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 30),
-                          GestureDetector(
-                            onTap: () => loginAsGuest(context),
-                            child: const Text(
-                              "Login sebagai Guest",
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 16,
-                                decoration: TextDecoration.underline,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 60),
                         ],
                       ),
                     ),

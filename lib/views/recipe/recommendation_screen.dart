@@ -32,6 +32,7 @@ class RekomendationRecipe extends StatefulWidget {
 class _RekomendationRecipeState extends State<RekomendationRecipe> {
   late Future<List<Recipe>> _futureRecipes;
   final ScrollController _scrollController = ScrollController();
+  bool _hasAnyFavoriteChanges = false; // Track perubahan favorit
 
   @override
   void initState() {
@@ -43,6 +44,12 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  // Method untuk handle back button dengan return value
+  Future<bool> _onWillPop() async {
+    Navigator.pop(context, _hasAnyFavoriteChanges);
+    return false;
   }
 
   /// Mengambil data resep dari API berdasarkan bahan atau kategori
@@ -121,7 +128,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                       onPressed: () {
                         Navigator.pop(context);
                         if (Navigator.canPop(context)) {
-                          Navigator.pop(context);
+                          Navigator.pop(context, _hasAnyFavoriteChanges);
                         }
                       },
                       child: Text(
@@ -139,90 +146,97 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFBC72A),
-      appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(120),
-        child: CustomHeader(title: "Ini adalah rekkomendsi resep untukmu"),
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(top: 30),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFFBC72A),
+        appBar: const PreferredSize(
+          preferredSize: Size.fromHeight(120),
+          child: CustomHeader(title: "Ini adalah rekkomendsi resep untukmu"),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.only(top: 30),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
                 ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-                    child: Text(
-                      "Rekomendasi",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      child: Text(
+                        "Rekomendasi",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Expanded(
-                    child: FutureBuilder<List<Recipe>>(
-                      future: _futureRecipes,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return _buildShimmerLoading();
-                        } else if (snapshot.hasError ||
-                            snapshot.data == null ||
-                            snapshot.data!.isEmpty) {
-                          return _buildErrorWidget();
-                        }
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: FutureBuilder<List<Recipe>>(
+                        future: _futureRecipes,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return _buildShimmerLoading();
+                          } else if (snapshot.hasError ||
+                              snapshot.data == null ||
+                              snapshot.data!.isEmpty) {
+                            return _buildErrorWidget();
+                          }
 
-                        final recipes = snapshot.data!;
-                        return Scrollbar(
-                          controller: _scrollController,
-                          thumbVisibility: true,
-                          radius: Radius.circular(8),
-                          interactive: true,
-                          thickness: 8,
-                          child: ListView.builder(
+                          final recipes = snapshot.data!;
+                          return Scrollbar(
                             controller: _scrollController,
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                            itemCount: recipes.length,
-                            itemBuilder: (context, index) {
-                              final recipe = recipes[index];
-                              return RecipeCard(
-                                recipe: recipe,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) =>
-                                              DetailMakanan(recipe: recipe),
-                                    ),
-                                  );
-                                },
-                                // image: recipe.gambar,
-                              );
-                            },
-                          ),
-                        );
-                      },
+                            thumbVisibility: true,
+                            radius: Radius.circular(8),
+                            interactive: true,
+                            thickness: 8,
+                            child: ListView.builder(
+                              controller: _scrollController,
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                              itemCount: recipes.length,
+                              itemBuilder: (context, index) {
+                                final recipe = recipes[index];
+                                return RecipeCard(
+                                  recipe: recipe,
+                                  onTap: () async {
+                                    // Tangkap hasil dari DetailMakanan
+                                    final result = await Navigator.push<bool>(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DetailMakanan(recipe: recipe),
+                                      ),
+                                    );
+                                    
+                                    // Jika ada perubahan favorit, tandai
+                                    if (result == true && mounted) {
+                                      _hasAnyFavoriteChanges = true;
+                                    }
+                                  },
+                                  // image: recipe.gambar,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

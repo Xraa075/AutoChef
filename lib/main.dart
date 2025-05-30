@@ -6,33 +6,29 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
+
   bool hasSeenIntro = prefs.getBool('hasSeenIntro') ?? false;
-  bool hasLoggedAsGuest = prefs.getBool('hasLoggedAsGuest') ?? false;
   bool hasLoggedAsUser = prefs.getBool('hasLoggedAsUser') ?? false;
+
+  if (prefs.containsKey('hasLoggedAsGuest')) {
+    await prefs.remove('hasLoggedAsGuest');
+  }
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(
-    MyApp(
-      hasSeenIntro: hasSeenIntro,
-      hasLoggedAsGuest: hasLoggedAsGuest,
-      hasLoggedAsUser: hasLoggedAsUser,
-    ),
-  );
+  runApp(MyApp(hasSeenIntro: hasSeenIntro, hasLoggedAsUser: hasLoggedAsUser));
 }
 
 class MyApp extends StatelessWidget {
   final bool hasSeenIntro;
-  final bool hasLoggedAsGuest;
   final bool hasLoggedAsUser;
 
   const MyApp({
     super.key,
     required this.hasSeenIntro,
-    required this.hasLoggedAsGuest,
     required this.hasLoggedAsUser,
   });
 
@@ -43,9 +39,7 @@ class MyApp extends StatelessWidget {
       title: 'AutoChef',
       initialRoute:
           hasSeenIntro
-              ? ((hasLoggedAsGuest || hasLoggedAsUser)
-                  ? Routes.home
-                  : Routes.login)
+              ? (hasLoggedAsUser ? Routes.home : Routes.login)
               : Routes.introScreen,
       onGenerateRoute: Routes.onGenerateRoute,
     );
