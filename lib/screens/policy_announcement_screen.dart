@@ -20,7 +20,7 @@ class PolicyAnnouncementScreen extends StatelessWidget {
     if (context.mounted) {
       Navigator.pushNamedAndRemoveUntil(
         context,
-        Routes.login,
+        Routes.register,
         (route) => false,
       );
     }

@@ -21,16 +21,7 @@ class NavbarState extends State<Navbar> {
     });
   }
 
-  // Future<bool> _onWillPop() async { // Menampilkan konfirmasi keluar hanya di homescreen
-  //   if (selectedIndex != 0) {
-  //     setState(() {
-  //       selectedIndex = 0; // Kembali ke HomeScreen jika bukan di halaman Home
-  //     });
-  //     return false; // Mencegah keluar dari aplikasi
-  //   } else {
-  //     return await _showExitConfirmation(); // Menampilkan konfirmasi keluar saat di halaman Home
-  //   }
-  // }
+
   Future<bool> _onWillPop() async {
     // Menampilkan konfirmasi keluar di setiap halaman
     return await _showExitConfirmation();

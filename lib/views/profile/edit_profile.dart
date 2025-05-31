@@ -788,7 +788,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 Icon(Icons.lock, color: Color(0xFFF46A06), size: 22),
                 SizedBox(width: 10),
                 Text(
-                  'Ubah Password (Opsional)',
+                  'Ubah Password',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -935,7 +935,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.face, color: Colors.black),
                       const SizedBox(width: 10),
                       const Text(
                         'Pilih Avatar',
