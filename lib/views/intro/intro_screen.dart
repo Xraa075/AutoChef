@@ -19,11 +19,22 @@ class IntroScreenState extends State<IntroScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('hasSeenIntro', true);
 
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-      (Route<dynamic> route) => false,
-    );
+    bool hasSeenPolicyAnnouncement =
+        prefs.getBool('hasSeenPolicyAnnouncement') ?? false;
+
+    if (!hasSeenPolicyAnnouncement) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/policy-announcement',
+        (Route<dynamic> route) => false,
+      );
+    } else {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+        (Route<dynamic> route) => false,
+      );
+    }
   }
 
   void nextPage() {

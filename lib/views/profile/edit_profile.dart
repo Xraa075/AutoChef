@@ -591,7 +591,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF333333),
+                    color: Colors.black,
                   ),
                 ),
                 const Spacer(),
@@ -603,7 +603,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF46A06).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(28),
+                      borderRadius: BorderRadius.circular(18),
                       border: Border.all(
                         color: const Color(0xFFF46A06).withOpacity(0.3),
                       ),
@@ -633,7 +633,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF666666),
+                        color: Colors.black54,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -649,7 +649,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ],
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: const Color(0xFFF5F5F5),
+                        fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 14,
@@ -657,7 +657,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         hintText: 'Masukkan nama lengkap',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide.none,
+                          borderSide: const BorderSide(color: Colors.grey),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
@@ -667,17 +667,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
-                          borderSide: const BorderSide(
-                            color: Colors.red,
-                            width: 1,
-                          ),
+                          borderSide: const BorderSide(color: Colors.red),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
-                          borderSide: const BorderSide(
-                            color: Colors.red,
-                            width: 1,
-                          ),
+                          borderSide: const BorderSide(color: Colors.red),
                         ),
                         errorStyle: const TextStyle(fontSize: 12, height: 1),
                         errorMaxLines: 2,
@@ -704,7 +698,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF666666),
+                        color: Colors.black54,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -714,7 +708,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       inputFormatters: [LengthLimitingTextInputFormatter(30)],
                       decoration: InputDecoration(
                         filled: true,
-                        fillColor: const Color(0xFFF5F5F5),
+                        fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 14,
@@ -722,7 +716,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         hintText: 'Masukkan email',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide.none,
+                          borderSide: const BorderSide(color: Colors.grey),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
@@ -732,17 +726,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                         errorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
-                          borderSide: const BorderSide(
-                            color: Colors.red,
-                            width: 1,
-                          ),
+                          borderSide: const BorderSide(color: Colors.red),
                         ),
                         focusedErrorBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
-                          borderSide: const BorderSide(
-                            color: Colors.red,
-                            width: 1,
-                          ),
+                          borderSide: const BorderSide(color: Colors.red),
                         ),
                         errorStyle: const TextStyle(fontSize: 12, height: 1),
                         errorMaxLines: 2,
@@ -776,7 +764,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.4),
+            color: Colors.grey.withOpacity(0.3),
             spreadRadius: 1,
             blurRadius: 3,
             offset: const Offset(0, 1),
@@ -804,7 +792,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF333333),
+                    color: Colors.black,
                   ),
                 ),
               ],
@@ -843,7 +831,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF666666),
+            color: Colors.black54,
           ),
         ),
         const SizedBox(height: 8),
@@ -855,7 +843,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ],
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFFF5F5F5),
+            fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 14,
@@ -878,7 +866,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
-              borderSide: BorderSide.none,
+              borderSide: const BorderSide(color: Colors.grey),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
@@ -886,11 +874,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: Colors.red, width: 1),
+              borderSide: const BorderSide(color: Colors.red),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: Colors.red, width: 1),
+              borderSide: const BorderSide(color: Colors.red),
             ),
             errorStyle: const TextStyle(fontSize: 12, height: 1),
             errorMaxLines: 2,
@@ -898,23 +886,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           style: const TextStyle(fontSize: 16),
           autovalidateMode: AutovalidateMode.onUserInteraction,
           validator: (value) {
-            // Validasi hanya jika field password diisi
             if (value != null && value.isNotEmpty && value.length < 5) {
               return 'Password minimal 5 karakter';
             }
-            // Validasi khusus untuk password baru
             if (labelText == 'Password Baru' &&
                 value != null &&
                 value.isNotEmpty) {
               if (_currentPasswordController.text.isEmpty) {
                 return 'Masukkan password saat ini terlebih dahulu';
               }
-              // Validasi password baru tidak boleh sama dengan password saat ini
               if (value == _currentPasswordController.text) {
                 return 'Password baru harus berbeda dengan password saat ini';
               }
             }
-            // Validasi khusus untuk password saat ini
             if (labelText == 'Password Saat Ini' &&
                 value != null &&
                 value.isNotEmpty) {

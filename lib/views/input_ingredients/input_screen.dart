@@ -246,16 +246,9 @@ class _InputRecipeState extends State<InputRecipe> {
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white,
                                   borderRadius: BorderRadius.circular(18),
                                   border: Border.all(color: Colors.grey),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.1),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 5),
-                                    ),
-                                  ],
                                 ),
                                 child: Row(
                                   children: [
