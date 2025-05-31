@@ -11,9 +11,7 @@ Future<void> register(String name, String email, String password) async {
   });
 
   if (response.statusCode == 200) {
-    var data = json.decode(response.body);
-    print("Register sukses: ${data['user']}");
+    json.decode(response.body);
   } else {
-    print("Register gagal: ${response.body}");
   }
 }

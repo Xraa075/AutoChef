@@ -186,7 +186,6 @@ class ApiProfile {
   static Future<Map<String, dynamic>> changePassword({
     required String currentPassword,
     required String newPassword,
-    required String confirmPassword,
   }) async {
     try {
       // Validasi password
@@ -195,10 +194,6 @@ class ApiProfile {
           'success': false,
           'message': 'Password baru minimal 5 karakter',
         };
-      }
-
-      if (newPassword != confirmPassword) {
-        return {'success': false, 'message': 'Konfirmasi password tidak cocok'};
       }
 
       final token = await getToken();
@@ -223,7 +218,7 @@ class ApiProfile {
             body: jsonEncode({
               'current_password': currentPassword,
               'password': newPassword,
-              'password_confirmation': confirmPassword,
+              'password_confirmation': newPassword,
             }),
           )
           .timeout(const Duration(seconds: 10));
@@ -307,7 +302,7 @@ class ApiProfile {
       }
 
       debugPrint(
-        'Checking token: ${token != null ? token.substring(0, 10) + "..." : "null"}',
+        'Checking token: ${token != null ? "${token.substring(0, 10)}..." : "null"}',
       );
 
       if (token == null || token.isEmpty) {
@@ -361,16 +356,7 @@ class ApiProfile {
 
       if (token != null) {
         try {
-          final url = Uri.parse('$baseUrl/logout');
-          final response = await http
-              .post(
-                url,
-                headers: {
-                  'Accept': 'application/json',
-                  'Authorization': 'Bearer $token',
-                },
-              )
-              .timeout(const Duration(seconds: 10));
+          Uri.parse('$baseUrl/logout');
 
           // Analisis response jika perlu
         } catch (e) {

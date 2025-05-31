@@ -126,7 +126,7 @@ class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Colors.black,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -134,7 +134,7 @@ class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
                             title,
                             style: const TextStyle(
                               fontSize: 14,
-                              color: Colors.white,
+                              color: Colors.black,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,

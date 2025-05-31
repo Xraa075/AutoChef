@@ -124,7 +124,7 @@ class _InputRecipeState extends State<InputRecipe> {
         return AlertDialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(28),
           ),
           title: Row(
             children: [
@@ -142,14 +142,13 @@ class _InputRecipeState extends State<InputRecipe> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFFF46A06),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  )
+                    borderRadius: BorderRadius.circular(18),
+                  ),
                 ),
                 onPressed: () {
                   Navigator.pop(context);
                 },
                 child: Text(
-                  
                   "Oke",
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
@@ -187,8 +186,8 @@ class _InputRecipeState extends State<InputRecipe> {
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
+                      topLeft: Radius.circular(28),
+                      topRight: Radius.circular(28),
                     ),
                   ),
                   child: Column(
@@ -223,10 +222,10 @@ class _InputRecipeState extends State<InputRecipe> {
                             child: Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.grey[300],
+                                color: Color(0xFFF46A06),
                               ),
                               padding: const EdgeInsets.all(8),
-                              child: const Icon(Icons.add, color: Colors.black),
+                              child: const Icon(Icons.add, color: Colors.white),
                             ),
                           ),
                         ],
@@ -247,16 +246,9 @@ class _InputRecipeState extends State<InputRecipe> {
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.9),
-                                  borderRadius: BorderRadius.circular(16),
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(18),
                                   border: Border.all(color: Colors.grey),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.1),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 5),
-                                    ),
-                                  ],
                                 ),
                                 child: Row(
                                   children: [
@@ -309,7 +301,7 @@ class _InputRecipeState extends State<InputRecipe> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Color(0xFFF46A06),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(18),
                               ),
                             ),
                             child:

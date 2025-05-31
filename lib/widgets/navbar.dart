@@ -21,16 +21,7 @@ class NavbarState extends State<Navbar> {
     });
   }
 
-  // Future<bool> _onWillPop() async { // Menampilkan konfirmasi keluar hanya di homescreen
-  //   if (selectedIndex != 0) {
-  //     setState(() {
-  //       selectedIndex = 0; // Kembali ke HomeScreen jika bukan di halaman Home
-  //     });
-  //     return false; // Mencegah keluar dari aplikasi
-  //   } else {
-  //     return await _showExitConfirmation(); // Menampilkan konfirmasi keluar saat di halaman Home
-  //   }
-  // }
+
   Future<bool> _onWillPop() async {
     // Menampilkan konfirmasi keluar di setiap halaman
     return await _showExitConfirmation();
@@ -41,8 +32,9 @@ class NavbarState extends State<Navbar> {
           context: context,
           builder:
               (context) => AlertDialog(
+                backgroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(28),
                 ),
                 title: Row(
                   children: [
@@ -59,8 +51,12 @@ class NavbarState extends State<Navbar> {
                 actions: [
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.3,
+                    height: 45,
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
                         foregroundColor: Colors.black,
                       ),
                       onPressed: () {
@@ -74,6 +70,9 @@ class NavbarState extends State<Navbar> {
                     height: 45,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
                         backgroundColor: Color(0xFFF46A06),
                       ),
                       onPressed: () {

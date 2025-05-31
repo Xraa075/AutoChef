@@ -1,9 +1,17 @@
-import 'package:flutter/material.dart';
-import 'package:autochef/models/user.dart';
-import 'package:autochef/data/dummy_user.dart';
-import 'package:autochef/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:autochef/models/user.dart';
+import 'package:autochef/models/recipe.dart';
+import 'package:autochef/data/dummy_user.dart';
 import 'package:autochef/views/profile/edit_profile.dart';
+import 'package:autochef/views/recipe/recipe_detail_screen.dart';
+import 'package:autochef/routes.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:io';
+import 'dart:async';
+import 'dart:convert';
+import 'favorite_recipe_item.dart';
+import 'package:shimmer/shimmer.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -13,45 +21,401 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  Future<void> logout(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('hasLoggedAsGuest', false);
-    await prefs.setBool('hasLoggedAsUser', false);
-    await prefs.remove('username');
-    await prefs.remove('email');
-    await prefs.remove('userImage');
-    Navigator.pushNamedAndRemoveUntil(context, Routes.login, (route) => false);
+  List<Recipe> _favoriteRecipes = [];
+  bool _isLoadingFavorites = true;
+  String? _favoritesError;
+  User? _currentUser;
+  SharedPreferences? _prefs;
+  bool _favoritesFetchedOnce = false;
+  bool _isUserActuallyLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAndLoadData();
   }
 
-  // Add this method to navigate to edit profile screen
-  Future<void> _navigateToEditProfile(User currentUser) async {
+  Future<void> _initializeAndLoadData() async {
+    _prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      _isUserActuallyLoggedIn = _prefs?.getBool('hasLoggedAsUser') ?? false;
+      setState(() {});
+    }
+  }
+
+  Future<void> _handleUserLoaded(User activeUserFromBuilder) async {
+    if (!mounted) return;
+
+    bool userActuallyChanged =
+        (_currentUser == null ||
+            _currentUser!.email != activeUserFromBuilder.email);
+    _currentUser = activeUserFromBuilder;
+
+    _isUserActuallyLoggedIn = _prefs?.getBool('hasLoggedAsUser') ?? false;
+
+    if (_isUserActuallyLoggedIn) {
+      if (!_favoritesFetchedOnce || userActuallyChanged) {
+        await _fetchFavoriteRecipes();
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _isLoadingFavorites = false;
+          _favoriteRecipes = [];
+          _favoritesFetchedOnce = true;
+          _favoritesError = null;
+        });
+      }
+    }
+  }
+
+  Future<String?> _getToken() async {
+    return _prefs?.getString('token');
+  }
+
+  Future<void> _fetchFavoriteRecipes() async {
+    if (!mounted) return;
+    if (!_isUserActuallyLoggedIn) {
+      if (mounted)
+        setState(() {
+          _isLoadingFavorites = false;
+          _favoriteRecipes = [];
+          _favoritesFetchedOnce = true;
+        });
+      return;
+    }
+
+    setState(() {
+      _isLoadingFavorites = true;
+      _favoritesError = null;
+    });
+    final token = await _getToken();
+
+    if (token == null) {
+      if (mounted)
+        setState(() {
+          _isLoadingFavorites = false;
+          _favoritesError = "Sesi berakhir, silakan login lagi.";
+          _favoritesFetchedOnce = true;
+        });
+      return;
+    }
+
+    try {
+      final response = await http
+          .get(
+            Uri.parse('http://156.67.214.60/api/favorites'),
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(const Duration(seconds: 20));
+
+      if (!mounted) return;
+      _favoritesFetchedOnce = true;
+
+      if (response.statusCode == 200) {
+        List<dynamic> responseDataList;
+        final decodedBody = jsonDecode(response.body);
+
+        if (decodedBody is List) {
+          responseDataList = decodedBody;
+        } else if (decodedBody is Map<String, dynamic> &&
+            decodedBody.containsKey('data') &&
+            decodedBody['data'] is List) {
+          responseDataList = decodedBody['data'];
+        } else if (decodedBody is Map<String, dynamic> &&
+            decodedBody.containsKey('favorites') &&
+            decodedBody['favorites'] is List) {
+          responseDataList = decodedBody['favorites'];
+        } else {
+          throw FormatException("Format data dari server tidak dikenali.");
+        }
+
+        setState(() {
+          _favoriteRecipes =
+              responseDataList
+                  .whereType<Map<String, dynamic>>()
+                  .map((data) => Recipe.fromJson(data))
+                  .toList();
+        });
+      } else {
+        String serverMessage = "Gagal memuat resep favorite.";
+        try {
+          final errorData = jsonDecode(response.body);
+          if (errorData is Map<String, dynamic> &&
+              errorData.containsKey('message')) {
+            serverMessage = errorData['message'];
+          }
+        } catch (_) {
+        }
+        _favoritesError = "$serverMessage (Kode: ${response.statusCode})";
+      }
+    } on TimeoutException {
+      _favoritesError = "Waktu koneksi habis. Periksa jaringan Anda.";
+    } on SocketException {
+      _favoritesError =
+          "Gagal terhubung ke server. Periksa koneksi internet Anda.";
+    } on http.ClientException {
+      _favoritesError = "Gagal memuat data. Masalah pada koneksi.";
+    } on FormatException {
+      _favoritesError = "Format data dari server tidak valid.";
+    } catch (e) {
+      _favoritesError =
+          "Terjadi kesalahan yang tidak diketahui. Coba lagi nanti.";
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingFavorites = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _toggleFavoriteStatus(int recipeId) async {
+    if (!mounted || !_isUserActuallyLoggedIn) return;
+    final token = await _getToken();
+    if (token == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Silakan login untuk mengubah favorite."),
+          ),
+        );
+      }
+      return;
+    }
+
+    final url = Uri.parse('http://156.67.214.60/api/resep/$recipeId/favorite');
+
+    try {
+      final response = await http
+          .delete(
+            url,
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          )
+          .timeout(const Duration(seconds: 15));
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        String successMessage = "Resep berhasil dihapus dari favorite.";
+        if (response.body.isNotEmpty && response.statusCode == 200) {
+          try {
+            final responseData = jsonDecode(response.body);
+            if (responseData is Map<String, dynamic> &&
+                responseData.containsKey('message')) {
+              successMessage = responseData['message'];
+            }
+          } catch (e) {
+          }
+        }
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(successMessage),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+        await _fetchFavoriteRecipes();
+      } else {
+        String errorMessage = "Gagal menghapus dari favorite.";
+        try {
+          final responseData = jsonDecode(response.body);
+          if (responseData is Map<String, dynamic> &&
+              responseData.containsKey('message')) {
+            errorMessage = responseData['message'];
+          } else if (response.body.isNotEmpty) {
+            errorMessage =
+                response.body.length > 100
+                    ? response.body.substring(0, 100) + "..."
+                    : response.body;
+          }
+        } catch (_) {
+        }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("$errorMessage (Kode: ${response.statusCode})"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } on TimeoutException {
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Waktu koneksi habis. Coba lagi."),
+            backgroundColor: Colors.orange,
+          ),
+        );
+    } on SocketException {
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Gagal terhubung ke server. Periksa koneksi internet Anda.",
+            ),
+            backgroundColor: Colors.orange,
+          ),
+        );
+    } on http.ClientException {
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Gagal mengubah status favorite. Masalah pada koneksi.",
+            ),
+            backgroundColor: Colors.orange,
+          ),
+        );
+    } on FormatException {
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Format data balasan dari server tidak valid."),
+            backgroundColor: Colors.orange,
+          ),
+        );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Terjadi kesalahan yang tidak diketahui: ${e.toString()}",
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {}
+  }
+
+  Future<void> logout(BuildContext context) async {
+    if (_prefs == null) _prefs = await SharedPreferences.getInstance();
+
+    await _prefs!.setBool('hasLoggedAsUser', false);
+    await _prefs!.remove('username');
+    await _prefs!.remove('email');
+    await _prefs!.remove('userImage');
+    await _prefs!.remove('token');
+
+    if (mounted) {
+      setState(() {
+        _currentUser = null;
+        _favoriteRecipes = [];
+        _isLoadingFavorites = true;
+        _favoritesError = null;
+        _favoritesFetchedOnce = false;
+        _isUserActuallyLoggedIn = false;
+      });
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        Routes.login,
+        (route) => false,
+      );
+    }
+  }
+
+  Future<void> _navigateToEditProfile(User currentUserFromBuilder) async {
+    if (!mounted || !_isUserActuallyLoggedIn) return;
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditProfileScreen(currentUser: currentUser),
+        builder:
+            (context) => EditProfileScreen(currentUser: currentUserFromBuilder),
       ),
     );
-
-    // Refresh profile if changes were made
-    if (result == true) {
+    if (result == true && mounted) {
       setState(() {
-        // This will trigger a rebuild to show updated data
+        _currentUser = null;
+        _favoritesFetchedOnce = false;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_prefs == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFFF46A06)),
+        ),
+      );
+    }
+
     return FutureBuilder<User>(
       future: getActiveUser(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
+      builder: (context, userSnapshot) {
+        User? processingUserDisplay = _currentUser;
+        if (userSnapshot.connectionState == ConnectionState.waiting &&
+            processingUserDisplay == null &&
+            _isUserActuallyLoggedIn) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(
+              child: CircularProgressIndicator(color: Color(0xFFF46A06)),
+            ),
           );
         }
 
-        final currentUser = snapshot.data!;
+        if (userSnapshot.hasError &&
+            processingUserDisplay == null &&
+            _isUserActuallyLoggedIn) {
+          return Scaffold(
+            body: Center(
+              child: Text(
+                "Error memuat detail pengguna: ${userSnapshot.error}",
+              ),
+            ),
+          );
+        }
+
+        User? activeUser =
+            _isUserActuallyLoggedIn
+                ? (userSnapshot.data ?? processingUserDisplay)
+                : userSnapshot.data;
+
+        if (activeUser == null && _isUserActuallyLoggedIn) {
+          return const Scaffold(
+            body: Center(child: Text("Gagal memuat data pengguna.")),
+          );
+        }
+        if (activeUser == null &&
+            !_isUserActuallyLoggedIn &&
+            userSnapshot.connectionState != ConnectionState.done) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(color: Color(0xFFF46A06)),
+            ),
+          );
+        }
+        if (activeUser == null &&
+            !_isUserActuallyLoggedIn &&
+            userSnapshot.connectionState == ConnectionState.done) {
+          return const Scaffold(
+            body: Center(child: Text("Gagal memuat info tampilan.")),
+          );
+        }
+
+        if (activeUser != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _handleUserLoaded(activeUser);
+          });
+        }
+
+        String displayUsername =
+            _isUserActuallyLoggedIn
+                ? (activeUser?.username ?? "Pengguna")
+                : "Pengguna";
+        String displayUserImage =
+            activeUser?.userImage ?? "lib/assets/images/avatar1.png";
 
         return Scaffold(
           backgroundColor: const Color(0xFFFBC72A),
@@ -62,13 +426,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     const SizedBox(height: 30),
                     CircleAvatar(
-                      backgroundImage: AssetImage(currentUser.userImage),
+                      backgroundImage: AssetImage(displayUserImage),
                       radius: 45,
                       backgroundColor: Colors.white,
+                      onBackgroundImageError: (exception, stackTrace) {
+                      },
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      currentUser.username,
+                      displayUsername,
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -76,19 +442,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    // Add Edit Profile Button
-                    ElevatedButton.icon(
-                      onPressed: () => _navigateToEditProfile(currentUser),
-                      icon: const Icon(Icons.edit),
-                      label: const Text("Edit Profil"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                    if (_isUserActuallyLoggedIn && activeUser != null)
+                      ElevatedButton.icon(
+                        onPressed: () => _navigateToEditProfile(activeUser),
+                        icon: const Icon(Icons.edit, color: Colors.black),
+                        label: const Text("Edit Profil"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 8,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
                         ),
                       ),
-                    ),
                     const SizedBox(height: 20),
                     Expanded(
                       child: Container(
@@ -96,124 +466,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30),
+                            topLeft: Radius.circular(28),
+                            topRight: Radius.circular(28),
                           ),
                         ),
-                        
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(28),
+                            topRight: Radius.circular(28),
+                          ),
+                          child: _buildFavoriteSection(_isUserActuallyLoggedIn),
+                        ),
                       ),
                     ),
                   ],
                 ),
-
-                // Bagian tombol login/logout + teks
                 Positioned(
                   top: 10,
                   right: 10,
-                  child: FutureBuilder<SharedPreferences>(
-                    future: SharedPreferences.getInstance(),
-                    builder: (context, prefsSnapshot) {
-                      if (!prefsSnapshot.hasData) {
-                        return SizedBox.shrink();
-                      }
-
-                      final prefs = prefsSnapshot.data!;
-                      final isGuest =
-                          prefs.getBool('hasLoggedAsGuest') ?? false;
-                      final isUser = prefs.getBool('hasLoggedAsUser') ?? false;
-
-                      // Jika guest → tombol login
-                      if (isGuest && !isUser) {
-                        return TextButton.icon(
-                          onPressed: () {
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              Routes.login,
-                              (route) => false,
-                            );
-                          },
-                          icon: const Icon(Icons.login, color: Colors.white),
-                          label: const Text(
-                            "Login",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        );
-                      }
-
-                      // Jika user → tombol logout
-                      return TextButton.icon(
-                        onPressed: () async {
-                          final shouldLogout = await showDialog<bool>(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                title: Row(
-                                  children: const [
-                                    Icon(Icons.info, color: Color(0xFFF46A06)),
-                                    SizedBox(width: 10),
-                                    Text("Konfirmasi Logout"),
-                                  ],
-                                ),
-                                content: const Text(
-                                  "Apakah anda yakin ingin logout dari akun saat ini?",
-                                  style: TextStyle(fontSize: 15),
-                                ),
-                                actionsAlignment: MainAxisAlignment.spaceAround,
-                                actions: [
-                                  SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.3,
-                                    height: 45,
-                                    child: OutlinedButton(
-                                      style: OutlinedButton.styleFrom(
-                                        foregroundColor: Colors.black,
-                                      ),
-                                      onPressed: () {
-                                        Navigator.pop(context, false);
-                                      },
-                                      child: const Text("Batal"),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.3,
-                                    height: 45,
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Color(0xFFF46A06),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.pop(context, true);
-                                      },
-                                      child: const Text(
-                                        "Logout",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-
-                          if (shouldLogout == true) {
-                            logout(context);
-                          }
-                        },
-                        icon: const Icon(
-                          Icons.logout_rounded,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          "Logout",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      );
-                    },
-                  ),
+                  child: _buildLoginLogoutButton(_isUserActuallyLoggedIn),
                 ),
               ],
             ),
@@ -222,34 +493,245 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
     );
   }
-  
-  Widget _buildInfoItem(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Icon(icon, color: Color(0xFFF46A06), size: 24),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+
+  Widget _buildLoginLogoutButton(bool isUserLoggedIn) {
+    if (!isUserLoggedIn) {
+      return TextButton.icon(
+        onPressed: () {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            Routes.login,
+            (route) => false,
+          );
+        },
+        icon: const Icon(Icons.login, color: Colors.black),
+        label: const Text("Login", style: TextStyle(color: Colors.black)),
+      );
+    } else {
+      return TextButton.icon(
+        onPressed: () async {
+          final shouldLogout = await showDialog<bool>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                title: Row(
+                  children: const [
+                    Icon(Icons.help_outline_rounded, color: Color(0xFFF46A06)),
+                    SizedBox(width: 10),
+                    Text("Konfirmasi Logout"),
+                  ],
+                ),
+                content: const Text(
+                  "Apakah Anda yakin ingin logout dari akun ini?",
+                  style: TextStyle(fontSize: 15),
+                ),
+                actionsAlignment: MainAxisAlignment.spaceAround,
+                actions: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    height: 45,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        foregroundColor: Colors.black,
+                        side: BorderSide(color: Colors.grey.shade400),
+                      ),
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text("Batal"),
+                    ),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    height: 45,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        backgroundColor: const Color(0xFFF46A06),
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text("Logout"),
+                    ),
+                  ),
+                ],
+              );
+            },
+          );
+          if (shouldLogout == true) {
+            logout(context);
+          }
+        },
+        icon: const Icon(Icons.logout_rounded, color: Colors.black),
+        label: const Text("Logout", style: TextStyle(color: Colors.black)),
+      );
+    }
+  }
+
+  Widget _buildFavoriteSection(bool isUserLoggedIn) {
+    if (!isUserLoggedIn) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
+              Icon(
+                Icons.favorite_border,
+                size: 60,
+                color: Colors.grey.shade400,
               ),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 16,
-                ),
+              const SizedBox(height: 16),
+              const Text(
+                "Login untuk melihat resep favorite kamu.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ],
           ),
-        ],
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 16.0, top: 20.0, bottom: 10.0),
+          child: Text(
+            "Resep Favorite Kamu",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        Expanded(child: _buildFavoriteContent()),
+      ],
+    );
+  }
+
+  Widget _buildFavoriteContent() {
+    if (_isLoadingFavorites) {
+      return _buildShimmerGridFavorite();
+    }
+
+    if (_favoritesError != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, color: Colors.red.shade300, size: 50),
+              const SizedBox(height: 10),
+              Text(
+                _favoritesError!,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.red.shade700, fontSize: 16),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _fetchFavoriteRecipes,
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  backgroundColor: const Color(0xFFF46A06),
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text("Coba Lagi"),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_favoriteRecipes.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.bookmarks_outlined, size: 60, color: Colors.grey),
+              SizedBox(height: 16),
+              Text(
+                "Kamu belum memiliki resep favorite.\nCari dan tambahkan resep kesukaanmu!",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _fetchFavoriteRecipes,
+      color: const Color(0xFFF46A06),
+      child: GridView.builder(
+        padding: const EdgeInsets.all(16.0),
+        itemCount: _favoriteRecipes.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 0.65,
+        ),
+        itemBuilder: (context, index) {
+          final recipe = _favoriteRecipes[index];
+          return FavoriteRecipeItem(
+            recipe: recipe,
+            onItemTap: () async {
+              final result = await Navigator.push<bool>(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailMakanan(recipe: recipe),
+                ),
+              );
+              if (result == true && mounted) {
+                _fetchFavoriteRecipes();
+              }
+            },
+            onToggleFavorite: () => _toggleFavoriteStatus(recipe.id),
+          );
+        },
       ),
+    );
+  }
+
+  Widget _buildShimmerGridFavorite() {
+    return GridView.builder(
+      padding: const EdgeInsets.all(16.0),
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 6,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 0.65,
+      ),
+      itemBuilder:
+          (context, index) => Shimmer.fromColors(
+            baseColor: Colors.grey.shade300,
+            highlightColor: Colors.grey.shade100,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+              ),
+            ),
+          ),
     );
   }
 }

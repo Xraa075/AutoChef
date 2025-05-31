@@ -23,7 +23,7 @@ class RecipeInfo extends StatelessWidget {
         _buildInfoItem(PhosphorIcons.timer(), "$waktu", "menit"),
         _buildInfoItem(PhosphorIcons.fire(), "$kalori", "kalori"),
         _buildInfoItem(PhosphorIcons.fishSimple(), "$protein g", "protein"),
-        _buildInfoItem(PhosphorIcons.bread(), "$karbohidrat g", "karbohidrat"),
+        _buildInfoItem(PhosphorIcons.bread(), "$karbohidrat g", "karbo"),
       ],
     );
   }
@@ -49,15 +49,15 @@ class RecipeInfo extends StatelessWidget {
                   Text(
                     value,
                     style: const TextStyle(
-                      fontSize: 12,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 1),
                   Text(
                     label,
                     style: const TextStyle(
-                      fontSize: 10,
+                      fontSize: 14,
                       color: Colors.black87,
                     ),
                   ),

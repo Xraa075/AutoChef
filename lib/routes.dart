@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:autochef/widgets/navbar.dart';
 import 'package:autochef/views/recipe/recommendation_screen.dart';
 import 'package:autochef/views/input_ingredients/input_screen.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
 import 'package:autochef/views/profile/edit_profile.dart';
-import 'package:autochef/models/recipe.dart';
 import 'package:autochef/views/intro/intro_screen.dart';
+import 'package:autochef/widgets/navbar.dart';
+import 'package:autochef/models/recipe.dart';
 import 'package:autochef/login/login.dart';
 import 'package:autochef/login/regis.dart';
 import 'package:autochef/models/user.dart';
+import 'package:autochef/screens/policy_announcement_screen.dart';
 
 class Routes {
   static const String introScreen = '/intro-screen';
@@ -19,6 +20,7 @@ class Routes {
   static const String login = '/login';
   static const String register = '/register';
   static const String editProfile = '/edit-profile';
+  static const String policyAnnouncement = '/policy-announcement';
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -59,6 +61,11 @@ class Routes {
           );
         }
         return MaterialPageRoute(builder: (_) => const Navbar());
+
+      case policyAnnouncement:
+        return MaterialPageRoute(
+          builder: (context) => const PolicyAnnouncementScreen(),
+        );
 
       default:
         return MaterialPageRoute(builder: (_) => const Navbar());

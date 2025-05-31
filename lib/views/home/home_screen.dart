@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:autochef/models/recipe.dart';
 import 'package:autochef/widgets/header.dart';
 import 'package:autochef/widgets/category_item.dart';
@@ -9,6 +8,8 @@ import 'package:autochef/services/api_rekomendation.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
 import 'package:autochef/views/recipe/recommendation_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:shimmer/shimmer.dart';
+import 'dart:async';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,31 +27,62 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    getRekomendasi();
+    _fetchInitialData();
+  }
+
+  Future<void> refreshData() async {
+    await _fetchInitialData();
+  }
+
+  Future<void> _fetchInitialData() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+    });
+
+    final connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none && mounted) {
+      _showPopup("Tidak ada koneksi internet. Gagal memuat data.");
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+    await getRekomendasi();
   }
 
   Future<void> getRekomendasi() async {
-    try {
-      final data = await ApiRekomendasi.fetchRekomendasi();
+  try {
+    debugPrint('Starting to fetch recommendations');
+    final data = await ApiRekomendasi.fetchRekomendasi();
+    debugPrint('Received ${data.length} recommendations');
+    
+    if (mounted) {
       setState(() {
         _rekomendasi = data;
         _isLoading = false;
       });
-    } catch (e) {
-      print('Terjadi error: $e');
+    }
+  } catch (e) {
+    debugPrint('Error getting recommendations: $e');
+    if (mounted) {
       setState(() {
         _isLoading = false;
       });
+      _showPopup("Gagal memuat rekomendasi: ${e.toString().split(':').last}");
     }
   }
+}
 
   void _showPopup(String message) {
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(28),
           ),
           title: Row(
             children: const [
@@ -66,11 +98,12 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 45,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFF46A06),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  backgroundColor: const Color(0xFFF46A06),
                 ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: () => Navigator.pop(context),
                 child: const Text(
                   "Oke",
                   style: TextStyle(color: Colors.white, fontSize: 16),
@@ -85,40 +118,40 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> handleSearch(BuildContext context) async {
     if (_isSearching) return;
-
     if (_searchQuery.trim().isEmpty) {
       _showPopup("Masukkan kata kunci pencarian");
       return;
     }
-
     final connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {
       _showPopup("Periksa koneksi internet Anda dan coba lagi.");
       return;
     }
-
+    if (!mounted) return;
     setState(() {
       _isSearching = true;
     });
-
     try {
       final results = await SearchService.searchResep(_searchQuery);
       if (!mounted) return;
-      Navigator.push(
+
+      final hasChanges = await Navigator.push<bool>(
         context,
         MaterialPageRoute(
           builder: (context) => RekomendationRecipe(results: results),
         ),
       );
+
+      if (hasChanges == true && mounted) {
+        await _fetchInitialData();
+      }
     } catch (e) {
-      print('Search error: $e');
       _showPopup("Gagal mencari resep. Silakan coba lagi nanti.");
     } finally {
-      if (mounted) {
+      if (mounted)
         setState(() {
           _isSearching = false;
         });
-      }
     }
   }
 
@@ -129,10 +162,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(18),
         ),
-        height: 150,
-        width: 100,
       ),
     );
   }
@@ -166,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             height: 40,
             padding: const EdgeInsets.symmetric(horizontal: 5),
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(18)),
             child: Row(
               children: [
                 Expanded(
@@ -177,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         vertical: 10,
                         horizontal: 20.0,
                       ),
-                      hintText: 'Cari resep...',
+                      hintText: 'Cari nama resep...',
                       hintStyle: TextStyle(
                         color: Colors.grey[500],
                         fontStyle: FontStyle.italic,
@@ -185,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(18),
                         borderSide: BorderSide.none,
                       ),
                     ),
@@ -219,7 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                         padding: const EdgeInsets.all(8),
-                        child: const Icon(Icons.search, color: Colors.black54),
+                        child: const Icon(Icons.search, color: Colors.black),
                       ),
                     ),
               ],
@@ -234,91 +265,124 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
+              topLeft: Radius.circular(28),
+              topRight: Radius.circular(28),
             ),
           ),
-          child: ListView(
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  "Kategori",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+          child: RefreshIndicator(
+            onRefresh: _fetchInitialData,
+            color: const Color(0xFFF46A06),
+            child: ListView(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    "Kategori",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  CategoryItemTap(
-                    title: "Snacks",
-                    kategori: "snack",
-                    imagePath: "lib/assets/images/snacks.jpg",
-                  ),
-                  CategoryItemTap(
-                    title: "Meal",
-                    kategori: "meal",
-                    imagePath: "lib/assets/images/meal.jpg",
-                  ),
-                  CategoryItemTap(
-                    title: "Vegan",
-                    kategori: "vegan",
-                    imagePath: "lib/assets/images/vegan.jpg",
-                  ),
-                  CategoryItemTap(
-                    title: "Dessert",
-                    kategori: "dessert",
-                    imagePath: "lib/assets/images/dessert.jpg",
-                  ),
-                  CategoryItemTap(
-                    title: "Drinks",
-                    kategori: "drink",
-                    imagePath: "lib/assets/images/drinks.jpg",
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              const Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Text(
-                  "Rekomendasi",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                const SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    CategoryItemTap(
+                      title: "Snacks",
+                      kategori: "snack",
+                      imagePath: "lib/assets/images/snacks.jpg",
+                    ),
+                    CategoryItemTap(
+                      title: "Meal",
+                      kategori: "meal",
+                      imagePath: "lib/assets/images/meal.jpg",
+                    ),
+                    CategoryItemTap(
+                      title: "Vegan",
+                      kategori: "vegan",
+                      imagePath: "lib/assets/images/vegan.jpg",
+                    ),
+                    CategoryItemTap(
+                      title: "Dessert",
+                      kategori: "dessert",
+                      imagePath: "lib/assets/images/dessert.jpg",
+                    ),
+                    CategoryItemTap(
+                      title: "Drinks",
+                      kategori: "drink",
+                      imagePath: "lib/assets/images/drinks.jpg",
+                    ),
+                  ],
                 ),
-              ),
-              _isLoading
-                  ? buildShimmerGrid()
-                  : GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: _rekomendasi.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                          childAspectRatio: 0.65,
+                const SizedBox(height: 10),
+                const Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Text(
+                    "Rekomendasi",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                  ),
+                ),
+                _isLoading
+                    ? buildShimmerGrid()
+                    : _rekomendasi.isEmpty
+                    ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 50.0,
+                          horizontal: 20.0,
                         ),
-                    itemBuilder: (context, index) {
-                      final resep = _rekomendasi[index];
-                      return HealthyFoodItem(
-                        title: resep.namaResep,
-                        imagePath: resep.gambar,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => DetailMakanan(recipe: resep),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.ramen_dining_outlined,
+                              size: 60,
+                              color: Colors.grey.shade400,
                             ),
-                          );
-                        },
-                      );
-                    },
-                  ),
-              const SizedBox(height: 10),
-            ],
+                            const SizedBox(height: 10),
+                            const Text(
+                              "Belum ada rekomendasi saat ini.",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                    : GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: _rekomendasi.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 0.65,
+                          ),
+                      itemBuilder: (context, index) {
+                        final resep = _rekomendasi[index];
+                        return HealthyFoodItem(
+                          recipe: resep,
+                          onTap: () async {
+                            final result = await Navigator.push<bool>(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => DetailMakanan(recipe: resep),
+                              ),
+                            );
+                            if (result == true && mounted) {
+                              await _fetchInitialData();
+                            }
+                          },
+                        );
+                      },
+                    ),
+                const SizedBox(height: 10),
+              ],
+            ),
           ),
         ),
       ),
@@ -341,15 +405,23 @@ class CategoryItemTap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        final hasChanges = await Navigator.push<bool>(
           context,
           MaterialPageRoute(
             builder: (context) => RekomendationRecipe(kategori: kategori),
           ),
         );
+
+        if (hasChanges == true && context.mounted) {
+          final homeScreenState =
+              context.findAncestorStateOfType<_HomeScreenState>();
+          if (homeScreenState != null) {
+            await homeScreenState.refreshData();
+          }
+        }
       },
-      child: CategoryItem(title: title, imagePath: imagePath),
+      child: CategoryItem(title: title, imagePath: imagePath, onTap: null),
     );
   }
 }
