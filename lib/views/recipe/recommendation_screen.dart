@@ -143,7 +143,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
         backgroundColor: const Color(0xFFFBC72A),
         appBar: const PreferredSize(
           preferredSize: Size.fromHeight(120),
-          child: CustomHeader(title: "Ini adalah rekkomendsi resep untukmu"),
+          child: CustomHeader(title: "Ini adalah rekomendsi resep untukmu"),
         ),
         body: Column(
           children: [
