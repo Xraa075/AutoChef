@@ -128,9 +128,6 @@ class _DetailMakananState extends State<DetailMakanan> {
             if (responseData.length == 1 && responseData.values.first is bool) {
               favorited = responseData.values.first;
             } else {
-              print(
-                "Format respons /is-favorited tidak dikenal: $responseData",
-              );
             }
           }
         } else if (responseData is bool) {
@@ -140,16 +137,12 @@ class _DetailMakananState extends State<DetailMakanan> {
           _isFavorite = favorited;
         });
       } else {
-        print(
-          "Gagal cek status favorit: ${response.statusCode} - ${response.body}",
-        );
         if (mounted)
           setState(() {
             _isFavorite = false;
           });
       }
     } catch (e) {
-      print("Error cek status favorit: $e");
       if (mounted)
         setState(() {
           _isFavorite = false;
@@ -247,7 +240,6 @@ class _DetailMakananState extends State<DetailMakanan> {
               message = responseData['message'];
             }
           } catch (e) {
-            print("Gagal parse JSON pesan toggle favorit: $e");
           }
         }
         setState(() {
@@ -273,7 +265,6 @@ class _DetailMakananState extends State<DetailMakanan> {
                     : response.body;
           }
         } catch (_) {
-          print("Gagal parse error body toggle favorit: ${response.body}");
         }
         if (mounted)
           ScaffoldMessenger.of(context).showSnackBar(

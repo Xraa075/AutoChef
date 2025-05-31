@@ -146,7 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
         await _fetchInitialData();
       }
     } catch (e) {
-      print('Search error: $e');
       _showPopup("Gagal mencari resep. Silakan coba lagi nanti.");
     } finally {
       if (mounted)

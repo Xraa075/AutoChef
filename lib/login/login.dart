@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/widgets/navbar.dart';
 import 'package:flutter/material.dart';

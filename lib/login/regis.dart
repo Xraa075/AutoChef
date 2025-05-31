@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors_in_immutables, library_private_types_in_public_api, use_build_context_synchronously, deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -225,7 +227,7 @@ class _RegisterPageState extends State<RegisterPage> {
               responseData?['message'] ?? 'Terjadi kesalahan validasi.';
           Map<String, dynamic>? errors = responseData?['errors'];
           String specificFieldErrors = "";
-          if (errors != null && errors is Map) {
+          if (errors != null) {
             errors.forEach((key, value) {
               if (value is List && value.isNotEmpty) {
                 String fieldName = key;

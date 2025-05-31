@@ -121,9 +121,6 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
             if (responseData.length == 1 && responseData.values.first is bool) {
               favorited = responseData.values.first;
             } else {
-              print(
-                "HealthyFoodItem (${widget.recipe.namaResep}): Format /is-favorited tidak dikenal: $responseData",
-              );
             }
           }
         } else if (responseData is bool) {
@@ -139,14 +136,8 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
           setState(() {
             _isFavorite = false;
           });
-        print(
-          "HealthyFoodItem (${widget.recipe.namaResep}): Gagal cek status favorite awal: ${response.statusCode}",
-        );
       }
     } catch (e) {
-      print(
-        "HealthyFoodItem (${widget.recipe.namaResep}): Error cek status favorite awal: $e",
-      );
       if (mounted)
         setState(() {
           _isFavorite = false;
@@ -239,9 +230,6 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
               message = responseData['message'];
             }
           } catch (e) {
-            print(
-              "HealthyFoodItem (${widget.recipe.namaResep}): Gagal parse JSON pesan toggle: $e",
-            );
           }
         }
         if (mounted)
@@ -268,9 +256,6 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
                     : response.body;
           }
         } catch (_) {
-          print(
-            "HealthyFoodItem (${widget.recipe.namaResep}): Gagal parse error body toggle: ${response.body}",
-          );
         }
         if (mounted)
           ScaffoldMessenger.of(context).showSnackBar(

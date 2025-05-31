@@ -11,7 +11,7 @@ class ApiService {
   final response = await http.get(Uri.parse("$baseUrl/search?bahan=$bahanQuery"));
 
     if (response.statusCode == 200) {
-      print("Response Body: ${response.body}"); // Tambahkan debug print
+      // Tambahkan debug print
 
       try {
         final decodedResponse = jsonDecode(response.body);

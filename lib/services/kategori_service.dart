@@ -10,7 +10,6 @@ class KategoriService {
     final response = await http.get(Uri.parse("$baseUrl/search?kategori=$kategoriQuery"));
 
     if (response.statusCode == 200) {
-      print("Response Body (searchRecipes): ${response.body}");
 
       try {
         final decodedResponse = jsonDecode(response.body);
@@ -35,7 +34,6 @@ class KategoriService {
     final response = await http.get(Uri.parse("$baseUrl/search?kategori=$kategori"));
 
     if (response.statusCode == 200) {
-      print("Response Body (getRecipesByKategori): ${response.body}");
 
       try {
         final decodedResponse = jsonDecode(response.body);

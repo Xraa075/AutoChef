@@ -8,7 +8,6 @@ import 'package:autochef/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
-import 'dart:math';
 import 'dart:async';
 import 'dart:convert';
 import 'favorite_recipe_item.dart';
@@ -131,7 +130,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decodedBody['favorites'] is List) {
           responseDataList = decodedBody['favorites'];
         } else {
-          print("FETCH FAVORITES - Unknown JSON structure: $decodedBody");
           throw FormatException("Format data dari server tidak dikenali.");
         }
 
@@ -151,25 +149,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
             serverMessage = errorData['message'];
           }
         } catch (_) {
-          print("FETCH FAVORITES - Gagal parse error body: ${response.body}");
         }
         _favoritesError = "$serverMessage (Kode: ${response.statusCode})";
       }
     } on TimeoutException {
-      print("FETCH FAVORITES - TimeoutException: $e");
       _favoritesError = "Waktu koneksi habis. Periksa jaringan Anda.";
-    } on SocketException catch (e) {
-      print("FETCH FAVORITES - SocketException: $e");
+    } on SocketException {
       _favoritesError =
           "Gagal terhubung ke server. Periksa koneksi internet Anda.";
-    } on http.ClientException catch (e) {
-      print("FETCH FAVORITES - ClientException: $e");
+    } on http.ClientException {
       _favoritesError = "Gagal memuat data. Masalah pada koneksi.";
-    } on FormatException catch (e) {
-      print("FETCH FAVORITES - FormatException: $e");
+    } on FormatException {
       _favoritesError = "Format data dari server tidak valid.";
     } catch (e) {
-      print("FETCH FAVORITES - Unknown error: $e");
       _favoritesError =
           "Terjadi kesalahan yang tidak diketahui. Coba lagi nanti.";
     } finally {
@@ -220,7 +212,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               successMessage = responseData['message'];
             }
           } catch (e) {
-            print("TOGGLE FAVORITE - Gagal parse JSON sukses unfavorite: $e");
           }
         }
 
@@ -247,7 +238,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     : response.body;
           }
         } catch (_) {
-          print("TOGGLE FAVORITE - Gagal parse error body: ${response.body}");
         }
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -259,7 +249,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
       }
     } on TimeoutException {
-      print("TOGGLE FAVORITE - TimeoutException: $e");
       if (mounted)
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -267,8 +256,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             backgroundColor: Colors.orange,
           ),
         );
-    } on SocketException catch (e) {
-      print("TOGGLE FAVORITE - SocketException: $e");
+    } on SocketException {
       if (mounted)
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -278,8 +266,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             backgroundColor: Colors.orange,
           ),
         );
-    } on http.ClientException catch (e) {
-      print("TOGGLE FAVORITE - ClientException: $e");
+    } on http.ClientException {
       if (mounted)
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -289,8 +276,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             backgroundColor: Colors.orange,
           ),
         );
-    } on FormatException catch (e) {
-      print("TOGGLE FAVORITE - FormatException: $e");
+    } on FormatException {
       if (mounted)
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -299,7 +285,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         );
     } catch (e) {
-      print("TOGGLE FAVORITE - Unknown error: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -445,9 +430,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       radius: 45,
                       backgroundColor: Colors.white,
                       onBackgroundImageError: (exception, stackTrace) {
-                        print(
-                          "Error loading profile image (path: $displayUserImage): $exception",
-                        );
                       },
                     ),
                     const SizedBox(height: 10),

@@ -302,7 +302,7 @@ class ApiProfile {
       }
 
       debugPrint(
-        'Checking token: ${token != null ? token.substring(0, 10) + "..." : "null"}',
+        'Checking token: ${token != null ? "${token.substring(0, 10)}..." : "null"}',
       );
 
       if (token == null || token.isEmpty) {
@@ -356,16 +356,7 @@ class ApiProfile {
 
       if (token != null) {
         try {
-          final url = Uri.parse('$baseUrl/logout');
-          final response = await http
-              .post(
-                url,
-                headers: {
-                  'Accept': 'application/json',
-                  'Authorization': 'Bearer $token',
-                },
-              )
-              .timeout(const Duration(seconds: 10));
+          Uri.parse('$baseUrl/logout');
 
           // Analisis response jika perlu
         } catch (e) {

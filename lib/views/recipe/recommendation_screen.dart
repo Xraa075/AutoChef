@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api, deprecated_member_use
+
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:autochef/models/recipe.dart';
@@ -6,7 +8,6 @@ import 'package:autochef/widgets/recipe_card.dart';
 import 'package:autochef/services/api_service.dart';
 import 'package:autochef/services/kategori_service.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:autochef/services/search_service.dart';
 
 class RekomendationRecipe extends StatefulWidget {
@@ -55,7 +56,6 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
 
       final apiService = ApiService();
       final kategoriService = KategoriService();
-      final searchService = SearchService();
 
       if (widget.results != null && widget.results!.isNotEmpty) {
         return widget.results!;
@@ -230,38 +230,6 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
     );
   }
 
-  Widget _buildImage(String? imageUrl) {
-    if (imageUrl == null || imageUrl.isEmpty) {
-      return Container(
-        color: Colors.grey[200],
-        height: 150,
-        child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
-      );
-    }
-
-    return CachedNetworkImage(
-      imageUrl: Uri.encodeFull(imageUrl),
-      placeholder:
-          (context, url) => Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              width: double.infinity,
-              height: 150,
-              color: Colors.white,
-            ),
-          ),
-      errorWidget:
-          (context, url, error) => Container(
-            color: Colors.grey[200],
-            height: 150,
-            child: const Center(
-              child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
-            ),
-          ),
-      fit: BoxFit.cover,
-    );
-  }
 
   Widget _buildShimmerLoading() {
     return ListView.builder(

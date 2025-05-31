@@ -26,8 +26,8 @@ android {
         applicationId = "com.autochef.app"
         minSdk = 21
         targetSdk = 35
-        versionCode = 8
-        versionName = "1.0.2"
+        versionCode = 9
+        versionName = "3.0.0"
     }
 
 
