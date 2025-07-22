@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 
 class ApiRekomendasi {
   static const String baseUrl =
-      'http://156.67.214.60/api/resepmakanan/rekomendasi';
+      'http://20.6.107.2:8002/api/resepmakanan/rekomendasi';
 
   static Future<List<Recipe>> fetchRekomendasi() async {
     try {
@@ -71,7 +71,7 @@ class ApiRekomendasi {
       }
 
       // Endpoint for logging recipe views
-      final url = Uri.parse('http://156.67.214.60/api/resepmakanan/log-view');
+      final url = Uri.parse('http://20.6.107.2:8002/api/resepmakanan/log-view');
 
       final response = await http
           .post(

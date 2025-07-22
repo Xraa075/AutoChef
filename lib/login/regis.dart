@@ -124,7 +124,7 @@ class _RegisterPageState extends State<RegisterPage> {
       try {
         final response = await http
             .post(
-              Uri.parse('http://156.67.214.60/api/register'),
+              Uri.parse('http://20.6.107.2:8002/api/register'),
               headers: {'Accept': 'application/json'},
               body: {
                 'name': nameController.text,

@@ -5,7 +5,7 @@ import 'package:autochef/models/recipe.dart';
 class SearchService {
   static Future<List<Recipe>> searchResep(String query) async {
     final encodedQuery = Uri.encodeComponent(query);
-    final url = Uri.parse("http://156.67.214.60/api/resepmakanan/search?nama_resep=$encodedQuery");
+    final url = Uri.parse("http://20.6.107.2:8002/api/resepmakanan/search?nama_resep=$encodedQuery");
 
     try {
       final response = await http.get(url).timeout(const Duration(seconds: 10));

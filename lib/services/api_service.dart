@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = "http://156.67.214.60/api/resepmakanan";
+  static const String baseUrl = "http://20.6.107.2:8002/api/resepmakanan";
 
   // 🔍 Fungsi untuk mencari resep berdasarkan bahan
   Future<List<Map<String, dynamic>>> searchRecipes(List<String> bahan) async {

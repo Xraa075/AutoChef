@@ -104,7 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final response = await http
           .get(
-            Uri.parse('http://156.67.214.60/api/favorites'),
+            Uri.parse('http://20.6.107.2:8002/api/favorites'),
             headers: {
               'Accept': 'application/json',
               'Authorization': 'Bearer $token',
@@ -187,7 +187,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
-    final url = Uri.parse('http://156.67.214.60/api/resep/$recipeId/favorite');
+    final url = Uri.parse('http://20.6.107.2:8002/api/resep/$recipeId/favorite');
 
     try {
       final response = await http

@@ -97,7 +97,7 @@ class _DetailMakananState extends State<DetailMakanan> {
 
     try {
       final url = Uri.parse(
-        'http://156.67.214.60/api/resep/${widget.recipe.id}/is-favorited',
+        'http://20.6.107.2:8002/api/resep/${widget.recipe.id}/is-favorited',
       );
       final response = await http
           .get(
@@ -189,7 +189,7 @@ class _DetailMakananState extends State<DetailMakanan> {
     }
 
     final url = Uri.parse(
-      'http://156.67.214.60/api/resep/${widget.recipe.id}/favorite',
+      'http://20.6.107.2:8002/api/resep/${widget.recipe.id}/favorite',
     );
     http.Response response;
 

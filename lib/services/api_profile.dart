@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 
 class ApiProfile {
-  static const String baseUrl = 'http://156.67.214.60/api';
+  static const String baseUrl = 'http://20.6.107.2:8002/api';
 
   // Mendapatkan token dari SharedPreferences
   static Future<String?> getToken() async {
