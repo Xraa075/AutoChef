@@ -23,11 +23,22 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
   bool _isSearching = false;
   String _searchQuery = '';
+  late FocusNode _searchFocusNode;
 
   @override
   void initState() {
     super.initState();
+    _searchFocusNode = FocusNode();
+    _searchFocusNode.addListener(() {
+      setState(() {});
+    });
     _fetchInitialData();
+  }
+
+  @override
+  void dispose() {
+    _searchFocusNode.dispose();
+    super.dispose();
   }
 
   Future<void> refreshData() async {
@@ -194,6 +205,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: CustomHeader(
           title: "Mau masak apa hari ini",
+           titleStyle: const TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 18,
+            color: Colors.black,
+          ),
           child: Container(
             height: 40,
             padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -202,17 +218,23 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Expanded(
                   child: TextField(
+                    focusNode: _searchFocusNode,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 18, color: Colors.black87),
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.symmetric(
                         vertical: 10,
                         horizontal: 20.0,
                       ),
-                      hintText: 'Cari nama resep...',
-                      hintStyle: TextStyle(
-                        color: Colors.grey[500],
-                        fontStyle: FontStyle.italic,
+                      hintText: _searchFocusNode.hasFocus ? '' : 'Cari Resep Makanan',
+                      hintStyle: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 18,
+                        color: Colors.black,
+                        
                       ),
+                      prefixIcon: const Icon(Icons.search, color: Colors.black),
+                      suffixIcon: const Icon(Icons.mic, color: Colors.black),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -229,30 +251,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                _isSearching
-                    ? const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          color: Colors.white,
-                        ),
-                      ),
-                    )
-                    : GestureDetector(
-                      onTap: () => handleSearch(context),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        padding: const EdgeInsets.all(8),
-                        child: const Icon(Icons.search, color: Colors.black),
-                      ),
-                    ),
+                // _isSearching
+                //     ? const Padding(
+                //       padding: EdgeInsets.symmetric(horizontal: 12),
+                //       child: SizedBox(
+                //         height: 24,
+                //         width: 24,
+                //         child: CircularProgressIndicator(
+                //           strokeWidth: 2.5,
+                //           color: Colors.white,
+                //         ),
+                //       ),
+                //     )
+                //     : GestureDetector(
+                //       onTap: () => handleSearch(context),
+                //       child: Container(
+                //         decoration: BoxDecoration(
+                //           shape: BoxShape.rectangle,
+                //           color: Colors.white,
+                //           borderRadius: BorderRadius.circular(30),
+                //         ),
+                //         padding: const EdgeInsets.all(8),
+                //         child: const Icon(Icons.search, color: Colors.black),
+                //       ),
+                //     ),
               ],
             ),
           ),
