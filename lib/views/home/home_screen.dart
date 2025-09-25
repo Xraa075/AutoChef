@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _startListening() async {
     var status = await Permission.microphone.request();
     if (status.isGranted) {
-       await _speechToText.listen(onResult: _onSpeechResult);
+       await _speechToText.listen(onResult: _onSpeechResult, localeId: 'id_ID');
        setState(() {});
     } else {
       _showPopup("Izin mikrofon ditolak. Fitur pencarian suara tidak dapat digunakan.");
