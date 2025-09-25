@@ -10,6 +10,9 @@ import 'package:autochef/views/recipe/recommendation_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'dart:async';
+import 'package:speech_to_text/speech_to_text.dart'; 
+import 'package:permission_handler/permission_handler.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,19 +28,52 @@ class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
   late FocusNode _searchFocusNode;
 
+  final SpeechToText _speechToText = SpeechToText();
+  bool _speechEnabled = false;
+  late TextEditingController _searchController;
+
   @override
   void initState() {
     super.initState();
     _searchFocusNode = FocusNode();
+    _searchController = TextEditingController();
     _searchFocusNode.addListener(() {
       setState(() {});
     });
+    _initSpeech();
     _fetchInitialData();
+  }
+
+  void _initSpeech() async {
+    _speechEnabled = await _speechToText.initialize();
+    setState(() {});
+  }
+
+  void _startListening() async {
+    var status = await Permission.microphone.request();
+    if (status.isGranted) {
+       await _speechToText.listen(onResult: _onSpeechResult);
+       setState(() {});
+    } else {
+      _showPopup("Izin mikrofon ditolak. Fitur pencarian suara tidak dapat digunakan.");
+    }
+  }
+
+   void _stopListening() async {
+    await _speechToText.stop();
+    setState(() {});
+  }
+
+  void _onSpeechResult(result) {
+    setState(() {
+      _searchController.text = result.recognizedWords;
+    });
   }
 
   @override
   void dispose() {
     _searchFocusNode.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -128,8 +164,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> handleSearch(BuildContext context) async {
+    // if (_isSearching) return;
+    // if (_searchQuery.trim().isEmpty) {
+    //   _showPopup("Masukkan kata kunci pencarian");
+    //   return;
+    // }
     if (_isSearching) return;
-    if (_searchQuery.trim().isEmpty) {
+    if (_searchController.text.trim().isEmpty) {
       _showPopup("Masukkan kata kunci pencarian");
       return;
     }
@@ -218,6 +259,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Expanded(
                   child: TextField(
+                    controller: _searchController,
                     focusNode: _searchFocusNode,
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 18, color: Colors.black87),
@@ -234,19 +276,25 @@ class _HomeScreenState extends State<HomeScreen> {
                         
                       ),
                       prefixIcon: const Icon(Icons.search, color: Colors.black),
-                      suffixIcon: const Icon(Icons.mic, color: Colors.black),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _speechToText.isListening ? Icons.mic_off : Icons.mic,
+                          color: Colors.black,
+                        ),
+                        onPressed: _speechToText.isListening ? _stopListening : _startListening,
+                      ),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(18),
                         borderSide: BorderSide.none,
                       ),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
+                    ),                   
+                    // onChanged: (value) {
+                    //   setState(() {
+                    //     _searchQuery = value;
+                    //   });
+                    // },
                     onSubmitted: (_) => handleSearch(context),
                   ),
                 ),
