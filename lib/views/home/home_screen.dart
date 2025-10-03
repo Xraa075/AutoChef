@@ -10,9 +10,8 @@ import 'package:autochef/views/recipe/recommendation_screen.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shimmer/shimmer.dart';
 import 'dart:async';
-import 'package:speech_to_text/speech_to_text.dart'; 
+import 'package:speech_to_text/speech_to_text.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,44 +29,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
+  bool _isListening = false;
   late TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
-    _searchFocusNode = FocusNode();
     _searchController = TextEditingController();
+    _searchFocusNode = FocusNode();
     _searchFocusNode.addListener(() {
       setState(() {});
     });
-    _initSpeech();
-    _fetchInitialData();
-  }
-
-  void _initSpeech() async {
-    _speechEnabled = await _speechToText.initialize();
-    setState(() {});
-  }
-
-  void _startListening() async {
-    var status = await Permission.microphone.request();
-    if (status.isGranted) {
-       await _speechToText.listen(onResult: _onSpeechResult, localeId: 'id_ID');
-       setState(() {});
-    } else {
-      _showPopup("Izin mikrofon ditolak. Fitur pencarian suara tidak dapat digunakan.");
-    }
-  }
-
-   void _stopListening() async {
-    await _speechToText.stop();
-    setState(() {});
-  }
-
-  void _onSpeechResult(result) {
-    setState(() {
-      _searchController.text = result.recognizedWords;
+    
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text;
+      });
     });
+
+    _fetchInitialData();
+    _initSpeech();
   }
 
   @override
@@ -75,6 +56,38 @@ class _HomeScreenState extends State<HomeScreen> {
     _searchFocusNode.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _initSpeech() async {
+    var status = await Permission.microphone.request();
+    if (status.isGranted) {
+      _speechEnabled = await _speechToText.initialize();
+      setState(() {});
+    } else {
+       debugPrint("Izin mikrofon ditolak");
+    }
+  }
+
+  void _startListening() async {
+    if (!_speechEnabled) return;
+    await _speechToText.listen(onResult: (result) {
+      setState(() {
+        _searchController.text = result.recognizedWords;
+        _searchController.selection = TextSelection.fromPosition(
+          TextPosition(offset: _searchController.text.length),
+        );
+      });
+    }, localeId: 'id_ID');
+    setState(() {
+      _isListening = true;
+    });
+  }
+
+  void _stopListening() async {
+    await _speechToText.stop();
+    setState(() {
+      _isListening = false;
+    });
   }
 
   Future<void> refreshData() async {
@@ -99,27 +112,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> getRekomendasi() async {
-  try {
-    debugPrint('Starting to fetch recommendations');
-    final data = await ApiRekomendasi.fetchRekomendasi();
-    debugPrint('Received ${data.length} recommendations');
-    
-    if (mounted) {
-      setState(() {
-        _rekomendasi = data;
-        _isLoading = false;
-      });
-    }
-  } catch (e) {
-    debugPrint('Error getting recommendations: $e');
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-      _showPopup("Gagal memuat rekomendasi: ${e.toString().split(':').last}");
+    try {
+      debugPrint('Starting to fetch recommendations');
+      final data = await ApiRekomendasi.fetchRekomendasi();
+      debugPrint('Received ${data.length} recommendations');
+
+      if (mounted) {
+        setState(() {
+          _rekomendasi = data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error getting recommendations: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        _showPopup("Gagal memuat rekomendasi: ${e.toString().split(':').last}");
+      }
     }
   }
-}
 
   void _showPopup(String message) {
     if (!mounted) return;
@@ -164,11 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> handleSearch(BuildContext context) async {
-    // if (_isSearching) return;
-    // if (_searchQuery.trim().isEmpty) {
-    //   _showPopup("Masukkan kata kunci pencarian");
-    //   return;
-    // }
+    debugPrint('MEMULAI PENCARIAN UNTUK: "${_searchController.text.trim()}"');
     if (_isSearching) return;
     if (_searchController.text.trim().isEmpty) {
       _showPopup("Masukkan kata kunci pencarian");
@@ -184,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _isSearching = true;
     });
     try {
-      final results = await SearchService.searchResep(_searchQuery);
+      final results = await SearchService.searchResep(_searchController.text);
       if (!mounted) return;
 
       final hasChanges = await Navigator.push<bool>(
@@ -246,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: CustomHeader(
           title: "Mau masak apa hari ini",
-           titleStyle: const TextStyle(
+          titleStyle: const TextStyle(
             fontFamily: 'Poppins',
             fontSize: 18,
             color: Colors.black,
@@ -261,6 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: TextField(
                     controller: _searchController,
                     focusNode: _searchFocusNode,
+                    textInputAction: TextInputAction.search,
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 18, color: Colors.black87),
                     decoration: InputDecoration(
@@ -273,13 +283,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontFamily: 'Poppins',
                         fontSize: 18,
                         color: Colors.black,
-                        
                       ),
                       prefixIcon: const Icon(Icons.search, color: Colors.black),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _speechToText.isListening ? Icons.mic_off : Icons.mic,
-                          color: Colors.black,
+                          _isListening ? Icons.mic_off : Icons.mic,
+                          color: _isListening ? Colors.red : Colors.black,
                         ),
                         onPressed: _speechToText.isListening ? _stopListening : _startListening,
                       ),
@@ -289,38 +298,37 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(18),
                         borderSide: BorderSide.none,
                       ),
-                    ),                   
-                    // onChanged: (value) {
-                    //   setState(() {
-                    //     _searchQuery = value;
-                    //   });
-                    // },
-                    onSubmitted: (_) => handleSearch(context),
+                    ),
+                    // onSubmitted: (_) => handleSearch(context),
+                    onSubmitted: (value) {
+                      handleSearch(context);
+                    },
                   ),
                 ),
                 const SizedBox(width: 8),
-                // _isSearching
-                //     ? const Padding(
-                //       padding: EdgeInsets.symmetric(horizontal: 12),
+                //  _isSearching
+                //   ? const Padding(
+                //       padding: EdgeInsets.symmetric(horizontal: 12.0),
                 //       child: SizedBox(
                 //         height: 24,
                 //         width: 24,
                 //         child: CircularProgressIndicator(
+                //           color: Colors.black,
                 //           strokeWidth: 2.5,
-                //           color: Colors.white,
                 //         ),
                 //       ),
                 //     )
-                //     : GestureDetector(
-                //       onTap: () => handleSearch(context),
-                //       child: Container(
-                //         decoration: BoxDecoration(
-                //           shape: BoxShape.rectangle,
-                //           color: Colors.white,
-                //           borderRadius: BorderRadius.circular(30),
+                //   : IconButton(
+                //       icon: const Icon(Icons.search, color: Colors.black),
+                //       onPressed: () {
+                //         // Panggil handleSearch saat tombol ditekan
+                //         handleSearch(context);
+                //       },
+                //       style: IconButton.styleFrom(
+                //         backgroundColor: Colors.white,
+                //         shape: RoundedRectangleBorder(
+                //           borderRadius: BorderRadius.circular(18),
                 //         ),
-                //         padding: const EdgeInsets.all(8),
-                //         child: const Icon(Icons.search, color: Colors.black),
                 //       ),
                 //     ),
               ],
@@ -393,63 +401,63 @@ class _HomeScreenState extends State<HomeScreen> {
                 _isLoading
                     ? buildShimmerGrid()
                     : _rekomendasi.isEmpty
-                    ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 50.0,
-                          horizontal: 20.0,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.ramen_dining_outlined,
-                              size: 60,
-                              color: Colors.grey.shade400,
-                            ),
-                            const SizedBox(height: 10),
-                            const Text(
-                              "Belum ada rekomendasi saat ini.",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 50.0,
+                                horizontal: 20.0,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.ramen_dining_outlined,
+                                    size: 60,
+                                    color: Colors.grey.shade400,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  const Text(
+                                    "Belum ada rekomendasi saat ini.",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    )
-                    : GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      itemCount: _rekomendasi.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 0.65,
+                          )
+                        : GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            itemCount: _rekomendasi.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 10,
+                              mainAxisSpacing: 10,
+                              childAspectRatio: 0.65,
+                            ),
+                            itemBuilder: (context, index) {
+                              final resep = _rekomendasi[index];
+                              return HealthyFoodItem(
+                                recipe: resep,
+                                onTap: () async {
+                                  final result = await Navigator.push<bool>(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => DetailMakanan(recipe: resep),
+                                    ),
+                                  );
+                                  if (result == true && mounted) {
+                                    await _fetchInitialData();
+                                  }
+                                },
+                              );
+                            },
                           ),
-                      itemBuilder: (context, index) {
-                        final resep = _rekomendasi[index];
-                        return HealthyFoodItem(
-                          recipe: resep,
-                          onTap: () async {
-                            final result = await Navigator.push<bool>(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => DetailMakanan(recipe: resep),
-                              ),
-                            );
-                            if (result == true && mounted) {
-                              await _fetchInitialData();
-                            }
-                          },
-                        );
-                      },
-                    ),
                 const SizedBox(height: 10),
               ],
             ),
