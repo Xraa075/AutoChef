@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:autochef/views/home/home_screen.dart';
 import 'package:autochef/views/profile/profile_screen.dart';
 import 'package:autochef/views/input_ingredients/input_screen.dart';
+import 'package:autochef/views/meal_plan/mealplanner.dart';
 
 class Navbar extends StatefulWidget {
   const Navbar({super.key});
@@ -13,7 +14,18 @@ class Navbar extends StatefulWidget {
 
 class NavbarState extends State<Navbar> {
   int selectedIndex = 0;
-  final List<Widget> pages = [HomeScreen(), InputRecipe(), ProfileScreen()];
+  // final List<Widget> pages = [
+  //   HomeScreen(),
+  //   InputRecipe(),
+  //   const MealPlannerScreen(),
+  //   ProfileScreen()
+  // ];
+
+  final List<Widget> pages = [
+    HomeScreen(),
+    const MealPlannerScreen(),
+    ProfileScreen()
+  ];
 
   void onNavTapped(int index) {
     setState(() {

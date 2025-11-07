@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/models/user.dart';
 import 'package:autochef/models/recipe.dart';
-import 'package:autochef/data/dummy_user.dart';
+import 'package:autochef/data/user.dart';
 import 'package:autochef/views/profile/edit_profile.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
 import 'package:autochef/routes.dart';

@@ -6,24 +6,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 
 class ApiRekomendasi {
-  static const String baseUrl =
-      'http://20.6.107.2:8002/api/resepmakanan/rekomendasi';
 
   static Future<List<Recipe>> fetchRekomendasi() async {
     try {
-      // Get the user's token for personalized recommendations
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       final isLoggedIn = prefs.getBool('hasLoggedAsUser') ?? false;
 
-      // PERBAIKAN: Gunakan URL yang sama, backend sudah menghandle personalisasi
-      // berdasarkan token tanpa perlu endpoint berbeda
-      final requestUrl = baseUrl;
+      final requestUrl = 'https://backend.autochef.site/api/recipes/recommendations';
 
       debugPrint('Fetching recommendations from: $requestUrl');
       debugPrint('User logged in: $isLoggedIn');
 
-      // Add auth token if logged in
       final Map<String, String> headers = {'Accept': 'application/json'};
 
       if (isLoggedIn && token != null) {
@@ -42,22 +36,26 @@ class ApiRekomendasi {
         );
 
         final List<dynamic> resepList = data['data'];
-        debugPrint('Found ${resepList.length} recommendations');
 
-        return resepList.map((json) => Recipe.fromJson(json)).toList();
+        final List<Recipe> recipes = resepList
+            .map((json) => Recipe.fromJson(json as Map<String, dynamic>))
+            .toList();
+
+        return recipes;
+        
       } else {
         debugPrint('Error response: ${response.body}');
         throw Exception(
           'Gagal memuat data rekomendasi: ${response.statusCode}',
         );
       }
-    } catch (e) {
+    } catch (e, stacktrace) {
       debugPrint('Exception in fetchRekomendasi: $e');
+      debugPrint('Stacktrace: $stacktrace');
       throw Exception('Terjadi kesalahan: $e');
     }
   }
 
-  // Add new method to log recipe views
   static Future<void> logRecipeView(int recipeId) async {
     try {
       // Check if user is logged in

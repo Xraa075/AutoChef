@@ -1,12 +1,7 @@
-// ignore_for_file: prefer_const_constructors_in_immutables, library_private_types_in_public_api, use_build_context_synchronously, deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:async';
-import 'dart:io';
 import 'login.dart';
+import '../services/api_login.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({super.key});
@@ -95,8 +90,8 @@ class _RegisterPageState extends State<RegisterPage> {
     if (value == null || value.isEmpty) {
       return 'Password tidak boleh kosong';
     }
-    if (value.length < 5) {
-      return 'Password minimal 5 karakter';
+    if (value.length < 8) {
+      return 'Password minimal 8 karakter';
     }
     return null;
   }
@@ -105,8 +100,8 @@ class _RegisterPageState extends State<RegisterPage> {
     if (value == null || value.isEmpty) {
       return 'Konfirmasi password tidak boleh kosong';
     }
-    if (value.length < 5) {
-      return 'Konfirmasi password minimal 5 karakter';
+    if (value.length < 8) {
+      return 'Konfirmasi password minimal 8 karakter';
     }
     if (value != passwordController.text) {
       return 'Password dan Konfirmasi Password tidak cocok';
@@ -114,6 +109,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return null;
   }
 
+  // FUNGSI INI DIPERBARUI
   Future<void> registerUser(BuildContext context) async {
     setState(() {
       apiErrorMessage = null;
@@ -121,164 +117,95 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (_formKey.currentState!.validate()) {
       showLoadingDialog();
-      try {
-        final response = await http
-            .post(
-              Uri.parse('http://20.6.107.2:8002/api/register'),
-              headers: {'Accept': 'application/json'},
-              body: {
-                'name': nameController.text,
-                'email': emailController.text,
-                'password': passwordController.text,
-                'password_confirmation': confirmPasswordController.text,
-              },
-            )
-            .timeout(const Duration(seconds: 20));
+      
+      // Memanggil fungsi register dari api_login.dart
+      final response = await register(
+        nameController.text,
+        emailController.text,
+        passwordController.text,
+        confirmPasswordController.text,
+      );
 
-        hideLoadingDialog();
-        Map<String, dynamic>? responseData;
-        if (response.body.isNotEmpty) {
-          try {
-            responseData = jsonDecode(response.body);
-          } catch (e) {
-            setState(() {
-              apiErrorMessage = 'Server memberikan respons yang tidak valid.';
-            });
-            return;
-          }
-        } else {
-          setState(() {
-            apiErrorMessage =
-                'Server tidak memberikan respons. Status: ${response.statusCode}';
-          });
-          return;
-        }
+      hideLoadingDialog();
 
-        if (response.statusCode == 201 || response.statusCode == 200) {
-          final String userName =
-              responseData?['user']?['name'] ?? nameController.text;
-          setState(() {
-            nameController.clear();
-            emailController.clear();
-            passwordController.clear();
-            confirmPasswordController.clear();
-            _formKey.currentState?.reset();
-          });
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28),
-                ),
-                title: Row(
-                  children: [
-                    const Icon(
-                      Icons.check_circle_outline,
-                      color: Color(0xFFF46A06),
-                      size: 28,
-                    ),
-                    const SizedBox(width: 10),
-                    const Text(
-                      'Registrasi Berhasil',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                content: Text(
-                  'Akun untuk $userName telah berhasil dibuat. Silakan login.',
-                  style: const TextStyle(fontSize: 16),
-                ),
-                actions: [
-                  SizedBox(
-                    width: double.infinity,
-                    height: 45,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        backgroundColor: const Color(0xFFF46A06),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (_) => LoginPage()),
-                        );
-                      },
-                      child: const Text(
-                        'Oke',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
+      if (response['status'] == 'success') {
+        // Logika sukses, mengambil data dari respons
+        Map<String, dynamic>? responseData = response['data'];
+        final String userName =
+            responseData?['user']?['name'] ?? nameController.text;
+        
+        setState(() {
+          nameController.clear();
+          emailController.clear();
+          passwordController.clear();
+          confirmPasswordController.clear();
+          _formKey.currentState?.reset();
+        });
+
+        // Tampilkan dialog sukses (logika ini sama seperti sebelumnya)
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
+              ),
+              title: Row(
+                children: [
+                  const Icon(
+                    Icons.check_circle_outline,
+                    color: Color(0xFFF46A06),
+                    size: 28,
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Registrasi Berhasil',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
-              );
-            },
-          );
-        } else if (response.statusCode == 422) {
-          String errorMsg =
-              responseData?['message'] ?? 'Terjadi kesalahan validasi.';
-          Map<String, dynamic>? errors = responseData?['errors'];
-          String specificFieldErrors = "";
-          if (errors != null) {
-            errors.forEach((key, value) {
-              if (value is List && value.isNotEmpty) {
-                String fieldName = key;
-                if (key == "name") fieldName = "Username";
-                if (key == "password") fieldName = "Password";
-                if (key == "email") fieldName = "Email";
-                specificFieldErrors += "$fieldName: ${value.first}\n";
-              }
-            });
-            setState(() {
-              apiErrorMessage =
-                  specificFieldErrors.isNotEmpty
-                      ? specificFieldErrors.trim()
-                      : errorMsg;
-            });
-          } else {
-            setState(() {
-              apiErrorMessage = errorMsg;
-            });
-          }
-        } else {
-          setState(() {
-            apiErrorMessage =
-                responseData?['message'] ??
-                'Gagal registrasi. Status: ${response.statusCode}';
-          });
-        }
-      } on SocketException {
-        hideLoadingDialog();
+              ),
+              content: Text(
+                'Akun untuk $userName telah berhasil dibuat. Silakan login.',
+                style: const TextStyle(fontSize: 16),
+              ),
+              actions: [
+                SizedBox(
+                  width: double.infinity,
+                  height: 45,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      backgroundColor: const Color(0xFFF46A06),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => LoginPage()),
+                      );
+                    },
+                    child: const Text(
+                      'Oke',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        // Jika gagal, tampilkan pesan error dari api_login.dart
         setState(() {
-          apiErrorMessage = 'Tidak ada koneksi internet.';
-        });
-      } on http.ClientException {
-        hideLoadingDialog();
-        setState(() {
-          apiErrorMessage = 'Tidak dapat terhubung ke server.';
-        });
-      } on FormatException {
-        hideLoadingDialog();
-        setState(() {
-          apiErrorMessage = 'Format respons server tidak valid.';
-        });
-      } on TimeoutException {
-        hideLoadingDialog();
-        setState(() {
-          apiErrorMessage = 'Koneksi ke server timeout.';
-        });
-      } catch (e) {
-        hideLoadingDialog();
-        setState(() {
-          apiErrorMessage = 'Terjadi kesalahan: ${e.toString()}';
+          apiErrorMessage =
+              response['message'] ?? 'Terjadi kesalahan tidak diketahui.';
         });
       }
     } else {
@@ -288,8 +215,11 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
+    // ... Sisa build method tidak berubah ...
+    // (Kode UI tetap sama)
     return WillPopScope(
       onWillPop: () async {
         SystemNavigator.pop();
@@ -464,6 +394,8 @@ class _RegisterPageState extends State<RegisterPage> {
     TextInputType keyboardType = TextInputType.text,
     List<TextInputFormatter>? inputFormatters,
   }) {
+    // ... Sisa buildTextFormField method tidak berubah ...
+    // (Kode UI tetap sama)
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: TextFormField(

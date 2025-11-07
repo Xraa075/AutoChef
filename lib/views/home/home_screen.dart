@@ -207,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
         await _fetchInitialData();
       }
     } catch (e) {
-      _showPopup("Gagal mencari resep. Silakan coba lagi nanti.");
+      _showPopup("Gagal mencari resep: ${e.toString().replaceFirst("Exception: ", "")}");
     } finally {
       if (mounted)
         setState(() {

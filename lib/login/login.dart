@@ -1,14 +1,9 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:async';
-import 'dart:io';
 import 'regis.dart';
+import '../services/api_login.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -87,128 +82,57 @@ class _LoginPageState extends State<LoginPage> {
       String email = emailController.text.trim();
       String password = passwordController.text;
 
+      debugPrint('Mencoba login dengan email: $email');
+
       showLoadingDialog();
-      try {
-        final response = await http
-            .post(
-              Uri.parse('http://20.6.107.2:8002/api/login'),
-              headers: {'Accept': 'application/json'},
-              body: {'email': email, 'password': password},
-            )
-            .timeout(const Duration(seconds: 20));
+      
+      final response = await login(email, password);
 
-        Map<String, dynamic>? responseData;
-        try {
-          if (response.body.isNotEmpty) {
-            responseData = jsonDecode(response.body);
-          }
-        } catch (e) {
-          hideLoadingDialog();
+      hideLoadingDialog();
+      if (!mounted) return;
+
+      if (response['status'] == 'success') {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        Map<String, dynamic>? responseData = response['data'];
+        String? token = responseData?['access_token'];
+        Map<String, dynamic>? userDataFromApi = responseData?['user'];
+
+          if (token != null) {
+          await prefs.setBool('hasLoggedAsUser', true);
+          await prefs.setString('token', token);
+          await prefs.setString(
+            'username',
+            userDataFromApi?['name'] ?? 'Pengguna',
+          );
+          await prefs.setString('email', userDataFromApi?['email'] ?? '');
+          await prefs.setString(
+            'userImage',
+            userDataFromApi?['userImage'] ??
+                userDataFromApi?['profile_photo_path'] ??
+                'lib/assets/images/avatar1.png',
+          );
+
+          emailController.clear();
+          passwordController.clear();
+          _formKey.currentState?.reset();
+
           if (mounted) {
-            setState(() {
-              apiErrorMessage = 'Format respons dari server tidak valid.';
-            });
-          }
-          return;
-        }
-
-        hideLoadingDialog();
-
-        if (!mounted) return;
-
-        if (response.statusCode == 200 && responseData != null) {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          String? token = responseData['token'];
-          Map<String, dynamic>? userDataFromApi = responseData['user'];
-
-          if (token != null && userDataFromApi != null) {
-            await prefs.setBool('hasLoggedAsUser', true);
-            await prefs.setString(
-              'username',
-              userDataFromApi['name'] ?? 'Pengguna',
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const Navbar()),
+              (route) => false,
             );
-            await prefs.setString('email', userDataFromApi['email'] ?? '');
-            await prefs.setString('token', token);
-            await prefs.setString(
-              'userImage',
-              userDataFromApi['userImage'] ??
-                  userDataFromApi['profile_photo_path'] ??
-                  'lib/assets/images/avatar1.png',
-            );
-
-            emailController.clear();
-            passwordController.clear();
-            _formKey.currentState?.reset();
-
-            if (mounted) {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const Navbar()),
-                (route) => false,
-              );
-            }
-          } else {
-            setState(() {
-              apiErrorMessage = 'Respons login tidak lengkap dari server.';
-            });
           }
-        } else if (response.statusCode == 401 && responseData != null) {
-          setState(() {
-            apiErrorMessage =
-                (responseData?['message'] as String?) ??
-                'Email atau password salah.';
-          });
         } else {
-          String messageFromServer = "Gagal login.";
-          if (responseData != null && responseData.containsKey('message')) {
-            messageFromServer = responseData['message'];
-          } else if (response.body.isNotEmpty) {
-            messageFromServer =
-                response.body.length > 100
-                    ? "${response.body.substring(0, 100)}..."
-                    : response.body;
-          }
           setState(() {
-            apiErrorMessage =
-                '$messageFromServer (Status: ${response.statusCode})';
+            apiErrorMessage = 'Respons login tidak lengkap dari server.';
           });
         }
-      } on SocketException {
-        hideLoadingDialog();
-        if (mounted) {
-          setState(() {
-            apiErrorMessage = 'Tidak ada koneksi internet.';
-          });
-        }
-      } on TimeoutException {
-        hideLoadingDialog();
-        if (mounted) {
-          setState(() {
-            apiErrorMessage = 'Koneksi ke server terputus atau terlalu lama.';
-          });
-        }
-      } on http.ClientException {
-        hideLoadingDialog();
-        if (mounted) {
-          setState(() {
-            apiErrorMessage = 'Tidak dapat terhubung ke server.';
-          });
-        }
-      } on FormatException {
-        hideLoadingDialog();
-        if (mounted) {
-          setState(() {
-            apiErrorMessage = 'Format respons server tidak valid.';
-          });
-        }
-      } catch (e) {
-        hideLoadingDialog();
-        if (mounted) {
-          setState(() {
-            apiErrorMessage = 'Terjadi kesalahan: ${e.toString()}';
-          });
-        }
-        debugPrint('Error saat login: $e');
+      } else {
+        setState(() {
+          apiErrorMessage =
+              response['message'] ?? 'Terjadi kesalahan tidak diketahui.';
+        });
       }
     } else {
       setState(() {
@@ -216,6 +140,7 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

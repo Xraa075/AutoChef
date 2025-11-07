@@ -10,6 +10,7 @@ import 'package:autochef/login/login.dart';
 import 'package:autochef/login/regis.dart';
 import 'package:autochef/models/user.dart';
 import 'package:autochef/screens/policy_announcement_screen.dart';
+import 'package:autochef/views/meal_plan/mealplanner.dart';
 
 class Routes {
   static const String introScreen = '/intro-screen';
@@ -21,6 +22,7 @@ class Routes {
   static const String register = '/register';
   static const String editProfile = '/edit-profile';
   static const String policyAnnouncement = '/policy-announcement';
+  static const String mealPlanner = '/meal-planner';
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -43,7 +45,9 @@ class Routes {
         return MaterialPageRoute(
           builder: (_) => const RekomendationRecipe(bahan: []),
         );
-
+      case mealPlanner:
+        return MaterialPageRoute(builder: (_) => const MealPlannerScreen());
+        
       case detailMakanan:
         if (settings.arguments is Recipe) {
           final recipe = settings.arguments as Recipe;
