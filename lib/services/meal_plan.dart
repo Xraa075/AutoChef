@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:autochef/models/recipe.dart';
 
+// --- Model untuk Summary (Sudah Benar) ---
 class WeeklyIngredient {
   final int idBahan;
   final String namaBahan;
@@ -44,10 +45,12 @@ class IngredientDetail {
     );
   }
 }
+// --- Akhir Model Summary ---
 
 class MealPlanService {
   static const String _baseUrl = "https://backend.autochef.site/api";
 
+  // (FUNGSI INI DIPERBAIKI KEMBALI)
   static Future<Map<String, List<Recipe>>> getMealPlans() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -70,32 +73,35 @@ class MealPlanService {
       debugPrint('Get Meal Plans response code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
+        // (PERBAIKAN 1) Kembalikan ke Map, karena responsnya adalah Object
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final Map<String, List<Recipe>> finalMealPlan = {};
 
-        responseData.values.forEach((dayData) {
+        // (PERBAIKAN 2) Iterasi menggunakan .values() dari Map
+        for (var dayData in responseData.values) {
           if (dayData is Map<String, dynamic>) {
-            final String dayName = dayData['day'];
+            final String dayName = dayData['day']; // "Senin", "Selasa", dst.
             final List<dynamic> recipesJson = dayData['recipes'] ?? [];
             final List<Recipe> recipesList = recipesJson.map((recipeJson) {
               return Recipe(
                 id: recipeJson['id'],
-                namaResep: recipeJson['nama_rese'],
+                namaResep: recipeJson['nama_resep'], // Typo 'nama_rese' sudah diperbaiki
                 gambar: recipeJson['url_gambar'],
                 waktu: recipeJson['waktu_masak'],
                 negara: recipeJson['negara'] ?? '',
                 kategori: recipeJson['kategori'] ?? '',
+                // Beri nilai default
                 kalori: 0,
                 protein: 0,
                 karbohidrat: 0,
-                bahan: '',
-                steps: '',
+                bahan: '', // DetailMakanan akan mengambil ini
+                steps: '', // DetailMakanan akan mengambil ini
               );
             }).toList();
 
             finalMealPlan[dayName] = recipesList;
           }
-        });
+        }
 
         return finalMealPlan;
       } else {
@@ -110,6 +116,7 @@ class MealPlanService {
     }
   }
 
+  // --- Fungsi getWeeklyIngredients (Sudah Benar) ---
   static Future<List<WeeklyIngredient>> getWeeklyIngredients() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -133,10 +140,10 @@ class MealPlanService {
           'Get Weekly Ingredients response code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
+        // Ini sudah benar, '{"data": [...] }' adalah Map
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final List<dynamic> ingredientsData = responseData['data'] ?? [];
 
-        // Map data JSON ke List<WeeklyIngredient>
         final List<WeeklyIngredient> ingredientsList = ingredientsData
             .map((item) =>
                 WeeklyIngredient.fromJson(item as Map<String, dynamic>))
@@ -156,7 +163,7 @@ class MealPlanService {
     }
   }
 
-  // Fungsi addRecipeToMealPlan (TETAP SAMA)
+  // --- Fungsi addRecipeToMealPlan (Sudah Benar) ---
   static Future<void> addRecipeToMealPlan({
     required String day,
     required int recipeId,

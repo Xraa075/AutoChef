@@ -25,6 +25,28 @@ Future<Map<String, dynamic>> register(
       },
     ).timeout(const Duration(seconds: 20));
 
+    if (response.statusCode == 200 ||
+        response.statusCode == 201 ||
+        response.statusCode == 204) {
+
+      if (response.statusCode == 204) {
+        return {'status': 'success', 'data': null};
+      }
+
+      Map<String, dynamic>? responseData;
+      if (response.body.isNotEmpty) {
+        try {
+          responseData = jsonDecode(response.body);
+          return {'status': 'success', 'data': responseData};
+        } catch (e) {
+          return {
+            'status': 'error',
+            'message': 'Server memberikan respons sukses tapi format data tidak valid.'
+          };
+        }
+      }
+      return {'status': 'success', 'data': null};
+    }
     Map<String, dynamic>? responseData;
     if (response.body.isNotEmpty) {
       try {
@@ -32,19 +54,12 @@ Future<Map<String, dynamic>> register(
       } catch (e) {
         return {
           'status': 'error',
-          'message': 'Server memberikan respons yang tidak valid.'
+          'message': 'Server error (Status ${response.statusCode}) dengan respons tidak valid.'
         };
       }
-    } else {
-      return {
-        'status': 'error',
-        'message': 'Server tidak memberikan respons. Status: ${response.statusCode}'
-      };
     }
 
-    if (response.statusCode == 201 || response.statusCode == 200) {
-      return {'status': 'success', 'data': responseData};
-    } else if (response.statusCode == 422) {
+    if (response.statusCode == 422) {
       String errorMsg =
           responseData?['message'] ?? 'Terjadi kesalahan validasi.';
       Map<String, dynamic>? errors = responseData?['errors'];
@@ -63,7 +78,9 @@ Future<Map<String, dynamic>> register(
             specificFieldErrors.isNotEmpty ? specificFieldErrors.trim() : errorMsg;
       }
       return {'status': 'error', 'message': errorMsg};
-    } else {
+    } 
+    
+    else {
       return {
         'status': 'error',
         'message': responseData?['message'] ??

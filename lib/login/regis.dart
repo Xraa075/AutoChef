@@ -1,3 +1,4 @@
+// (MODIFIKASI) regis.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'login.dart';
@@ -109,7 +110,6 @@ class _RegisterPageState extends State<RegisterPage> {
     return null;
   }
 
-
   Future<void> registerUser(BuildContext context) async {
     setState(() {
       apiErrorMessage = null;
@@ -138,7 +138,8 @@ class _RegisterPageState extends State<RegisterPage> {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (BuildContext context) {
+          // (MODIFIKASI 1) Ganti nama 'context' di sini menjadi 'dialogContext'
+          builder: (BuildContext dialogContext) {
             return AlertDialog(
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
@@ -175,13 +176,14 @@ class _RegisterPageState extends State<RegisterPage> {
                       const SizedBox(height: 10),
                     ],
                   ),
-                  
                   Positioned(
                     top: -18.0,
                     right: -18.0,
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.of(context).pop();
+                        // (MODIFIKASI 2) Gunakan 'dialogContext' untuk menutup dialog
+                        Navigator.of(dialogContext).pop();
+                        // (MODIFIKASI 3) Gunakan 'context' (milik halaman) untuk navigasi
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (_) => LoginPage()),
@@ -190,10 +192,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2)
-                        ),
+                            color: Colors.grey[200],
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2)),
                         child: const Icon(
                           Icons.close,
                           color: Colors.black54,
@@ -204,7 +205,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ],
               ),
-              actions: null, 
+              actions: null,
             );
           },
         );
@@ -220,7 +221,6 @@ class _RegisterPageState extends State<RegisterPage> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -404,10 +404,9 @@ class _RegisterPageState extends State<RegisterPage> {
         controller: controller,
         validator: validator,
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        obscureText:
-            isPassword
-                ? (isConfirmField ? _obscureConfirmPassword : _obscurePassword)
-                : false,
+        obscureText: isPassword
+            ? (isConfirmField ? _obscureConfirmPassword : _obscurePassword)
+            : false,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
         decoration: InputDecoration(
@@ -440,28 +439,27 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           errorStyle: const TextStyle(fontSize: 12, height: 1),
           errorMaxLines: 2,
-          suffixIcon:
-              isPassword
-                  ? IconButton(
-                    icon: Icon(
-                      (isConfirmField
-                              ? _obscureConfirmPassword
-                              : _obscurePassword)
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                      color: Colors.grey,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        if (isConfirmField) {
-                          _obscureConfirmPassword = !_obscureConfirmPassword;
-                        } else {
-                          _obscurePassword = !_obscurePassword;
-                        }
-                      });
-                    },
-                  )
-                  : null,
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    (isConfirmField
+                            ? _obscureConfirmPassword
+                            : _obscurePassword)
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      if (isConfirmField) {
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                      } else {
+                        _obscurePassword = !_obscurePassword;
+                      }
+                    });
+                  },
+                )
+              : null,
         ),
       ),
     );
