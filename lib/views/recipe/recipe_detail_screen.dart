@@ -1,4 +1,3 @@
-// (MODIFIKASI) recipe_detail_screen.dart
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -8,8 +7,6 @@ import 'package:autochef/views/recipe/components/recipe_info.dart';
 import 'package:autochef/views/recipe/components/ingredients.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/services/api_rekomendation.dart';
-
-// (BARU) Import service meal plan yang baru dibuat
 import 'package:autochef/services/meal_plan.dart';
 
 import 'package:autochef/models/recipe_detail_model.dart' as DetailModel;
@@ -33,21 +30,6 @@ class _DetailMakananState extends State<DetailMakanan> {
     _futureRecipeDetail = ApiRekomendasi.fetchRecipeDetail(widget.recipe.id);
   }
 
-  // (DIHAPUS/KOMENTARI) Fungsi ini tidak lagi digunakan, diganti API call
-  // Future<void> _addRecipeToMealPlanner(String day, Recipe recipe) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final key = 'meal_planner_$day';
-  //   List<String> recipesJson = prefs.getStringList(key) ?? [];
-  //   String newRecipeJson = jsonEncode(recipe.toJson());
-  //   if (!recipesJson.contains(newRecipeJson)) {
-  //     recipesJson.add(newRecipeJson);
-  //     await prefs.setStringList(key, recipesJson);
-  //     debugPrint('Berhasil menyimpan resep JSON untuk hari $day');
-  //   } else {
-  //     debugPrint('Resep ini sudah ada untuk hari $day');
-  //   }
-  // }
-
   Future<void> _logRecipeView() async {
     await Future.delayed(const Duration(milliseconds: 300));
     if (!mounted) return;
@@ -63,7 +45,6 @@ class _DetailMakananState extends State<DetailMakanan> {
     }
   }
 
-  // (MODIFIKASI) Fungsi ini diubah untuk memanggil API
   void _showAddToMealPlannerDialog() {
     final List<String> days = [
       'Senin',
@@ -75,15 +56,12 @@ class _DetailMakananState extends State<DetailMakanan> {
       'Minggu'
     ];
     
-    // Variabel untuk melacak loading state di dalam dialog
     bool _isLoading = false;
 
     showDialog(
       context: context,
-      // Jangan biarkan dialog ditutup saat sedang loading
       barrierDismissible: false, 
       builder: (BuildContext dialogContext) {
-        // Gunakan StatefulBuilder agar dialog bisa update state-nya sendiri (untuk loading)
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
@@ -104,10 +82,7 @@ class _DetailMakananState extends State<DetailMakanan> {
                 alignment: WrapAlignment.center,
                 children: days.map((day) {
                   return ElevatedButton(
-                    // (MODIFIKASI) onPressed menjadi async
-                    // Nonaktifkan tombol jika sedang loading
                     onPressed: _isLoading ? null : () async {
-                      // 1. Tampilkan loading
                       setDialogState(() {
                         _isLoading = true;
                       });
@@ -115,16 +90,12 @@ class _DetailMakananState extends State<DetailMakanan> {
                       try {
                         debugPrint(
                             'Menambahkan resep "${widget.recipe.namaResep}" ke hari $day');
-                        
-                        // 2. (BARU) Panggil API Service
                         await MealPlanService.addRecipeToMealPlan(
-                          day: day, // Service akan mengubah ke lowercase
+                          day: day,
                           recipeId: widget.recipe.id,
                         );
-
-                        // 3. Jika sukses
                         if (!mounted) return;
-                        Navigator.pop(dialogContext); // Tutup dialog
+                        Navigator.pop(dialogContext);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content:
@@ -134,15 +105,11 @@ class _DetailMakananState extends State<DetailMakanan> {
                           ),
                         );
                       } catch (e) {
-                        // 4. Jika gagal
-                        // Berhenti loading
                         setDialogState(() {
                           _isLoading = false;
                         });
 
                         if (!mounted) return;
-                        // Tampilkan SnackBar error
-                        // Tutup dialog terlebih dahulu
                         Navigator.pop(dialogContext);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -169,7 +136,6 @@ class _DetailMakananState extends State<DetailMakanan> {
               actionsAlignment: MainAxisAlignment.center,
               actionsPadding: const EdgeInsets.only(bottom: 20, top: 10),
               actions: [
-                // (MODIFIKASI) Tampilkan loading atau tombol Batal
                 if (_isLoading)
                   const Padding(
                     padding: EdgeInsets.only(bottom: 12.0),
@@ -223,7 +189,6 @@ class _DetailMakananState extends State<DetailMakanan> {
               },
             ),
           ),
-          // Tombol Kembali
           Positioned(
             top: 40,
             left: 10,
@@ -244,8 +209,6 @@ class _DetailMakananState extends State<DetailMakanan> {
               ),
             ),
           ),
-          // (MODIFIKASI INTI)
-          // Gunakan FutureBuilder untuk menunggu data detail
           DraggableScrollableSheet(
             initialChildSize: 0.71,
             minChildSize: 0.71,
@@ -261,11 +224,9 @@ class _DetailMakananState extends State<DetailMakanan> {
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(30)),
                   ),
-                  // Ganti ListView dengan FutureBuilder
                   child: FutureBuilder<DetailModel.RecipeDetail>(
                     future: _futureRecipeDetail,
                     builder: (context, snapshot) {
-                      // Saat loading
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return ListView(
                           controller: scrollController,
@@ -273,10 +234,9 @@ class _DetailMakananState extends State<DetailMakanan> {
                             _buildDragHandle(),
                             _buildHeader(
                               widget.recipe
-                                  .namaResep, // Tampilkan nama resep awal
-                              widget.recipe.negara, // Tampilkan negara awal
+                                  .namaResep,
+                              widget.recipe.negara,
                             ),
-                            // Tampilkan Info Awal (opsional, bisa diganti shimmer)
                             RecipeInfo(
                               waktu: widget.recipe.waktu,
                               kalori: widget.recipe.kalori,
@@ -294,8 +254,6 @@ class _DetailMakananState extends State<DetailMakanan> {
                           ],
                         );
                       }
-
-                      // Jika error
                       if (snapshot.hasError || !snapshot.hasData) {
                         return ListView(
                           controller: scrollController,
@@ -392,7 +350,7 @@ class _DetailMakananState extends State<DetailMakanan> {
             ),
             IconButton(
               icon: const Icon(
-                Icons.add_circle_outline,
+                Icons.calendar_month_outlined,
                 color: Color(0xFFF46A06),
                 size: 32,
               ),

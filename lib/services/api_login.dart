@@ -141,7 +141,7 @@ Future<Map<String, dynamic>> login(String email, String password) async {
     else if (response.statusCode == 401 || response.statusCode == 422) {
       return {
         'status': 'error',
-        'message': 'Gmail / password yang kamu masukkan salah'
+        'message': 'Email atau password yang kamu masukkan salah'
       };
     }
     else {
@@ -155,7 +155,7 @@ Future<Map<String, dynamic>> login(String email, String password) async {
       }
       return {
         'status': 'error',
-        'message': '$messageFromServer (Status: ${response.statusCode})'
+        'message': '$messageFromServer'
       };
     }
   } on SocketException {

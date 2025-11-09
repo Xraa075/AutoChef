@@ -85,18 +85,6 @@ class RecipeCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    Text(
-                      "Bahan: ${recipe.bahan.isEmpty ? 'Tidak ada data' : recipe.bahan.split(',').join(', ')}",
-                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      "Kalori : ${recipe.kalori} kalori",
-                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                    ),
-                    const SizedBox(height: 5),
                     Row(
                       children: [
                         Icon(Icons.access_time, color: Colors.orange, size: 16),

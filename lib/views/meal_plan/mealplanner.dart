@@ -236,14 +236,29 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
                           final String text =
                               "$jumlah ${item.detailBahan.satuan} ${item.namaBahan}$catatan";
 
-                          return Padding(
+                         return Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
-                            child: Text(
-                              text,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.black87,
-                              ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "•  ",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    text,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           );
                         }).toList(),
