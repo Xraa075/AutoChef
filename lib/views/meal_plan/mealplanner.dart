@@ -225,17 +225,11 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
                                       item.detailBahan.catatan!.isNotEmpty
                                   ? " (${item.detailBahan.catatan})"
                                   : "";
-                          final String jumlah =
-                              item.detailBahan.jumlah.toStringAsFixed(
-                            item.detailBahan.jumlah.truncateToDouble() ==
-                                    item.detailBahan.jumlah
-                                ? 0
-                                : 1,
-                          );
-
+                          final String jumlah = item.detailBahan.jumlah
+                              .toString()
+                              .replaceAll(RegExp(r'\.0$'), '');
                           final String text =
                               "$jumlah ${item.detailBahan.satuan} ${item.namaBahan}$catatan";
-
                          return Padding(
                             padding: const EdgeInsets.only(bottom: 8.0),
                             child: Row(
