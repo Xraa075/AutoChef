@@ -26,8 +26,8 @@ android {
         applicationId = "com.autochef.app"
         minSdk = flutter.minSdkVersion
         targetSdk = 35
-        versionCode = 10
-        versionName = "3.0.2"
+        versionCode = 11
+        versionName = "3.0.3"
     }
 
 
