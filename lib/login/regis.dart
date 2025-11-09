@@ -109,7 +109,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return null;
   }
 
-  // FUNGSI INI DIPERBARUI
+
   Future<void> registerUser(BuildContext context) async {
     setState(() {
       apiErrorMessage = null;
@@ -117,8 +117,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (_formKey.currentState!.validate()) {
       showLoadingDialog();
-      
-      // Memanggil fungsi register dari api_login.dart
       final response = await register(
         nameController.text,
         emailController.text,
@@ -129,11 +127,6 @@ class _RegisterPageState extends State<RegisterPage> {
       hideLoadingDialog();
 
       if (response['status'] == 'success') {
-        // Logika sukses, mengambil data dari respons
-        Map<String, dynamic>? responseData = response['data'];
-        final String userName =
-            responseData?['user']?['name'] ?? nameController.text;
-        
         setState(() {
           nameController.clear();
           emailController.clear();
@@ -142,7 +135,6 @@ class _RegisterPageState extends State<RegisterPage> {
           _formKey.currentState?.reset();
         });
 
-        // Tampilkan dialog sukses (logika ini sama seperti sebelumnya)
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -150,59 +142,73 @@ class _RegisterPageState extends State<RegisterPage> {
             return AlertDialog(
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(28),
+                borderRadius: BorderRadius.circular(20),
               ),
-              title: Row(
+              contentPadding: const EdgeInsets.all(20),
+              content: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  const Icon(
-                    Icons.check_circle_outline,
-                    color: Color(0xFFF46A06),
-                    size: 28,
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 15),
+                      const Icon(
+                        Icons.mark_email_read_outlined,
+                        color: Color(0xFFF46A06),
+                        size: 48,
+                      ),
+                      const SizedBox(height: 15),
+                      const Text(
+                        'Verifikasi Email Anda',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'silahkan cek gmail anda untuk verifikasi',
+                        style: TextStyle(fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Registrasi Berhasil',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  
+                  Positioned(
+                    top: -18.0,
+                    right: -18.0,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => LoginPage()),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2)
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.black54,
+                          size: 24,
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
-              content: Text(
-                'Akun untuk $userName telah berhasil dibuat. Silakan login.',
-                style: const TextStyle(fontSize: 16),
-              ),
-              actions: [
-                SizedBox(
-                  width: double.infinity,
-                  height: 45,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      backgroundColor: const Color(0xFFF46A06),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => LoginPage()),
-                      );
-                    },
-                    child: const Text(
-                      'Oke',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ),
-                ),
-              ],
+              actions: null, 
             );
           },
         );
       } else {
-        // Jika gagal, tampilkan pesan error dari api_login.dart
         setState(() {
           apiErrorMessage =
               response['message'] ?? 'Terjadi kesalahan tidak diketahui.';
@@ -218,8 +224,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ... Sisa build method tidak berubah ...
-    // (Kode UI tetap sama)
     return WillPopScope(
       onWillPop: () async {
         SystemNavigator.pop();
@@ -394,8 +398,6 @@ class _RegisterPageState extends State<RegisterPage> {
     TextInputType keyboardType = TextInputType.text,
     List<TextInputFormatter>? inputFormatters,
   }) {
-    // ... Sisa buildTextFormField method tidak berubah ...
-    // (Kode UI tetap sama)
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: TextFormField(

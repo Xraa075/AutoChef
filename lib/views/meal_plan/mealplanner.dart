@@ -1,10 +1,11 @@
+// (MODIFIKASI) mealplanner.dart
 import 'package:flutter/material.dart';
 import 'package:autochef/widgets/header.dart';
 import 'package:autochef/widgets/recipe_card.dart';
 import 'package:autochef/models/recipe.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
+// (MODIFIKASI) Import service dan model baru
+import 'package:autochef/services/meal_plan.dart';
 
 class MealPlannerScreen extends StatefulWidget {
   const MealPlannerScreen({super.key});
@@ -15,45 +16,76 @@ class MealPlannerScreen extends StatefulWidget {
 
 class _MealPlannerScreenState extends State<MealPlannerScreen> {
   final List<String> days = [
-    'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'
+    'Senin',
+    'Selasa',
+    'Rabu',
+    'Kamis',
+    'Jumat',
+    'Sabtu',
+    'Minggu'
   ];
 
-  final List<String> summaryItems = [
-    '100 bawang',
-    '100 butir telur',
-    '100 gram gula',
-    '100 gram minyak',
-  ];
-  
-  Map<String, List<Recipe>> _mealPlan = {}; 
+  // (DIHAPUS) List summaryItems yang di-hardcode
+  // final List<String> summaryItems = [ ... ];
+
+  // (BARU) State untuk menampung data dari API
+  Map<String, List<Recipe>> _mealPlan = {};
+  List<WeeklyIngredient> _summaryItems = []; // <-- State baru
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadMealPlan();
+    _loadData(); // Ganti nama fungsi
   }
 
-  Future<void> _loadMealPlan() async {
-    final prefs = await SharedPreferences.getInstance();
-    final Map<String, List<Recipe>> newMealPlan = {};
+  // (MODIFIKASI) Ganti nama dan gunakan Future.wait
+  Future<void> _loadData() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+    });
 
-    for (var day in days) {
-      final key = 'meal_planner_$day';
-      final recipesJson = prefs.getStringList(key); 
-      
-      if (recipesJson != null && recipesJson.isNotEmpty) {
-        newMealPlan[day] = recipesJson
-            .map((jsonString) => Recipe.fromJson(jsonDecode(jsonString)))
-            .toList();
+    try {
+      // (BARU) Panggil kedua API secara bersamaan
+      final results = await Future.wait([
+        MealPlanService.getMealPlans(),
+        MealPlanService.getWeeklyIngredients(),
+      ]);
+
+      // (BARU) Ekstrak hasil dari Future.wait
+      final newMealPlan = results[0] as Map<String, List<Recipe>>;
+      final newSummary = results[1] as List<WeeklyIngredient>;
+
+      // Atur meal plan
+      final Map<String, List<Recipe>> orderedMealPlan = {};
+      for (var day in days) {
+        orderedMealPlan[day] = newMealPlan[day] ?? [];
       }
-    }
 
-    if (mounted) {
-      setState(() {
-        _mealPlan = newMealPlan;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _mealPlan = orderedMealPlan;
+          _summaryItems = newSummary; // <-- Set state baru
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _mealPlan = {};
+          _summaryItems = []; // <-- Kosongkan state baru jika error
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Gagal memuat data meal plan: ${e.toString().replaceFirst("Exception: ", "")}'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -67,7 +99,10 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
           mainTitle: "Meal Planner",
           title: "Rencanakan bahan masakan mingguan mu",
           mainTitleStyle: const TextStyle(
-            fontFamily: 'Poppins', fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black,
+            fontFamily: 'Poppins',
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
         ),
       ),
@@ -77,23 +112,27 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(28), topRight: Radius.circular(28),
+            topLeft: Radius.circular(28),
+            topRight: Radius.circular(28),
           ),
         ),
-        // Menggunakan RefreshIndicator dari kode baru
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: Color(0xFFF46A06)))
+            ? const Center(
+                child: CircularProgressIndicator(color: Color(0xFFF46A06)))
             : RefreshIndicator(
-                onRefresh: _loadMealPlan,
+                onRefresh: _loadData, // Panggil fungsi baru
+                color: const Color(0xFFF46A06),
                 child: SingleChildScrollView(
-                  // Menggunakan padding dari kode lama
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
+                  physics: const AlwaysScrollableScrollPhysics(), // Agar bisa refresh
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Bagian Resep per Hari
                       ...days.map((day) => _buildDayTile(day)).toList(),
-                      
-                      // --- BAGIAN SUMMARY DARI KODE LAMA DIKEMBALIKAN ---
+
+                      // Bagian Summary
                       const SizedBox(height: 30),
                       const Text(
                         'Summary',
@@ -104,19 +143,47 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      ...summaryItems.map((item) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
+
+                      // (MODIFIKASI) Tampilkan data summary dari API
+                      if (_summaryItems.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 8.0),
                           child: Text(
-                            item,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
+                            'Belum ada summary bahan.',
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
                           ),
-                        );
-                      }).toList(),
-                      // --- SAMPAI SINI ---
+                        )
+                      else
+                        ..._summaryItems.map((item) {
+                          // Format string dari data model
+                          final String catatan =
+                              item.detailBahan.catatan != null &&
+                                      item.detailBahan.catatan!.isNotEmpty
+                                  ? " (${item.detailBahan.catatan})"
+                                  : "";
+                          // Format jumlah, hapus .0 jika tidak perlu
+                          final String jumlah =
+                              item.detailBahan.jumlah.toStringAsFixed(
+                            item.detailBahan.jumlah.truncateToDouble() ==
+                                    item.detailBahan.jumlah
+                                ? 0
+                                : 1,
+                          );
+
+                          final String text =
+                              "$jumlah ${item.detailBahan.satuan} ${item.namaBahan}$catatan";
+
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Text(
+                              text,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                     ],
                   ),
                 ),
@@ -131,7 +198,6 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
     return Theme(
       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
       child: ExpansionTile(
-        // Menggunakan styling dari kode lama
         tilePadding: EdgeInsets.zero,
         title: Text(
           day,
@@ -141,13 +207,14 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
             color: Colors.black,
           ),
         ),
+        initiallyExpanded: recipes.isNotEmpty,
         children: recipes.isEmpty
             ? [
-                // Menggunakan widget pesan kosong dari kode lama
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 16.0),
                     child: Text(
                       'Belum ada resep untuk hari $day.',
                       style: const TextStyle(color: Colors.grey),
@@ -164,7 +231,8 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
                       MaterialPageRoute(
                         builder: (context) => DetailMakanan(recipe: recipe),
                       ),
-                    ).then((_) => _loadMealPlan());
+                    ).then((_) =>
+                        _loadData()); // Muat ulang data setelah kembali
                   },
                 );
               }).toList(),

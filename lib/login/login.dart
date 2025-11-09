@@ -67,13 +67,13 @@ class _LoginPageState extends State<LoginPage> {
     if (value == null || value.isEmpty) {
       return 'Password tidak boleh kosong';
     }
-    if (value.length < 5) {
-      return 'Password minimal 5 karakter';
+    if (value.length < 8) {
+      return 'Password minimal 8 karakter';
     }
     return null;
   }
 
-  Future<void> loginUser() async {
+Future<void> loginUser() async {
     setState(() {
       apiErrorMessage = null;
     });
@@ -129,10 +129,86 @@ class _LoginPageState extends State<LoginPage> {
           });
         }
       } else {
-        setState(() {
-          apiErrorMessage =
-              response['message'] ?? 'Terjadi kesalahan tidak diketahui.';
-        });
+        String errorMessage =
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui.';
+        if (errorMessage.toLowerCase().contains('verifikasi') || 
+            errorMessage.toLowerCase().contains('unverified')) {
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                contentPadding: const EdgeInsets.all(20),
+                content: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 15),
+                        const Icon(
+                          Icons.mark_email_read_outlined,
+                          color: Color(0xFFF46A06),
+                          size: 48,
+                        ),
+                        const SizedBox(height: 15),
+                        const Text(
+                          'Email Belum Diverifikasi',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          (errorMessage.length > 10 && errorMessage.length < 100) 
+                            ? errorMessage 
+                            : 'Silakan cek email Anda untuk melakukan verifikasi akun.',
+                          style: const TextStyle(fontSize: 16),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                    
+                    // Tombol "x" di pojok kanan atas
+                    Positioned(
+                      top: -18.0,
+                      right: -18.0,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2)
+                          ),
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.black54,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        } else {
+          setState(() {
+            apiErrorMessage = errorMessage;
+          });
+        }
       }
     } else {
       setState(() {
