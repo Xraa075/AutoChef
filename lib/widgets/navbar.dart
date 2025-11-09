@@ -28,6 +28,9 @@ class NavbarState extends State<Navbar> {
   ];
 
   void onNavTapped(int index) {
+    // if (index == 2) {
+    //   return;
+    // }
     setState(() {
       selectedIndex = index;
     });
@@ -35,7 +38,6 @@ class NavbarState extends State<Navbar> {
 
 
   Future<bool> _onWillPop() async {
-    // Menampilkan konfirmasi keluar di setiap halaman
     return await _showExitConfirmation();
   }
 
@@ -143,12 +145,12 @@ class NavbarState extends State<Navbar> {
                 ),
                 NavigationDestination(
                   icon: Icon(
-                    Icons.search_rounded,
+                    Icons.calendar_month_outlined,
                     size: 30,
                     color: Colors.white,
                   ),
                   selectedIcon: Icon(
-                    Icons.search_rounded,
+                    Icons.calendar_month_outlined,
                     size: 30,
                     color: Color(0xFFF46A06),
                   ),

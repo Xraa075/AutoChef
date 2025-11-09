@@ -73,29 +73,26 @@ class MealPlanService {
       debugPrint('Get Meal Plans response code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        // (PERBAIKAN 1) Kembalikan ke Map, karena responsnya adalah Object
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final Map<String, List<Recipe>> finalMealPlan = {};
 
-        // (PERBAIKAN 2) Iterasi menggunakan .values() dari Map
         for (var dayData in responseData.values) {
           if (dayData is Map<String, dynamic>) {
-            final String dayName = dayData['day']; // "Senin", "Selasa", dst.
+            final String dayName = dayData['day'];
             final List<dynamic> recipesJson = dayData['recipes'] ?? [];
             final List<Recipe> recipesList = recipesJson.map((recipeJson) {
               return Recipe(
                 id: recipeJson['id'],
-                namaResep: recipeJson['nama_resep'], // Typo 'nama_rese' sudah diperbaiki
+                namaResep: recipeJson['nama_resep'],
                 gambar: recipeJson['url_gambar'],
                 waktu: recipeJson['waktu_masak'],
                 negara: recipeJson['negara'] ?? '',
                 kategori: recipeJson['kategori'] ?? '',
-                // Beri nilai default
                 kalori: 0,
                 protein: 0,
                 karbohidrat: 0,
-                bahan: '', // DetailMakanan akan mengambil ini
-                steps: '', // DetailMakanan akan mengambil ini
+                bahan: '',
+                steps: '',
               );
             }).toList();
 

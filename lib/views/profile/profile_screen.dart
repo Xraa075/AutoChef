@@ -55,7 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (_isUserActuallyLoggedIn) {
       if (!_favoritesFetchedOnce || userActuallyChanged) {
-        await _fetchFavoriteRecipes();
+        ;
       }
     } else {
       if (mounted) {

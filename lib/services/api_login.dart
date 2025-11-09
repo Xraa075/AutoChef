@@ -137,13 +137,14 @@ Future<Map<String, dynamic>> login(String email, String password) async {
 
     if (response.statusCode == 200) {
       return {'status': 'success', 'data': responseData};
-    } else if (response.statusCode == 401) {
+    }
+    else if (response.statusCode == 401 || response.statusCode == 422) {
       return {
         'status': 'error',
-        'message': (responseData?['message'] as String?) ??
-            'Email atau password salah.'
+        'message': 'Gmail / password yang kamu masukkan salah'
       };
-    } else {
+    }
+    else {
       String messageFromServer = "Gagal login.";
       if (responseData != null && responseData.containsKey('message')) {
         messageFromServer = responseData['message'];
