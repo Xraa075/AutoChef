@@ -402,25 +402,25 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
                             ),
                           ],
                         ),
-                        _isLoadingInitialStatus || _isTogglingFavorite
-                            ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.0,
-                                color: Colors.red,
-                              ),
-                            )
-                            : GestureDetector(
-                              onTap: _handleToggleFavorite,
-                              child: Icon(
-                                _isFavorite
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                                size: 18,
-                                color: Colors.red,
-                              ),
-                            ),
+                        // _isLoadingInitialStatus || _isTogglingFavorite
+                        //     ? const SizedBox(
+                        //       width: 18,
+                        //       height: 18,
+                        //       child: CircularProgressIndicator(
+                        //         strokeWidth: 2.0,
+                        //         color: Colors.red,
+                        //       ),
+                        //     )
+                        //     : GestureDetector(
+                        //       onTap: _handleToggleFavorite,
+                        //       child: Icon(
+                        //         _isFavorite
+                        //             ? Icons.favorite
+                        //             : Icons.favorite_border,
+                        //         size: 18,
+                        //         color: Colors.red,
+                        //       ),
+                        //     ),
                       ],
                     ),
                   ],

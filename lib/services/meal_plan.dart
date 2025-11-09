@@ -1,11 +1,9 @@
-// (MODIFIKASI) meal_plan.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 import 'package:autochef/models/recipe.dart';
 
-// --- Model untuk Summary (Sudah Benar) ---
 class WeeklyIngredient {
   final int idBahan;
   final String namaBahan;
@@ -45,12 +43,10 @@ class IngredientDetail {
     );
   }
 }
-// --- Akhir Model Summary ---
 
 class MealPlanService {
   static const String _baseUrl = "https://backend.autochef.site/api";
 
-  // (FUNGSI INI DIPERBAIKI KEMBALI)
   static Future<Map<String, List<Recipe>>> getMealPlans() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -113,7 +109,6 @@ class MealPlanService {
     }
   }
 
-  // --- Fungsi getWeeklyIngredients (Sudah Benar) ---
   static Future<List<WeeklyIngredient>> getWeeklyIngredients() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -137,7 +132,6 @@ class MealPlanService {
           'Get Weekly Ingredients response code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        // Ini sudah benar, '{"data": [...] }' adalah Map
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final List<dynamic> ingredientsData = responseData['data'] ?? [];
 
@@ -160,7 +154,6 @@ class MealPlanService {
     }
   }
 
-  // --- Fungsi addRecipeToMealPlan (Sudah Benar) ---
   static Future<void> addRecipeToMealPlan({
     required String day,
     required int recipeId,
@@ -218,6 +211,45 @@ class MealPlanService {
       }
     } catch (e, stacktrace) {
       debugPrint('Exception in addRecipeToMealPlan: $e');
+      debugPrint('Stacktrace: $stacktrace');
+      throw Exception(
+          'Terjadi kesalahan: ${e.toString().replaceFirst("Exception: ", "")}');
+    }
+  }
+
+  static Future<void> removeRecipeFromMealPlan({
+    required String day,
+    required int recipeId,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final isLoggedIn = prefs.getBool('hasLoggedAsUser') ?? false;
+
+      if (!isLoggedIn || token == null) {
+        throw Exception("Anda harus login untuk menghapus meal plan.");
+      }
+
+      final String requestUrl =
+          '$_baseUrl/meal-plans/${day.toLowerCase()}/$recipeId';
+      debugPrint('Deleting recipe from: $requestUrl');
+
+      final Map<String, String> headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+
+      final response = await http.delete(Uri.parse(requestUrl), headers: headers);
+      debugPrint('Delete recipe response code: ${response.statusCode}');
+
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        debugPrint('Failed to delete recipe: ${response.body}');
+        throw Exception('Gagal menghapus resep: ${response.statusCode}');
+      }
+
+      debugPrint('Recipe deleted successfully');
+    } catch (e, stacktrace) {
+      debugPrint('Exception in removeRecipeFromMealPlan: $e');
       debugPrint('Stacktrace: $stacktrace');
       throw Exception(
           'Terjadi kesalahan: ${e.toString().replaceFirst("Exception: ", "")}');

@@ -156,15 +156,15 @@ class NavbarState extends State<Navbar> {
                   ),
                   label: '',
                 ),
-                NavigationDestination(
-                  icon: Icon(Icons.person, size: 30, color: Colors.white),
-                  selectedIcon: Icon(
-                    Icons.person,
-                    size: 30,
-                    color: Color(0xFFF46A06),
-                  ),
-                  label: '',
-                ),
+                // NavigationDestination(
+                //   icon: Icon(Icons.person, size: 30, color: Colors.white),
+                //   selectedIcon: Icon(
+                //     Icons.person,
+                //     size: 30,
+                //     color: Color(0xFFF46A06),
+                //   ),
+                //   label: '',
+                // ),
               ],
             ),
           ),

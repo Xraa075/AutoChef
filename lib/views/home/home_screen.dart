@@ -352,44 +352,44 @@ class _HomeScreenState extends State<HomeScreen> {
             color: const Color(0xFFF46A06),
             child: ListView(
               children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    "Kategori",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    CategoryItemTap(
-                      title: "Snacks",
-                      kategori: "snack",
-                      imagePath: "lib/assets/images/snacks.jpg",
-                    ),
-                    CategoryItemTap(
-                      title: "Meal",
-                      kategori: "meal",
-                      imagePath: "lib/assets/images/meal.jpg",
-                    ),
-                    CategoryItemTap(
-                      title: "Vegan",
-                      kategori: "vegan",
-                      imagePath: "lib/assets/images/vegan.jpg",
-                    ),
-                    CategoryItemTap(
-                      title: "Dessert",
-                      kategori: "dessert",
-                      imagePath: "lib/assets/images/dessert.jpg",
-                    ),
-                    CategoryItemTap(
-                      title: "Drinks",
-                      kategori: "drink",
-                      imagePath: "lib/assets/images/drinks.jpg",
-                    ),
-                  ],
-                ),
+                // const Padding(
+                //   padding: EdgeInsets.symmetric(horizontal: 20),
+                //   child: Text(
+                //     "Kategori",
+                //     style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                //   ),
+                // ),
+                // const SizedBox(height: 15),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //   children: [
+                //     CategoryItemTap(
+                //       title: "Snacks",
+                //       kategori: "snack",
+                //       imagePath: "lib/assets/images/snacks.jpg",
+                //     ),
+                //     CategoryItemTap(
+                //       title: "Meal",
+                //       kategori: "meal",
+                //       imagePath: "lib/assets/images/meal.jpg",
+                //     ),
+                //     CategoryItemTap(
+                //       title: "Vegan",
+                //       kategori: "vegan",
+                //       imagePath: "lib/assets/images/vegan.jpg",
+                //     ),
+                //     CategoryItemTap(
+                //       title: "Dessert",
+                //       kategori: "dessert",
+                //       imagePath: "lib/assets/images/dessert.jpg",
+                //     ),
+                //     CategoryItemTap(
+                //       title: "Drinks",
+                //       kategori: "drink",
+                //       imagePath: "lib/assets/images/drinks.jpg",
+                //     ),
+                //   ],
+                // ),
                 const SizedBox(height: 10),
                 const Padding(
                   padding: EdgeInsets.all(20.0),

@@ -4,7 +4,6 @@ import 'package:autochef/widgets/header.dart';
 import 'package:autochef/widgets/recipe_card.dart';
 import 'package:autochef/models/recipe.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
-// (MODIFIKASI) Import service dan model baru
 import 'package:autochef/services/meal_plan.dart';
 
 class MealPlannerScreen extends StatefulWidget {
@@ -25,21 +24,16 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
     'Minggu'
   ];
 
-  // (DIHAPUS) List summaryItems yang di-hardcode
-  // final List<String> summaryItems = [ ... ];
-
-  // (BARU) State untuk menampung data dari API
   Map<String, List<Recipe>> _mealPlan = {};
-  List<WeeklyIngredient> _summaryItems = []; // <-- State baru
+  List<WeeklyIngredient> _summaryItems = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadData(); // Ganti nama fungsi
+    _loadData();
   }
 
-  // (MODIFIKASI) Ganti nama dan gunakan Future.wait
   Future<void> _loadData() async {
     if (!mounted) return;
     setState(() {
@@ -47,17 +41,14 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
     });
 
     try {
-      // (BARU) Panggil kedua API secara bersamaan
       final results = await Future.wait([
         MealPlanService.getMealPlans(),
         MealPlanService.getWeeklyIngredients(),
       ]);
 
-      // (BARU) Ekstrak hasil dari Future.wait
       final newMealPlan = results[0] as Map<String, List<Recipe>>;
       final newSummary = results[1] as List<WeeklyIngredient>;
 
-      // Atur meal plan
       final Map<String, List<Recipe>> orderedMealPlan = {};
       for (var day in days) {
         orderedMealPlan[day] = newMealPlan[day] ?? [];
@@ -66,7 +57,7 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
       if (mounted) {
         setState(() {
           _mealPlan = orderedMealPlan;
-          _summaryItems = newSummary; // <-- Set state baru
+          _summaryItems = newSummary;
           _isLoading = false;
         });
       }
@@ -75,7 +66,7 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
         setState(() {
           _isLoading = false;
           _mealPlan = {};
-          _summaryItems = []; // <-- Kosongkan state baru jika error
+          _summaryItems = [];
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -85,6 +76,85 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
             behavior: SnackBarBehavior.floating,
           ),
         );
+      }
+    }
+  }
+
+  Future<void> _showDeleteConfirmation(String day, Recipe recipe) async {
+    bool? isConfirmed = await showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          // (PERBAIKAN) Typo: RoundedRectangleOrder -> RoundedRectangleBorder
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          backgroundColor: Colors.white,
+          title: Row(
+            children: const [
+              Icon(Icons.warning_amber_rounded, color: Colors.red),
+              SizedBox(width: 10),
+              Text("Konfirmasi Hapus"),
+            ],
+          ),
+          content: Text(
+              "Anda yakin ingin menghapus resep \"${recipe.namaResep}\" dari hari $day?"),
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+          actions: [
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18))),
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text("Batal"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18))),
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text("Hapus", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (isConfirmed == true) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        await MealPlanService.removeRecipeFromMealPlan(
+            day: day, recipeId: recipe.id);
+        await _loadData();
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Resep berhasil dihapus.'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Gagal menghapus resep: ${e.toString().replaceFirst("Exception: ", "")}'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
     }
   }
@@ -120,19 +190,16 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
             ? const Center(
                 child: CircularProgressIndicator(color: Color(0xFFF46A06)))
             : RefreshIndicator(
-                onRefresh: _loadData, // Panggil fungsi baru
+                onRefresh: _loadData,
                 color: const Color(0xFFF46A06),
                 child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(), // Agar bisa refresh
+                  physics: const AlwaysScrollableScrollPhysics(),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Bagian Resep per Hari
                       ...days.map((day) => _buildDayTile(day)).toList(),
-
-                      // Bagian Summary
                       const SizedBox(height: 30),
                       const Text(
                         'Summary',
@@ -143,8 +210,6 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-
-                      // (MODIFIKASI) Tampilkan data summary dari API
                       if (_summaryItems.isEmpty)
                         const Padding(
                           padding: EdgeInsets.only(bottom: 8.0),
@@ -155,13 +220,11 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
                         )
                       else
                         ..._summaryItems.map((item) {
-                          // Format string dari data model
                           final String catatan =
                               item.detailBahan.catatan != null &&
                                       item.detailBahan.catatan!.isNotEmpty
                                   ? " (${item.detailBahan.catatan})"
                                   : "";
-                          // Format jumlah, hapus .0 jika tidak perlu
                           final String jumlah =
                               item.detailBahan.jumlah.toStringAsFixed(
                             item.detailBahan.jumlah.truncateToDouble() ==
@@ -223,16 +286,22 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
                 ),
               ]
             : recipes.map((recipe) {
+                // (MODIFIKASI) Hapus Row/Padding, kembalikan ke RecipeCard
+                // dan tambahkan callback onDeleteTapped
                 return RecipeCard(
                   recipe: recipe,
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => DetailMakanan(recipe: recipe),
+                        builder: (context) =>
+                            DetailMakanan(recipe: recipe),
                       ),
                     ).then((_) =>
-                        _loadData()); // Muat ulang data setelah kembali
+                        _loadData());
+                  },
+                  onDeleteTapped: () {
+                    _showDeleteConfirmation(day, recipe);
                   },
                 );
               }).toList(),
