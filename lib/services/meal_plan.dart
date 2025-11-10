@@ -69,7 +69,12 @@ class MealPlanService {
       debugPrint('Get Meal Plans response code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final dynamic responseJson = jsonDecode(response.body);
+        if (responseJson is! Map<String, dynamic>) {
+          return {};
+        }
+        final Map<String, dynamic> responseData =
+            responseJson;
         final Map<String, List<Recipe>> finalMealPlan = {};
 
         for (var dayData in responseData.values) {
