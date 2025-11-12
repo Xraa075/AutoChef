@@ -242,7 +242,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("$errorMessage (Kode: ${response.statusCode})"),
+              content: Text("$errorMessage"),
               backgroundColor: Colors.red,
             ),
           );
