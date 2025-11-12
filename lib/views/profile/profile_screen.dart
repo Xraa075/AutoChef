@@ -150,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
         } catch (_) {
         }
-        _favoritesError = "$serverMessage (Kode: ${response.statusCode})";
+        _favoritesError = "$serverMessage";
       }
     } on TimeoutException {
       _favoritesError = "Waktu koneksi habis. Periksa jaringan Anda.";

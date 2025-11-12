@@ -260,7 +260,7 @@ class _HealthyFoodItemState extends State<HealthyFoodItem> {
         if (mounted)
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("$errorMessage (Kode: ${response.statusCode})"),
+              content: Text("$errorMessage"),
               backgroundColor: Colors.red,
             ),
           );

@@ -45,7 +45,7 @@ class SearchService {
             .toList();
       } else {
         throw Exception(
-            "Gagal mengambil data pencarian resep: ${response.statusCode}");
+            "Gagal mengambil data pencarian resep");
       }
     } catch (e) {
       debugPrint("Error di searchResep: $e");

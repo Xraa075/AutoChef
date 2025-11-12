@@ -116,7 +116,7 @@ class ApiProfile {
           } else {
             // Coba parse response error
             String errorMessage =
-                'Gagal memperbarui profil (${response.statusCode})';
+                'Gagal memperbarui profil';
             Map<String, dynamic> responseData = {};
             try {
               responseData = jsonDecode(response.body);

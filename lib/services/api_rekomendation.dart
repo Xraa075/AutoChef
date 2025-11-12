@@ -47,7 +47,7 @@ class ApiRekomendasi {
       } else {
         debugPrint('Error response: ${response.body}');
         throw Exception(
-          'Gagal memuat data rekomendasi: ${response.statusCode}',
+          'Gagal memuat data rekomendasi',
         );
       }
     } catch (e, stacktrace) {
@@ -82,7 +82,7 @@ class ApiRekomendasi {
       } else {
         debugPrint('Error response detail: ${response.body}');
         throw Exception(
-          'Gagal memuat detail resep: ${response.statusCode}',
+          'Gagal memuat detail resep',
         );
       }
     } catch (e, stacktrace) {

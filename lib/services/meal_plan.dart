@@ -104,7 +104,7 @@ class MealPlanService {
         return finalMealPlan;
       } else {
         debugPrint('Failed to get meal plans: ${response.body}');
-        throw Exception('Gagal memuat meal plan: ${response.statusCode}');
+        throw Exception('Gagal memuat meal plan');
       }
     } catch (e, stacktrace) {
       debugPrint('Exception in getMealPlans: $e');
@@ -149,7 +149,7 @@ class MealPlanService {
       } else {
         debugPrint('Failed to get weekly ingredients: ${response.body}');
         throw Exception(
-            'Gagal memuat summary bahan: ${response.statusCode}');
+            'Gagal memuat summary bahan');
       }
     } catch (e, stacktrace) {
       debugPrint('Exception in getWeeklyIngredients: $e');
@@ -249,7 +249,7 @@ class MealPlanService {
 
       if (response.statusCode != 200 && response.statusCode != 204) {
         debugPrint('Failed to delete recipe: ${response.body}');
-        throw Exception('Gagal menghapus resep: ${response.statusCode}');
+        throw Exception('Gagal menghapus resep');
       }
 
       debugPrint('Recipe deleted successfully');

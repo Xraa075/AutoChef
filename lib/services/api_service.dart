@@ -27,7 +27,7 @@ class ApiService {
         throw Exception("Gagal memproses JSON: $e");
       }
     } else {
-      throw Exception("Gagal mengambil data resep. Kode status: ${response.statusCode}");
+      throw Exception("Gagal mengambil data resep");
     }
   }
 

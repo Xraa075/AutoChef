@@ -54,7 +54,7 @@ Future<Map<String, dynamic>> register(
       } catch (e) {
         return {
           'status': 'error',
-          'message': 'Server error (Status ${response.statusCode}) dengan respons tidak valid.'
+          'message': 'Server error dengan respons tidak valid.'
         };
       }
     }
@@ -84,7 +84,7 @@ Future<Map<String, dynamic>> register(
       return {
         'status': 'error',
         'message': responseData?['message'] ??
-            'Gagal registrasi. Status: ${response.statusCode}'
+            'Gagal registrasi'
       };
     }
   } on SocketException {
@@ -193,7 +193,7 @@ Future<Map<String, dynamic>> getUserProfile(String token) async {
     } else {
       return {
         'status': 'error',
-        'message': 'Gagal mengambil data pengguna. Status: ${response.statusCode}'
+        'message': 'Gagal mengambil data pengguna'
       };
     }
   } on SocketException {
