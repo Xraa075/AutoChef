@@ -22,7 +22,7 @@ class KategoriService {
           throw Exception("Format respons API tidak sesuai.");
         }
       } catch (e) {
-        throw Exception("Gagal memproses JSON: $e");
+        throw Exception("Gagal memproses Data");
       }
     } else {
       throw Exception("Gagal mengambil data resep");
@@ -46,7 +46,7 @@ class KategoriService {
           throw Exception("Format respons API tidak sesuai.");
         }
       } catch (e) {
-        throw Exception("Gagal memproses JSON: $e");
+        throw Exception("Gagal memproses Data");
       }
     } else {
       throw Exception("Gagal mengambil data resep");

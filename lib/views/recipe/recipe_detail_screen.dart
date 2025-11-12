@@ -113,8 +113,7 @@ class _DetailMakananState extends State<DetailMakanan> {
                         Navigator.pop(dialogContext);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(
-                                'Gagal: ${e.toString().replaceFirst("Exception: ", "")}'),
+                            content: Text('Gagal'),
                             backgroundColor: Colors.red,
                             behavior: SnackBarBehavior.floating,
                           ),
@@ -269,7 +268,7 @@ class _DetailMakananState extends State<DetailMakanan> {
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 40.0),
                                 child: Text(
-                                  'Gagal memuat detail resep:\n${snapshot.error}',
+                                  'Gagal memuat detail resep',
                                   textAlign: TextAlign.center,
                                   style:
                                       TextStyle(color: Colors.red.shade700),

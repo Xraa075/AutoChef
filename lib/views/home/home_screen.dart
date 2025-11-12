@@ -129,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           _isLoading = false;
         });
-        _showPopup("Gagal memuat rekomendasi: ${e.toString().split(':').last}");
+        _showPopup("Gagal memuat rekomendasi");
       }
     }
   }
@@ -207,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
         await _fetchInitialData();
       }
     } catch (e) {
-      _showPopup("Gagal mencari resep: ${e.toString().replaceFirst("Exception: ", "")}");
+      _showPopup("Gagal mencari resep");
     } finally {
       if (mounted)
         setState(() {

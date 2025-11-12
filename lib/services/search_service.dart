@@ -49,7 +49,7 @@ class SearchService {
       }
     } catch (e) {
       debugPrint("Error di searchResep: $e");
-      throw Exception("Terjadi kesalahan saat mencari resep: $e");
+      throw Exception("Terjadi kesalahan saat mencari resep");
     }
   }
 }

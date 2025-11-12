@@ -70,8 +70,7 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                'Gagal memuat data meal plan: ${e.toString().replaceFirst("Exception: ", "")}'),
+            content: Text('Gagal memuat data meal plan'),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
           ),
@@ -148,9 +147,8 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
           });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                  'Gagal menghapus resep: ${e.toString().replaceFirst("Exception: ", "")}'),
-              backgroundColor: Colors.red,
+              content: Text('Gagal menghapus resep'),
+                backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
             ),
           );
