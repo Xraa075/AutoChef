@@ -137,54 +137,61 @@ Future<void> loginUser() async {
             context: context,
             barrierDismissible: true,
             builder: (BuildContext context) {
-              return AlertDialog(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                contentPadding: const EdgeInsets.all(20),
-                content: Stack(
+              return Dialog(
+                backgroundColor: Colors.transparent,
+                insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Stack(
                   clipBehavior: Clip.none,
+                  alignment: Alignment.center,
                   children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SizedBox(height: 15),
-                        const Icon(
-                          Icons.mark_email_read_outlined,
-                          color: Color(0xFFF46A06),
-                          size: 48,
-                        ),
-                        const SizedBox(height: 15),
-                        const Text(
-                          'Email Belum Diverifikasi',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                    // 1. Kontainer Putih (Isi Popup)
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(height: 15),
+                          const Icon(
+                            Icons.mark_email_read_outlined,
+                            color: Color(0xFFF46A06),
+                            size: 48,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          (errorMessage.length > 10 && errorMessage.length < 100) 
-                            ? errorMessage 
-                            : 'Silakan cek email Anda untuk melakukan verifikasi akun.',
-                          style: const TextStyle(fontSize: 16),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 10),
-                      ],
+                          const SizedBox(height: 15),
+                          const Text(
+                            'Email Belum Diverifikasi',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            (errorMessage.length > 10 && errorMessage.length < 100) 
+                              ? errorMessage 
+                              : 'Silakan cek email Anda untuk melakukan verifikasi akun.',
+                            style: const TextStyle(fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
                     ),
                     
                     Positioned(
-                      top: -18.0,
-                      right: -18.0,
+                      top: -15.0,
+                      right: -15.0,
                       child: GestureDetector(
                         onTap: () {
                           Navigator.of(context).pop();
                         },
                         child: Container(
-                          padding: const EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
                             shape: BoxShape.circle,

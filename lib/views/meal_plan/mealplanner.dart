@@ -15,13 +15,13 @@ class MealPlannerScreen extends StatefulWidget {
 
 class _MealPlannerScreenState extends State<MealPlannerScreen> {
   final List<String> days = [
+    'Minggu',
     'Senin',
     'Selasa',
     'Rabu',
     'Kamis',
     'Jumat',
-    'Sabtu',
-    'Minggu'
+    'Sabtu'
   ];
 
   Map<String, List<Recipe>> _mealPlan = {};
@@ -84,7 +84,6 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          // (PERBAIKAN) Typo: RoundedRectangleOrder -> RoundedRectangleBorder
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
           backgroundColor: Colors.white,
@@ -293,8 +292,6 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
                 ),
               ]
             : recipes.map((recipe) {
-                // (MODIFIKASI) Hapus Row/Padding, kembalikan ke RecipeCard
-                // dan tambahkan callback onDeleteTapped
                 return RecipeCard(
                   recipe: recipe,
                   onTap: () {

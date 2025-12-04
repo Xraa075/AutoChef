@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:autochef/models/recipe.dart';
 import 'package:autochef/views/recipe/components/steps.dart';
@@ -7,7 +6,7 @@ import 'package:autochef/views/recipe/components/recipe_info.dart';
 import 'package:autochef/views/recipe/components/ingredients.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/services/api_rekomendation.dart';
-import 'package:autochef/services/meal_plan.dart';
+import 'package:autochef/widgets/popup_mealplan.dart';
 
 import 'package:autochef/models/recipe_detail_model.dart' as DetailModel;
 
@@ -43,122 +42,6 @@ class _DetailMakananState extends State<DetailMakanan> {
     } catch (e) {
       debugPrint('Error when logging recipe view: $e');
     }
-  }
-
-  void _showAddToMealPlannerDialog() {
-    final List<String> days = [
-      'Senin',
-      'Selasa',
-      'Rabu',
-      'Kamis',
-      'Jumat',
-      'Sabtu',
-      'Minggu'
-    ];
-    
-    bool _isLoading = false;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false, 
-      builder: (BuildContext dialogContext) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25)),
-              backgroundColor: Colors.white,
-              title: const Text(
-                'Simpan resep untuk hari apa?',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    fontFamily: 'Poppins'),
-              ),
-              content: Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                alignment: WrapAlignment.center,
-                children: days.map((day) {
-                  return ElevatedButton(
-                    onPressed: _isLoading ? null : () async {
-                      setDialogState(() {
-                        _isLoading = true;
-                      });
-
-                      try {
-                        debugPrint(
-                            'Menambahkan resep "${widget.recipe.namaResep}" ke hari $day');
-                        await MealPlanService.addRecipeToMealPlan(
-                          day: day,
-                          recipeId: widget.recipe.id,
-                        );
-                        if (!mounted) return;
-                        Navigator.pop(dialogContext);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content:
-                                Text('Resep berhasil ditambahkan ke hari $day!'),
-                            backgroundColor: Colors.green,
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      } catch (e) {
-                        setDialogState(() {
-                          _isLoading = false;
-                        });
-
-                        if (!mounted) return;
-                        Navigator.pop(dialogContext);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Gagal'),
-                            backgroundColor: Colors.red,
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF46A06),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 28, vertical: 12),
-                    ),
-                    child: Text(day),
-                  );
-                }).toList(),
-              ),
-              actionsAlignment: MainAxisAlignment.center,
-              actionsPadding: const EdgeInsets.only(bottom: 20, top: 10),
-              actions: [
-                if (_isLoading)
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 12.0),
-                    child: CircularProgressIndicator(color: Color(0xFFF46A06)),
-                  )
-                else
-                  OutlinedButton(
-                    onPressed: () => Navigator.pop(dialogContext),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      side: const BorderSide(color: Colors.grey),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30)),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 12),
-                    ),
-                    child: const Text('Batal'),
-                  ),
-              ],
-            );
-          },
-        );
-      },
-    );
   }
 
   @override
@@ -232,11 +115,11 @@ class _DetailMakananState extends State<DetailMakanan> {
                           children: [
                             _buildDragHandle(),
                             _buildHeader(
-                              widget.recipe
-                                  .namaResep,
+                              context,
+                              widget.recipe.namaResep,
                               widget.recipe.negara,
                             ),
-                            RecipeInfo(
+                             RecipeInfo(
                               waktu: widget.recipe.waktu,
                               kalori: widget.recipe.kalori,
                               protein: widget.recipe.protein,
@@ -254,13 +137,13 @@ class _DetailMakananState extends State<DetailMakanan> {
                         );
                       }
                       if (snapshot.hasError || !snapshot.hasData) {
-                        return ListView(
+                         return ListView(
                           controller: scrollController,
                           children: [
                             _buildDragHandle(),
                             _buildHeader(
-                              widget.recipe
-                                  .namaResep,
+                              context,
+                              widget.recipe.namaResep,
                               widget.recipe.negara,
                             ),
                             Center(
@@ -284,6 +167,7 @@ class _DetailMakananState extends State<DetailMakanan> {
                         children: [
                           _buildDragHandle(),
                           _buildHeader(
+                            context,
                             detail.namaResep,
                             detail.negara,
                           ),
@@ -330,7 +214,8 @@ class _DetailMakananState extends State<DetailMakanan> {
     );
   }
 
-  Widget _buildHeader(String namaResep, String negara) {
+
+  Widget _buildHeader(BuildContext context, String namaResep, String negara) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -353,7 +238,14 @@ class _DetailMakananState extends State<DetailMakanan> {
                 color: Color(0xFFF46A06),
                 size: 32,
               ),
-              onPressed: _showAddToMealPlannerDialog,
+              // MEMANGGIL CLASS BARU DISINI
+              onPressed: () {
+                MealPlanPopup.show(
+                  context, 
+                  recipeId: widget.recipe.id, 
+                  recipeName: widget.recipe.namaResep
+                );
+              },
             ),
           ],
         ),

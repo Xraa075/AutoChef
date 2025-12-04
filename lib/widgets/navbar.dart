@@ -4,6 +4,7 @@ import 'package:autochef/views/home/home_screen.dart';
 import 'package:autochef/views/profile/profile_screen.dart';
 import 'package:autochef/views/input_ingredients/input_screen.dart';
 import 'package:autochef/views/meal_plan/mealplanner.dart';
+import 'package:autochef/views/profile/favorite_screen.dart';
 
 class Navbar extends StatefulWidget {
   const Navbar({super.key});
@@ -14,23 +15,15 @@ class Navbar extends StatefulWidget {
 
 class NavbarState extends State<Navbar> {
   int selectedIndex = 0;
-  // final List<Widget> pages = [
-  //   HomeScreen(),
-  //   InputRecipe(),
-  //   const MealPlannerScreen(),
-  //   ProfileScreen()
-  // ];
 
   final List<Widget> pages = [
     HomeScreen(),
     const MealPlannerScreen(),
-    ProfileScreen()
+    ProfileScreen(),
+    const FavoriteScreen()
   ];
 
   void onNavTapped(int index) {
-    // if (index == 2) {
-    //   return;
-    // }
     setState(() {
       selectedIndex = index;
     });
@@ -156,15 +149,24 @@ class NavbarState extends State<Navbar> {
                   ),
                   label: '',
                 ),
-                // NavigationDestination(
-                //   icon: Icon(Icons.person, size: 30, color: Colors.white),
-                //   selectedIcon: Icon(
-                //     Icons.person,
-                //     size: 30,
-                //     color: Color(0xFFF46A06),
-                //   ),
-                //   label: '',
-                // ),
+                NavigationDestination(
+                  icon: Icon(Icons.person, size: 30, color: Colors.white),
+                  selectedIcon: Icon(
+                    Icons.person,
+                    size: 30,
+                    color: Color(0xFFF46A06),
+                  ),
+                  label: '',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.favorite, size: 30, color: Colors.white),
+                  selectedIcon: Icon(
+                    Icons.person,
+                    size: 30,
+                    color: Color(0xFFF46A06),
+                  ),
+                  label: '',
+                ),
               ],
             ),
           ),

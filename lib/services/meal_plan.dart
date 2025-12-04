@@ -45,7 +45,7 @@ class IngredientDetail {
 }
 
 class MealPlanService {
-  static const String _baseUrl = "https://backend.autochef.site/api";
+  static const String _baseUrl = "http://100.120.18.38:8080/api";
 
   static Future<Map<String, List<Recipe>>> getMealPlans() async {
     try {
@@ -162,6 +162,7 @@ class MealPlanService {
   static Future<void> addRecipeToMealPlan({
     required String day,
     required int recipeId,
+    required int quantity,
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -184,7 +185,7 @@ class MealPlanService {
       final body = jsonEncode({
         'day': day.toLowerCase(),
         'recipes': [
-          {'recipe_id': recipeId, 'quantity': 1}
+          {'recipe_id': recipeId, 'quantity': quantity}
         ]
       });
 
