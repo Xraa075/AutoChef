@@ -223,6 +223,29 @@ Future<void> loginUser() async {
     }
   }
 
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+
+  // Tangkap argumen dari deep link (jika ada)
+  final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+  if (args?['verified'] == true) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            '✅ Email kamu berhasil diverifikasi! Silakan login untuk melanjutkan.',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Color(0xFFF46A06),
+          duration: Duration(seconds: 4),
+        ),
+      );
+    });
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
