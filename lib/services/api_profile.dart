@@ -115,12 +115,12 @@ class ApiProfile {
       } else {
         return {
           'success': false,
-          'message': 'Gagal upload foto. Status: ${response.statusCode}'
+          'message': 'Gagal upload foto. Status:'
         };
       }
     } catch (e) {
-      debugPrint('Error upload photo: $e');
-      return {'success': false, 'message': 'Terjadi kesalahan: $e'};
+      debugPrint('Error upload photo: ');
+      return {'success': false, 'message': 'Terjadi kesalahan: '};
     }
   }
 
@@ -129,6 +129,9 @@ class ApiProfile {
     required String name,
     required String email,
     String? avatar,
+    String? password,
+    String? passwordConfirmation,
+    String? currentPassword,
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -147,24 +150,38 @@ class ApiProfile {
 
       if (token != null) {
         try {
-          // Asumsi endpoint update masih menggunakan update-profile atau disesuaikan nanti
-          final url = Uri.parse('$baseUrl/update-profile'); 
+          final url = Uri.parse('$baseUrl/profile'); 
+
+          final Map<String, String> body = {
+            'name': name,
+            'email': email,
+          };
+          if (password != null && password.isNotEmpty) {
+            body['password'] = password;
+            body['password_confirmation'] = passwordConfirmation ?? password;
+            
+            if (currentPassword != null && currentPassword.isNotEmpty) {
+              body['current_password'] = currentPassword;
+            }
+          }
+
+          debugPrint('Sending Update (PUT) to $url');
+          debugPrint('Body: $body');
 
           final response = await http
-              .post(
+              .put(
                 url,
                 headers: {
                   'Accept': 'application/json',
                   'Authorization': 'Bearer $token',
-                  // Jika backend Laravel standar resource, biasanya perlu content-type json atau x-www-form
                   'Content-Type': 'application/x-www-form-urlencoded', 
                 },
-                body: {
-                  'name': name,
-                  'email': email,
-                },
+                body: body,
               )
               .timeout(const Duration(seconds: 15));
+          
+          debugPrint('Update Status: ${response.statusCode}');
+          debugPrint('Update Response: ${response.body}');
 
           if (response.statusCode == 200 || response.statusCode == 201) {
             final prefs = await SharedPreferences.getInstance();
@@ -180,38 +197,37 @@ class ApiProfile {
               'message': 'Profil berhasil diperbarui',
             };
           } else {
+            final respBody = jsonDecode(response.body);
+            String msg = respBody['message'] ?? 'Gagal memperbarui profil ke server.';
+            if (respBody['errors'] != null) {
+               if (respBody['errors']['current_password'] != null) {
+                 msg = "Password saat ini salah atau tidak diisi.";
+               }
+            }
+
             return {
               'success': false,
-              'message': 'Gagal memperbarui profil ke server.',
+              'message': msg,
             };
           }
         } catch (e) {
           debugPrint('API update failed');
-          // Fallback offline save
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('name', name); // <--- Kunci diubah ke 'name'
+          await prefs.setString('name', name);
           await prefs.setString('email', email);
           if (avatar != null && avatar.isNotEmpty) {
             await prefs.setString('userImage', avatar);
           }
           return {
             'success': true,
-            'message': 'Profil disimpan lokal (Offline).',
+            'message': 'Profil disimpan lokal (Offline). Password tidak berubah.',
             'isOffline': true,
           };
         }
       } else {
-        // Offline / No Token
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('name', name);
-        await prefs.setString('email', email);
-        if (avatar != null && avatar.isNotEmpty) {
-          await prefs.setString('userImage', avatar);
-        }
         return {
           'success': false,
-          'message': 'Token tidak ditemukan. Disimpan lokal.',
-          'isOffline': true,
+          'message': 'Token tidak ditemukan.',
         };
       }
     } catch (e) {

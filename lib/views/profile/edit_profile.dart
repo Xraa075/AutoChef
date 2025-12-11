@@ -75,7 +75,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
   }
 
-  // Helper untuk menentukan Image Provider (Asset vs Network)
   ImageProvider _getImageProvider(String path) {
     if (path.startsWith('http')) {
       return NetworkImage(path);
@@ -93,13 +92,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  // --- BARU: Fungsi Upload Foto dari Galeri ---
   Future<void> _pickAndUploadImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
-      // Tutup dialog dulu biar UX enak
       Navigator.pop(context); 
 
       setState(() => _isLoading = true);
@@ -109,8 +106,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         final result = await ApiProfile.uploadProfilePhoto(file);
 
         if (result['success'] == true) {
-          // Asumsi response backend mengembalikan URL foto di field 'profile_photo_url'
-          // Sesuaikan key ini dengan JSON response backend Anda
           String? newPhotoUrl = result['data']['profile_photo_url']; 
           
           if (newPhotoUrl != null) {
@@ -118,12 +113,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               _selectedAvatar = newPhotoUrl;
               _avatarChanged = true;
             });
-            _showNotification(
-              icon: Icons.check_circle_outline,
-              title: 'Berhasil',
-              message: 'Foto berhasil diupload.',
-              isError: false,
-            );
           }
         } else {
           _showNotification(
@@ -152,28 +141,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-
-    if (_passwordController.text.isNotEmpty || _confirmPasswordController.text.isNotEmpty) {
-      _showNotification(
-        icon: Icons.construction, 
-        title: 'Dalam Pengembangan', 
-        message: 'Mohon maaf, fitur ubah password belum tersedia saat ini.', 
-        isError: false,
-        showWarning: true
-      );
-      if (!_nameChanged && !_avatarChanged) return;
+    bool isPasswordFilled = _passwordController.text.isNotEmpty;
+    if (isPasswordFilled && _currentPasswordController.text.isEmpty) {
+        _showNotification(
+          icon: Icons.warning_amber_rounded,
+          title: 'Perhatian',
+          message: 'Harap isi Password Saat Ini untuk mengubah password.',
+          isError: true,
+        );
+        return;
     }
 
-    if (!_nameChanged && !_avatarChanged) {
-      if (_passwordController.text.isEmpty) {
-        _showNotification(
-          icon: Icons.info_outline,
-          title: 'Info',
-          message: 'Tidak ada perubahan data diri yang disimpan.',
-          isError: false,
-          showWarning: true,
-        );
-      }
+    if (!_nameChanged && !_avatarChanged && !isPasswordFilled) {
+      _showNotification(
+        icon: Icons.info_outline,
+        title: 'Info',
+        message: 'Tidak ada perubahan data diri yang disimpan.',
+        isError: false,
+        showWarning: true,
+      );
       return;
     }
 
@@ -181,11 +167,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       Map<String, dynamic> result;
-      if (_nameChanged) {
+      if (_nameChanged || isPasswordFilled) {
         result = await ApiProfile.updateProfile(
           name: _nameController.text.trim(),
-          email: widget.currentUser.email, 
+          email: widget.currentUser.email,
           avatar: _selectedAvatar,
+          password: isPasswordFilled ? _passwordController.text : null,
+          passwordConfirmation: isPasswordFilled ? _confirmPasswordController.text : null,
+          currentPassword: isPasswordFilled ? _currentPasswordController.text : null,
         );
       } 
       else if (_avatarChanged) {
@@ -201,7 +190,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           message: 'Profil berhasil diperbarui.',
           isError: false,
         );
-        
+
+        _currentPasswordController.clear();
+        _passwordController.clear();
+        _confirmPasswordController.clear();
+
         await Future.delayed(const Duration(seconds: 1));
         if (mounted) Navigator.pop(context, true);
 
