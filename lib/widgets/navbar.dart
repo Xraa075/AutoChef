@@ -16,11 +16,12 @@ class Navbar extends StatefulWidget {
 class NavbarState extends State<Navbar> {
   int selectedIndex = 0;
 
+  // PERBAIKAN 1: Urutan pages ditukar (FavoriteScreen jadi ke-3, ProfileScreen jadi ke-4)
   final List<Widget> pages = [
     HomeScreen(),
     const MealPlannerScreen(),
+    const FavoriteScreen(), 
     ProfileScreen(),
-    const FavoriteScreen()
   ];
 
   void onNavTapped(int index) {
@@ -28,7 +29,6 @@ class NavbarState extends State<Navbar> {
       selectedIndex = index;
     });
   }
-
 
   Future<bool> _onWillPop() async {
     return await _showExitConfirmation();
@@ -150,16 +150,16 @@ class NavbarState extends State<Navbar> {
                   label: '',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.person, size: 30, color: Colors.white),
+                  icon: Icon(Icons.favorite, size: 30, color: Colors.white),
                   selectedIcon: Icon(
-                    Icons.person,
+                    Icons.favorite,
                     size: 30,
                     color: Color(0xFFF46A06),
                   ),
                   label: '',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.favorite, size: 30, color: Colors.white),
+                  icon: Icon(Icons.person, size: 30, color: Colors.white),
                   selectedIcon: Icon(
                     Icons.person,
                     size: 30,

@@ -33,6 +33,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  ImageProvider _getImageProvider(String path) {
+    if (path.startsWith('http') || path.startsWith('https')) {
+      return NetworkImage(path);
+    } else {
+      return AssetImage(path);
+    }
+  }
+
   Future<void> _handleUserLoaded(User activeUserFromBuilder) async {
     if (!mounted) return;
     // Cek jika ada perubahan data user untuk update state lokal
@@ -162,7 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
 
         // Fallback tampilan jika belum login / loading
-        String displayUsername = activeUser?.username ?? "Pengguna";
+        String displayUsername = activeUser?.name ?? "Pengguna";
         String displayEmail = activeUser?.email ?? "email@example.com";
         String displayUserImage = activeUser?.userImage ?? "lib/assets/images/avatar1.png";
 
@@ -186,7 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       CircleAvatar(
                         radius: 40,
                         backgroundColor: Colors.white,
-                        backgroundImage: AssetImage(displayUserImage),
+                        backgroundImage: _getImageProvider(displayUserImage),
                         onBackgroundImageError: (_, __) {},
                       ),
                       const SizedBox(width: 16),

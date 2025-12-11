@@ -25,6 +25,7 @@ dependencies:
   speech_to_text: ^7.3.0
   permission_handler: ^11.3.1
   app_links: ^3.4.2
+  image_picker: ^1.0.7
 
 dev_dependencies:
   flutter_test:

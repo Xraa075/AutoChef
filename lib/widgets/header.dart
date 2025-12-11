@@ -18,6 +18,14 @@ class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
     this.titleStyle,
   });
 
+  ImageProvider _getImageProvider(String path) {
+    if (path.startsWith('http') || path.startsWith('https')) {
+      return NetworkImage(path);
+    } else {
+      return AssetImage(path);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<User>(
@@ -47,7 +55,7 @@ class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            mainTitle ?? 'Halo, ${currentUser.username}',
+                            mainTitle ?? 'Halo, ${currentUser.name}',
                             style: mainTitleStyle ??
                                 const TextStyle(
                                   fontFamily: 'Poppins',
@@ -72,7 +80,7 @@ class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ),
                     CircleAvatar(
-                      backgroundImage: AssetImage(currentUser.userImage),
+                      backgroundImage: _getImageProvider(currentUser.userImage),
                       radius: 24,
                       backgroundColor: Colors.white,
                     ),

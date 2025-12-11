@@ -4,6 +4,7 @@ import 'package:autochef/widgets/header.dart';
 import 'package:autochef/widgets/category_item.dart';
 import 'package:autochef/services/search_service.dart';
 import 'package:autochef/widgets/healthy_food_item.dart';
+import 'package:autochef/services/api_profile.dart';
 import 'package:autochef/services/api_rekomendation.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
 import 'package:autochef/views/recipe/recommendation_screen.dart';
@@ -12,6 +13,7 @@ import 'package:shimmer/shimmer.dart';
 import 'dart:async';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -108,7 +110,25 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       return;
     }
+    await _updateUserProfile();
     await getRekomendasi();
+  }
+
+  Future<void> _updateUserProfile() async {
+    try {
+      final result = await ApiProfile.getProfile();
+      if (result['success'] == true && result['data'] != null) {
+        final data = result['data'];
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('name', data['name'] ?? 'Pengguna'); 
+        await prefs.setString('email', data['email'] ?? '');
+        if (mounted) {
+          setState(() {}); 
+        }
+      }
+    } catch (e) {
+      debugPrint("Gagal update user profile di home: $e");
+    }
   }
 
   Future<void> getRekomendasi() async {
