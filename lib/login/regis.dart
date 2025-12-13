@@ -1,12 +1,8 @@
-// ignore_for_file: prefer_const_constructors_in_immutables, library_private_types_in_public_api, use_build_context_synchronously, deprecated_member_use
-
+// (MODIFIKASI) regis.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:async';
-import 'dart:io';
 import 'login.dart';
+import '../services/api_login.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({super.key});
@@ -95,8 +91,8 @@ class _RegisterPageState extends State<RegisterPage> {
     if (value == null || value.isEmpty) {
       return 'Password tidak boleh kosong';
     }
-    if (value.length < 5) {
-      return 'Password minimal 5 karakter';
+    if (value.length < 8) {
+      return 'Password minimal 8 karakter';
     }
     return null;
   }
@@ -105,8 +101,8 @@ class _RegisterPageState extends State<RegisterPage> {
     if (value == null || value.isEmpty) {
       return 'Konfirmasi password tidak boleh kosong';
     }
-    if (value.length < 5) {
-      return 'Konfirmasi password minimal 5 karakter';
+    if (value.length < 8) {
+      return 'Konfirmasi password minimal 8 karakter';
     }
     if (value != passwordController.text) {
       return 'Password dan Konfirmasi Password tidak cocok';
@@ -121,164 +117,102 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (_formKey.currentState!.validate()) {
       showLoadingDialog();
-      try {
-        final response = await http
-            .post(
-              Uri.parse('http://156.67.214.60/api/register'),
-              headers: {'Accept': 'application/json'},
-              body: {
-                'name': nameController.text,
-                'email': emailController.text,
-                'password': passwordController.text,
-                'password_confirmation': confirmPasswordController.text,
-              },
-            )
-            .timeout(const Duration(seconds: 20));
+      final response = await register(
+        nameController.text,
+        emailController.text,
+        passwordController.text,
+        confirmPasswordController.text,
+      );
 
-        hideLoadingDialog();
-        Map<String, dynamic>? responseData;
-        if (response.body.isNotEmpty) {
-          try {
-            responseData = jsonDecode(response.body);
-          } catch (e) {
-            setState(() {
-              apiErrorMessage = 'Server memberikan respons yang tidak valid.';
-            });
-            return;
-          }
-        } else {
-          setState(() {
-            apiErrorMessage =
-                'Server tidak memberikan respons. Status: ${response.statusCode}';
-          });
-          return;
-        }
+      hideLoadingDialog();
 
-        if (response.statusCode == 201 || response.statusCode == 200) {
-          final String userName =
-              responseData?['user']?['name'] ?? nameController.text;
-          setState(() {
-            nameController.clear();
-            emailController.clear();
-            passwordController.clear();
-            confirmPasswordController.clear();
-            _formKey.currentState?.reset();
-          });
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28),
-                ),
-                title: Row(
-                  children: [
-                    const Icon(
-                      Icons.check_circle_outline,
-                      color: Color(0xFFF46A06),
-                      size: 28,
-                    ),
-                    const SizedBox(width: 10),
-                    const Text(
-                      'Registrasi Berhasil',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+      if (response['status'] == 'success') {
+        setState(() {
+          nameController.clear();
+          emailController.clear();
+          passwordController.clear();
+          confirmPasswordController.clear();
+          _formKey.currentState?.reset();
+        });
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          // (MODIFIKASI 1) Ganti nama 'context' di sini menjadi 'dialogContext'
+          builder: (BuildContext dialogContext) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              contentPadding: const EdgeInsets.all(20),
+              content: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 15),
+                      const Icon(
+                        Icons.mark_email_read_outlined,
+                        color: Color(0xFFF46A06),
+                        size: 48,
                       ),
-                    ),
-                  ],
-                ),
-                content: Text(
-                  'Akun untuk $userName telah berhasil dibuat. Silakan login.',
-                  style: const TextStyle(fontSize: 16),
-                ),
-                actions: [
-                  SizedBox(
-                    width: double.infinity,
-                    height: 45,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
+                      const SizedBox(height: 15),
+                      const Text(
+                        'Verifikasi Email Anda',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
-                        backgroundColor: const Color(0xFFF46A06),
+                        textAlign: TextAlign.center,
                       ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
+                      const SizedBox(height: 10),
+                      const Text(
+                        'silahkan cek gmail anda untuk verifikasi',
+                        style: TextStyle(fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                  Positioned(
+                    top: -18.0,
+                    right: -18.0,
+                    child: GestureDetector(
+                      onTap: () {
+                        // (MODIFIKASI 2) Gunakan 'dialogContext' untuk menutup dialog
+                        Navigator.of(dialogContext).pop();
+                        // (MODIFIKASI 3) Gunakan 'context' (milik halaman) untuk navigasi
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (_) => LoginPage()),
                         );
                       },
-                      child: const Text(
-                        'Oke',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2)),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.black54,
+                          size: 24,
+                        ),
                       ),
                     ),
                   ),
                 ],
-              );
-            },
-          );
-        } else if (response.statusCode == 422) {
-          String errorMsg =
-              responseData?['message'] ?? 'Terjadi kesalahan validasi.';
-          Map<String, dynamic>? errors = responseData?['errors'];
-          String specificFieldErrors = "";
-          if (errors != null) {
-            errors.forEach((key, value) {
-              if (value is List && value.isNotEmpty) {
-                String fieldName = key;
-                if (key == "name") fieldName = "Username";
-                if (key == "password") fieldName = "Password";
-                if (key == "email") fieldName = "Email";
-                specificFieldErrors += "$fieldName: ${value.first}\n";
-              }
-            });
-            setState(() {
-              apiErrorMessage =
-                  specificFieldErrors.isNotEmpty
-                      ? specificFieldErrors.trim()
-                      : errorMsg;
-            });
-          } else {
-            setState(() {
-              apiErrorMessage = errorMsg;
-            });
-          }
-        } else {
-          setState(() {
-            apiErrorMessage =
-                responseData?['message'] ??
-                'Gagal registrasi. Status: ${response.statusCode}';
-          });
-        }
-      } on SocketException {
-        hideLoadingDialog();
+              ),
+              actions: null,
+            );
+          },
+        );
+      } else {
         setState(() {
-          apiErrorMessage = 'Tidak ada koneksi internet.';
-        });
-      } on http.ClientException {
-        hideLoadingDialog();
-        setState(() {
-          apiErrorMessage = 'Tidak dapat terhubung ke server.';
-        });
-      } on FormatException {
-        hideLoadingDialog();
-        setState(() {
-          apiErrorMessage = 'Format respons server tidak valid.';
-        });
-      } on TimeoutException {
-        hideLoadingDialog();
-        setState(() {
-          apiErrorMessage = 'Koneksi ke server timeout.';
-        });
-      } catch (e) {
-        hideLoadingDialog();
-        setState(() {
-          apiErrorMessage = 'Terjadi kesalahan: ${e.toString()}';
+          apiErrorMessage =
+              response['message'] ?? 'Terjadi kesalahan tidak diketahui.';
         });
       }
     } else {
@@ -470,10 +404,9 @@ class _RegisterPageState extends State<RegisterPage> {
         controller: controller,
         validator: validator,
         autovalidateMode: AutovalidateMode.onUserInteraction,
-        obscureText:
-            isPassword
-                ? (isConfirmField ? _obscureConfirmPassword : _obscurePassword)
-                : false,
+        obscureText: isPassword
+            ? (isConfirmField ? _obscureConfirmPassword : _obscurePassword)
+            : false,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
         decoration: InputDecoration(
@@ -506,28 +439,27 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           errorStyle: const TextStyle(fontSize: 12, height: 1),
           errorMaxLines: 2,
-          suffixIcon:
-              isPassword
-                  ? IconButton(
-                    icon: Icon(
-                      (isConfirmField
-                              ? _obscureConfirmPassword
-                              : _obscurePassword)
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                      color: Colors.grey,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        if (isConfirmField) {
-                          _obscureConfirmPassword = !_obscureConfirmPassword;
-                        } else {
-                          _obscurePassword = !_obscurePassword;
-                        }
-                      });
-                    },
-                  )
-                  : null,
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    (isConfirmField
+                            ? _obscureConfirmPassword
+                            : _obscurePassword)
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      if (isConfirmField) {
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                      } else {
+                        _obscurePassword = !_obscurePassword;
+                      }
+                    });
+                  },
+                )
+              : null,
         ),
       ),
     );

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class KategoriService {
-  static const String baseUrl = "http://156.67.214.60/api/resepmakanan"; // Pastikan URL betul
+  static const String baseUrl = "http://20.6.107.2:8002/api/resepmakanan"; // Pastikan URL betul
 
   // 🔍 Fungsi untuk mencari resep berdasarkan banyak kategori
   Future<List<Map<String, dynamic>>> searchRecipes(List<String> kategori) async {
@@ -22,10 +22,10 @@ class KategoriService {
           throw Exception("Format respons API tidak sesuai.");
         }
       } catch (e) {
-        throw Exception("Gagal memproses JSON: $e");
+        throw Exception("Gagal memproses Data");
       }
     } else {
-      throw Exception("Gagal mengambil data resep. Kode status: ${response.statusCode}");
+      throw Exception("Gagal mengambil data resep");
     }
   }
 
@@ -46,10 +46,10 @@ class KategoriService {
           throw Exception("Format respons API tidak sesuai.");
         }
       } catch (e) {
-        throw Exception("Gagal memproses JSON: $e");
+        throw Exception("Gagal memproses Data");
       }
     } else {
-      throw Exception("Gagal mengambil data resep. Kode status: ${response.statusCode}");
+      throw Exception("Gagal mengambil data resep");
     }
   }
 }

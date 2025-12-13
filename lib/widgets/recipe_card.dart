@@ -5,11 +5,13 @@ import 'package:autochef/models/recipe.dart';
 class RecipeCard extends StatelessWidget {
   final Recipe recipe;
   final VoidCallback? onTap;
+  final VoidCallback? onDeleteTapped;
 
   const RecipeCard({
     super.key,
     required this.recipe,
     this.onTap,
+    this.onDeleteTapped,
   });
 
   @override
@@ -31,7 +33,7 @@ class RecipeCard extends StatelessWidget {
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.only(right: 15),
+          padding: const EdgeInsets.only(right: 4.0),
           child: Row(
             children: [
               ClipRRect(
@@ -83,20 +85,6 @@ class RecipeCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 5),
-                    Text(
-                      "Bahan: ${recipe.bahan.split(',').join(', ')}",
-                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 5),
-                    // Added calorie information
-                    Text(
-                      "Kalori : ${recipe.kalori} kalori",
-                      style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                    ),
-                    const SizedBox(height: 5),
-                    // Added cooking time and difficulty level
                     Row(
                       children: [
                         Icon(Icons.access_time, color: Colors.orange, size: 16),
@@ -107,16 +95,23 @@ class RecipeCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 10),
                         Icon(Icons.restaurant_menu, color: Colors.red[300], size: 16),
-                        const SizedBox(width: 2),
-                        Text(
-                          "Mudah", // You can replace this with actual difficulty if available
-                          style: TextStyle(fontSize: 12, color: Colors.red[300]),
-                        ),
                       ],
                     ),
                   ],
                 ),
               ),
+              if (onDeleteTapped != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 4.0),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      color: Colors.red,
+                      size: 28,
+                    ),
+                    onPressed: onDeleteTapped,
+                  ),
+                ),
             ],
           ),
         ),

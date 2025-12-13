@@ -2,14 +2,58 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:io';
 
 class ApiProfile {
-  static const String baseUrl = 'http://156.67.214.60/api';
+  static const String baseUrl = 'http://100.120.18.38:8080/api';
 
   // Mendapatkan token dari SharedPreferences
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
+  }
+
+  // --- BARU: Mengambil Data Profile (GET /profile) ---
+  static Future<Map<String, dynamic>> getProfile() async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'Token tidak ditemukan'};
+      }
+
+      // Endpoint sesuai request: /api/profile
+      final url = Uri.parse('$baseUrl/profile');
+      
+      debugPrint('GET Profile URL: $url');
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      ).timeout(const Duration(seconds: 15));
+
+      debugPrint('Response Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        // Parsing respons sesuai format JSON baru
+        final data = jsonDecode(response.body);
+        return {
+          'success': true,
+          'data': data, // data berisi {id, name, email, ...}
+        };
+      } else {
+        return {
+          'success': false,
+          'message': 'Gagal mengambil data profil',
+        };
+      }
+    } catch (e) {
+      debugPrint('Error getProfile');
+      return {'success': false, 'message': 'Terjadi kesalahan'};
+    }
   }
 
   // Update avatar - khusus untuk menyimpan avatar secara lokal
@@ -19,17 +63,64 @@ class ApiProfile {
         return {'success': false, 'message': 'Avatar tidak boleh kosong'};
       }
 
-      // Simpan avatar hanya secara lokal karena tidak ada di database
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('userImage', avatar);
 
       return {'success': true, 'message': 'Avatar berhasil diperbarui'};
     } catch (e) {
-      debugPrint('Error update avatar: $e');
+      debugPrint('Error update avatar');
       return {
         'success': false,
-        'message': 'Terjadi kesalahan saat memperbarui avatar: $e',
+        'message': 'Terjadi kesalahan saat memperbarui avatar',
       };
+    }
+  }
+
+  static Future<Map<String, dynamic>> uploadProfilePhoto(File imageFile) async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'Token tidak ditemukan'};
+      }
+
+      final url = Uri.parse('$baseUrl/profile/photo');
+      debugPrint('Uploading photo to: $url');
+
+      var request = http.MultipartRequest('POST', url);
+      
+      // Header Authorization
+      request.headers['Authorization'] = 'Bearer $token';
+      request.headers['Accept'] = 'application/json';
+
+      // Attach File (Asumsi key-nya adalah 'photo' atau 'image', biasanya 'photo' di Laravel Jetstream/Default)
+      // Jika backend minta key lain (misal 'file'), ganti 'photo' di bawah ini.
+      request.files.add(await http.MultipartFile.fromPath(
+        'photo', 
+        imageFile.path,
+      ));
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      debugPrint('Upload Response: ${response.statusCode}');
+      debugPrint('Upload Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        // Biasanya return URL baru atau object user baru
+        final data = jsonDecode(response.body);
+        return {
+          'success': true,
+          'data': data, // Berharap ada field 'profile_photo_url' disini
+        };
+      } else {
+        return {
+          'success': false,
+          'message': 'Gagal upload foto. Status:'
+        };
+      }
+    } catch (e) {
+      debugPrint('Error upload photo: ');
+      return {'success': false, 'message': 'Terjadi kesalahan: '};
     }
   }
 
@@ -38,14 +129,15 @@ class ApiProfile {
     required String name,
     required String email,
     String? avatar,
+    String? password,
+    String? passwordConfirmation,
+    String? currentPassword,
   }) async {
     try {
-      // Cek dulu apakah user adalah guest
       final prefs = await SharedPreferences.getInstance();
       bool isGuest = prefs.getBool('hasLoggedAsGuest') ?? false;
       bool isUser = prefs.getBool('hasLoggedAsUser') ?? false;
 
-      // Jika user adalah guest, kembalikan pesan untuk login
       if (isGuest && !isUser) {
         return {
           'success': false,
@@ -56,129 +148,91 @@ class ApiProfile {
 
       final token = await getToken();
 
-      // Debug info
-      debugPrint('Token: ${token != null ? "Valid" : "Null"}');
-      debugPrint('Updating profile: name=$name, email=$email');
-
-      // Jika ada token, coba update ke API
       if (token != null) {
         try {
-          final url = Uri.parse('$baseUrl/update-profile');
+          final url = Uri.parse('$baseUrl/profile'); 
 
-          // PERBAIKAN: Format request body dan headers
+          final Map<String, String> body = {
+            'name': name,
+            'email': email,
+          };
+          if (password != null && password.isNotEmpty) {
+            body['password'] = password;
+            body['password_confirmation'] = passwordConfirmation ?? password;
+            
+            if (currentPassword != null && currentPassword.isNotEmpty) {
+              body['current_password'] = currentPassword;
+            }
+          }
+
+          debugPrint('Sending Update (PUT) to $url');
+          debugPrint('Body: $body');
+
           final response = await http
-              .post(
+              .put(
                 url,
                 headers: {
                   'Accept': 'application/json',
                   'Authorization': 'Bearer $token',
-                  'Content-Type':
-                      'application/x-www-form-urlencoded', // Menggunakan format Laravel standar
+                  'Content-Type': 'application/x-www-form-urlencoded', 
                 },
-                body: {
-                  // Tidak menggunakan jsonEncode untuk x-www-form-urlencoded
-                  'name': name,
-                  'email': email,
-                },
+                body: body,
               )
               .timeout(const Duration(seconds: 15));
-
-          // Debug response
-          debugPrint('Response status: ${response.statusCode}');
-          debugPrint('Response body: ${response.body}');
+          
+          debugPrint('Update Status: ${response.statusCode}');
+          debugPrint('Update Response: ${response.body}');
 
           if (response.statusCode == 200 || response.statusCode == 201) {
-            // Jika API berhasil, simpan data ke SharedPreferences
             final prefs = await SharedPreferences.getInstance();
-            await prefs.setString('username', name);
+            await prefs.setString('name', name);
             await prefs.setString('email', email);
 
-            // Jika avatar disediakan, simpan secara lokal
             if (avatar != null && avatar.isNotEmpty) {
               await prefs.setString('userImage', avatar);
             }
 
-            // Decode response body
-            Map<String, dynamic> responseData = {};
-            if (response.body.isNotEmpty) {
-              try {
-                responseData = jsonDecode(response.body);
-              } catch (e) {
-                debugPrint('Error parsing response: $e');
-              }
-            }
-
             return {
               'success': true,
-              'message':
-                  responseData['message'] ?? 'Profil berhasil diperbarui',
+              'message': 'Profil berhasil diperbarui',
             };
           } else {
-            // Coba parse response error
-            String errorMessage =
-                'Gagal memperbarui profil (${response.statusCode})';
-            Map<String, dynamic> responseData = {};
-            try {
-              responseData = jsonDecode(response.body);
-              if (responseData.containsKey('message')) {
-                errorMessage = responseData['message'];
-              } else if (responseData.containsKey('errors')) {
-                final errors = responseData['errors'];
-                if (errors is Map && errors.isNotEmpty) {
-                  errorMessage = errors.values.first[0] ?? errorMessage;
-                }
-              }
-            } catch (e) {
-              debugPrint('Error parsing error response: $e');
+            final respBody = jsonDecode(response.body);
+            String msg = respBody['message'] ?? 'Gagal memperbarui profil ke server.';
+            if (respBody['errors'] != null) {
+               if (respBody['errors']['current_password'] != null) {
+                 msg = "Password saat ini salah atau tidak diisi.";
+               }
             }
 
             return {
               'success': false,
-              'message': errorMessage,
-              'statusCode': response.statusCode,
-              'responseBody': response.body,
+              'message': msg,
             };
           }
         } catch (e) {
-          // Error koneksi API
-          debugPrint('API update failed: $e');
-
-          // Dalam kasus error koneksi, simpan secara lokal
+          debugPrint('API update failed');
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('username', name);
+          await prefs.setString('name', name);
           await prefs.setString('email', email);
-
           if (avatar != null && avatar.isNotEmpty) {
             await prefs.setString('userImage', avatar);
           }
-
           return {
             'success': true,
-            'message':
-                'Profil berhasil disimpan secara lokal, tetapi tidak tersimpan ke server. Cek koneksi internet Anda.',
+            'message': 'Profil disimpan lokal (Offline). Password tidak berubah.',
             'isOffline': true,
           };
         }
       } else {
-        // Mode offline (tidak ada token)
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('username', name);
-        await prefs.setString('email', email);
-
-        if (avatar != null && avatar.isNotEmpty) {
-          await prefs.setString('userImage', avatar);
-        }
-
         return {
           'success': false,
-          'message':
-              'Token tidak ditemukan. Silakan login kembali untuk menyimpan ke server.',
-          'isOffline': true,
+          'message': 'Token tidak ditemukan.',
         };
       }
     } catch (e) {
-      debugPrint('Error update profile: $e');
-      return {'success': false, 'message': 'Terjadi kesalahan: $e'};
+      debugPrint('Error update profile');
+      return {'success': false, 'message': 'Terjadi kesalahan'};
     }
   }
 
@@ -187,59 +241,14 @@ class ApiProfile {
     required String currentPassword,
     required String newPassword,
   }) async {
-    try {
-      // Validasi password
-      if (newPassword.isEmpty || newPassword.length < 5) {
-        return {
-          'success': false,
-          'message': 'Password baru minimal 5 karakter',
-        };
-      }
+    debugPrint('Fitur Change Password dipanggil tapi sedang dinonaktifkan.');
 
-      final token = await getToken();
+    await Future.delayed(const Duration(milliseconds: 500));
 
-      if (token == null) {
-        return {
-          'success': false,
-          'message': 'Token tidak tersedia, silakan login kembali',
-        };
-      }
-
-      final url = Uri.parse('$baseUrl/change-password');
-
-      final response = await http
-          .post(
-            url,
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer $token',
-            },
-            body: jsonEncode({
-              'current_password': currentPassword,
-              'password': newPassword,
-              'password_confirmation': newPassword,
-            }),
-          )
-          .timeout(const Duration(seconds: 10));
-
-      final responseData = json.decode(response.body);
-
-      if (response.statusCode == 200) {
-        return {
-          'success': true,
-          'message': responseData['message'] ?? 'Password berhasil diubah',
-        };
-      } else {
-        return {
-          'success': false,
-          'message': responseData['message'] ?? 'Gagal mengubah password',
-          'errors': responseData['errors'],
-        };
-      }
-    } catch (e) {
-      return {'success': false, 'message': 'Terjadi kesalahan koneksi: $e'};
-    }
+    return {
+      'success': false,
+      'message': 'Fitur ubah password sedang dalam pemeliharaan.',
+    };
   }
 
   // Verifikasi apakah user login dan token valid
@@ -253,7 +262,8 @@ class ApiProfile {
       }
 
       try {
-        final url = Uri.parse('$baseUrl/user');
+        final url = Uri.parse('$baseUrl/profile');
+        
         final response = await http
             .get(
               url,
@@ -265,56 +275,41 @@ class ApiProfile {
             .timeout(const Duration(seconds: 5));
 
         if (response.statusCode == 200) {
+          final userData = jsonDecode(response.body);
+          
           return {
             'loggedIn': true,
             'message': 'Token valid',
-            'user': jsonDecode(response.body),
+            'user': userData, 
           };
         } else {
           return {'loggedIn': false, 'message': 'Token tidak valid'};
         }
       } catch (e) {
         return {
-          'loggedIn': true, // Assume logged in if network error
-          'message': 'Tidak dapat memverifikasi login: $e',
+          'loggedIn': true,
+          'message': 'Tidak dapat memverifikasi login (Offline)',
           'error': e.toString(),
         };
       }
     } catch (e) {
-      return {'loggedIn': false, 'message': 'Error checking login status: $e'};
+      return {'loggedIn': false, 'message': 'Error checking login status'};
     }
   }
 
-  // Tambahkan fungsi baru
   static Future<bool> checkAndRefreshToken() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-
-      // Tambahkan cek guest
       final isGuest = prefs.getBool('hasLoggedAsGuest') ?? false;
       final isUser = prefs.getBool('hasLoggedAsUser') ?? false;
 
-      // Jika guest, langsung return false
-      if (isGuest && !isUser) {
-        debugPrint('User is guest, no token needed');
-        return true; // Return true karena kita akan handle di updateProfile
-      }
+      if (isGuest && !isUser) return true;
 
-      debugPrint(
-        'Checking token: ${token != null ? "${token.substring(0, 10)}..." : "null"}',
-      );
+      if (token == null || token.isEmpty) return false;
 
-      if (token == null || token.isEmpty) {
-        debugPrint('Token is null or empty');
-        return false;
-      }
-
-      // Rest of the code...
-
-      // Coba validasi token dengan hit endpoint sederhana
       try {
-        final url = Uri.parse('$baseUrl/user');
+        final url = Uri.parse('$baseUrl/profile');
         final response = await http
             .get(
               url,
@@ -325,26 +320,17 @@ class ApiProfile {
             )
             .timeout(const Duration(seconds: 5));
 
-        debugPrint('Token validation response: ${response.statusCode}');
-
         if (response.statusCode == 200) {
           return true;
         } else if (response.statusCode == 401) {
-          // Token tidak valid, hapus
           await prefs.remove('token');
-          debugPrint('Token invalid, removing from storage');
           return false;
         }
-
-        // Default fallback - asumsikan token valid jika tidak 401
         return true;
       } catch (e) {
-        // Jika terjadi kesalahan koneksi, anggap token valid (benefit of doubt)
-        debugPrint('Connection error when validating token: $e');
         return true;
       }
     } catch (e) {
-      debugPrint('Error checking token: $e');
       return false;
     }
   }
@@ -353,39 +339,33 @@ class ApiProfile {
   static Future<Map<String, dynamic>> logout() async {
     try {
       final token = await getToken();
-
       if (token != null) {
         try {
-          Uri.parse('$baseUrl/logout');
-
-          // Analisis response jika perlu
+          http.post(
+            Uri.parse('$baseUrl/logout'),
+            headers: {'Authorization': 'Bearer $token'},
+          );
         } catch (e) {
-          // Abaikan error API, tetap lanjut ke logout lokal
-          debugPrint('API logout failed: $e');
+          debugPrint('API logout failed');
         }
       }
-
-      // Hapus data lokal
       await _clearLocalData();
-
       return {'success': true, 'message': 'Berhasil logout'};
     } catch (e) {
-      // Tetap coba hapus data lokal
       try {
         await _clearLocalData();
         return {'success': true, 'message': 'Berhasil logout (offline)'};
       } catch (_) {
-        return {'success': false, 'message': 'Gagal logout: $e'};
+        return {'success': false, 'message': 'Gagal logout'};
       }
     }
   }
 
-  // Helper method untuk menghapus data lokal
   static Future<void> _clearLocalData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('hasLoggedAsGuest', false);
     await prefs.setBool('hasLoggedAsUser', false);
-    await prefs.remove('username');
+    await prefs.remove('name');
     await prefs.remove('email');
     await prefs.remove('userImage');
     await prefs.remove('token');

@@ -10,7 +10,7 @@ plugins {
 android {
     namespace = "com.example.autochef"
     compileSdk = 35
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -24,10 +24,10 @@ android {
 
     defaultConfig {
         applicationId = "com.autochef.app"
-        minSdk = 21
+        minSdk = flutter.minSdkVersion
         targetSdk = 35
-        versionCode = 9
-        versionName = "3.0.0"
+        versionCode = 16
+        versionName = "3.0.7"
     }
 
 
@@ -57,4 +57,11 @@ android {
 
 flutter {
     source = "../.."
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("androidx.activity:activity:1.9.3")
+        force("androidx.activity:activity-ktx:1.9.3")
+    }
 }

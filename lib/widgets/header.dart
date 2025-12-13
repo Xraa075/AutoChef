@@ -1,92 +1,30 @@
-// import 'package:flutter/material.dart';
-// import 'package:autochef/models/user.dart';
-// import 'package:autochef/data/dummy_user.dart';
-
-// class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
-//   final String title;
-//   final Widget? child; // ✅ Tambahin child di sini
-
-//   const CustomHeader({
-//     super.key,
-//     required this.title,
-//     this.child, // ✅ Masukin ke constructor
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     User currentUser = getActiveUser(); // Ambil user aktif dari data dummy
-
-//     return Container(
-//       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-//       decoration: const BoxDecoration(
-//         color: Color(0xFFFBC72A),
-//       ),
-//       child: SafeArea(
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           mainAxisSize: MainAxisSize.min, // Supaya tinggi header menyesuaikan konten
-//           children: [
-//             Row(
-//               children: [
-//                 CircleAvatar(
-//                   backgroundImage: AssetImage(currentUser.userImage),
-//                   radius: 24,
-//                   backgroundColor: Colors.white,
-//                 ),
-//                 const SizedBox(width: 10),
-//                 Expanded(
-//                   child: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text(
-//                         'Halo, ${currentUser.username}',
-//                         style: const TextStyle(
-//                           fontSize: 18,
-//                           fontWeight: FontWeight.bold,
-//                           color: Colors.white,
-//                         ),
-//                         overflow: TextOverflow.ellipsis,
-//                       ),
-//                       Text(
-//                         title,
-//                         style: const TextStyle(
-//                           fontSize: 14,
-//                           color: Colors.white,
-//                         ),
-//                         maxLines: 2,
-//                         overflow: TextOverflow.ellipsis,
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ],
-//             ),
-//             if (child != null) ...[
-//               const SizedBox(height: 12), // Tambahin jarak dari row ke child
-//               child!, // ✅ Tampilkan child kalau ada
-//             ],
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   @override
-//   Size get preferredSize {
-//     return child != null ? const Size.fromHeight(140) : const Size.fromHeight(80);
-//   }
-
-// }
-
 import 'package:flutter/material.dart';
 import 'package:autochef/models/user.dart';
-import 'package:autochef/data/dummy_user.dart';
+import 'package:autochef/data/user.dart';
 
 class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Widget? child;
+  final TextStyle? mainTitleStyle;
+  final String? mainTitle;
+  final TextStyle? titleStyle;
 
-  const CustomHeader({super.key, required this.title, this.child});
+  const CustomHeader({
+    super.key,
+    required this.title,
+    this.mainTitleStyle,
+    this.mainTitle,
+    this.child,
+    this.titleStyle,
+  });
+
+  ImageProvider _getImageProvider(String path) {
+    if (path.startsWith('http') || path.startsWith('https')) {
+      return NetworkImage(path);
+    } else {
+      return AssetImage(path);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,36 +49,40 @@ class CustomHeader extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 Row(
                   children: [
-                    CircleAvatar(
-                      backgroundImage: AssetImage(currentUser.userImage),
-                      radius: 24,
-                      backgroundColor: Colors.white,
-                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Halo, ${currentUser.username}',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                            mainTitle ?? 'Halo, ${currentUser.name}',
+                            style: mainTitleStyle ??
+                                const TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
                             title,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                            ),
+                            style:
+                                titleStyle ??
+                                const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
+                    ),
+                    CircleAvatar(
+                      backgroundImage: _getImageProvider(currentUser.userImage),
+                      radius: 24,
+                      backgroundColor: Colors.white,
                     ),
                   ],
                 ),

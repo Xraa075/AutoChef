@@ -4,26 +4,22 @@ import 'package:http/http.dart' as http;
 import '../models/recipe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
+import 'package:autochef/models/recipe_detail_model.dart';
 
 class ApiRekomendasi {
-  static const String baseUrl =
-      'http://156.67.214.60/api/resepmakanan/rekomendasi';
+  static const String _baseUrl = "http://100.120.18.38:8080/api";
 
   static Future<List<Recipe>> fetchRekomendasi() async {
     try {
-      // Get the user's token for personalized recommendations
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       final isLoggedIn = prefs.getBool('hasLoggedAsUser') ?? false;
 
-      // PERBAIKAN: Gunakan URL yang sama, backend sudah menghandle personalisasi
-      // berdasarkan token tanpa perlu endpoint berbeda
-      final requestUrl = baseUrl;
+      final requestUrl = '$_baseUrl/recipes/recommendations';
 
       debugPrint('Fetching recommendations from: $requestUrl');
       debugPrint('User logged in: $isLoggedIn');
 
-      // Add auth token if logged in
       final Map<String, String> headers = {'Accept': 'application/json'};
 
       if (isLoggedIn && token != null) {
@@ -42,36 +38,71 @@ class ApiRekomendasi {
         );
 
         final List<dynamic> resepList = data['data'];
-        debugPrint('Found ${resepList.length} recommendations');
 
-        return resepList.map((json) => Recipe.fromJson(json)).toList();
+        final List<Recipe> recipes = resepList
+            .map((json) => Recipe.fromJson(json as Map<String, dynamic>))
+            .toList();
+
+        return recipes;
       } else {
         debugPrint('Error response: ${response.body}');
         throw Exception(
-          'Gagal memuat data rekomendasi: ${response.statusCode}',
+          'Gagal memuat data rekomendasi',
         );
       }
-    } catch (e) {
+    } catch (e, stacktrace) {
       debugPrint('Exception in fetchRekomendasi: $e');
+      debugPrint('Stacktrace: $stacktrace');
       throw Exception('Terjadi kesalahan: $e');
     }
   }
 
-  // Add new method to log recipe views
-  static Future<void> logRecipeView(int recipeId) async {
+  static Future<RecipeDetail> fetchRecipeDetail(int recipeId) async {
     try {
-      // Check if user is logged in
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       final isLoggedIn = prefs.getBool('hasLoggedAsUser') ?? false;
 
-      // Only log if user is logged in
+      final requestUrl = '$_baseUrl/recipes/$recipeId';
+      debugPrint('Fetching recipe detail from: $requestUrl');
+
+      final Map<String, String> headers = {'Accept': 'application/json'};
+
+      if (isLoggedIn && token != null) {
+        headers['Authorization'] = 'Bearer $token';
+        debugPrint('Using auth token for recipe detail');
+      }
+
+      final response = await http.get(Uri.parse(requestUrl), headers: headers);
+      debugPrint('Recipe Detail response code: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return RecipeDetail.fromJson(data['data'] as Map<String, dynamic>);
+      } else {
+        debugPrint('Error response detail: ${response.body}');
+        throw Exception(
+          'Gagal memuat detail resep',
+        );
+      }
+    } catch (e, stacktrace) {
+      debugPrint('Exception in fetchRecipeDetail: $e');
+      debugPrint('Stacktrace: $stacktrace');
+      throw Exception('Terjadi kesalahan saat mengambil detail: $e');
+    }
+  }
+
+  static Future<void> logRecipeView(int recipeId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final isLoggedIn = prefs.getBool('hasLoggedAsUser') ?? false;
+
       if (!isLoggedIn || token == null) {
         return;
       }
 
-      // Endpoint for logging recipe views
-      final url = Uri.parse('http://156.67.214.60/api/resepmakanan/log-view');
+      final url = Uri.parse('http://20.6.107.2:8002/api/resepmakanan/log-view');
 
       final response = await http
           .post(
@@ -90,7 +121,6 @@ class ApiRekomendasi {
         debugPrint('Response: ${response.body}');
       }
     } catch (e) {
-      // Silently fail - logging should not affect user experience
       debugPrint('Error logging recipe view: $e');
     }
   }

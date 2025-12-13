@@ -1,14 +1,9 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:async';
-import 'dart:io';
 import 'regis.dart';
+import '../services/api_login.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -72,13 +67,13 @@ class _LoginPageState extends State<LoginPage> {
     if (value == null || value.isEmpty) {
       return 'Password tidak boleh kosong';
     }
-    if (value.length < 5) {
-      return 'Password minimal 5 karakter';
+    if (value.length < 8) {
+      return 'Password minimal 8 karakter';
     }
     return null;
   }
 
-  Future<void> loginUser() async {
+Future<void> loginUser() async {
     setState(() {
       apiErrorMessage = null;
     });
@@ -87,128 +82,139 @@ class _LoginPageState extends State<LoginPage> {
       String email = emailController.text.trim();
       String password = passwordController.text;
 
+      debugPrint('Mencoba login dengan email: $email');
+
       showLoadingDialog();
-      try {
-        final response = await http
-            .post(
-              Uri.parse('http://156.67.214.60/api/login'),
-              headers: {'Accept': 'application/json'},
-              body: {'email': email, 'password': password},
-            )
-            .timeout(const Duration(seconds: 20));
+      
+      final response = await login(email, password);
 
-        Map<String, dynamic>? responseData;
-        try {
-          if (response.body.isNotEmpty) {
-            responseData = jsonDecode(response.body);
-          }
-        } catch (e) {
-          hideLoadingDialog();
+      hideLoadingDialog();
+      if (!mounted) return;
+
+      if (response['status'] == 'success') {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        Map<String, dynamic>? responseData = response['data'];
+        String? token = responseData?['access_token'];
+        Map<String, dynamic>? userDataFromApi = responseData?['user'];
+
+          if (token != null) {
+          await prefs.setBool('hasLoggedAsUser', true);
+          await prefs.setString('token', token);
+          await prefs.setString(
+            'username',
+            userDataFromApi?['name'] ?? 'Pengguna',
+          );
+          await prefs.setString('email', userDataFromApi?['email'] ?? '');
+          await prefs.setString(
+            'userImage',
+            userDataFromApi?['userImage'] ??
+                userDataFromApi?['profile_photo_path'] ??
+                'lib/assets/images/avatar1.png',
+          );
+
+          emailController.clear();
+          passwordController.clear();
+          _formKey.currentState?.reset();
+
           if (mounted) {
-            setState(() {
-              apiErrorMessage = 'Format respons dari server tidak valid.';
-            });
-          }
-          return;
-        }
-
-        hideLoadingDialog();
-
-        if (!mounted) return;
-
-        if (response.statusCode == 200 && responseData != null) {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          String? token = responseData['token'];
-          Map<String, dynamic>? userDataFromApi = responseData['user'];
-
-          if (token != null && userDataFromApi != null) {
-            await prefs.setBool('hasLoggedAsUser', true);
-            await prefs.setString(
-              'username',
-              userDataFromApi['name'] ?? 'Pengguna',
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const Navbar()),
+              (route) => false,
             );
-            await prefs.setString('email', userDataFromApi['email'] ?? '');
-            await prefs.setString('token', token);
-            await prefs.setString(
-              'userImage',
-              userDataFromApi['userImage'] ??
-                  userDataFromApi['profile_photo_path'] ??
-                  'lib/assets/images/avatar1.png',
-            );
-
-            emailController.clear();
-            passwordController.clear();
-            _formKey.currentState?.reset();
-
-            if (mounted) {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const Navbar()),
-                (route) => false,
-              );
-            }
-          } else {
-            setState(() {
-              apiErrorMessage = 'Respons login tidak lengkap dari server.';
-            });
           }
-        } else if (response.statusCode == 401 && responseData != null) {
-          setState(() {
-            apiErrorMessage =
-                (responseData?['message'] as String?) ??
-                'Email atau password salah.';
-          });
         } else {
-          String messageFromServer = "Gagal login.";
-          if (responseData != null && responseData.containsKey('message')) {
-            messageFromServer = responseData['message'];
-          } else if (response.body.isNotEmpty) {
-            messageFromServer =
-                response.body.length > 100
-                    ? "${response.body.substring(0, 100)}..."
-                    : response.body;
-          }
           setState(() {
-            apiErrorMessage =
-                '$messageFromServer (Status: ${response.statusCode})';
+            apiErrorMessage = 'Respons login tidak lengkap dari server.';
           });
         }
-      } on SocketException {
-        hideLoadingDialog();
-        if (mounted) {
+      } else {
+        String errorMessage =
+            response['message'] ?? 'Terjadi kesalahan tidak diketahui.';
+        if (errorMessage.toLowerCase().contains('verifikasi') || 
+            errorMessage.toLowerCase().contains('unverified')) {
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (BuildContext context) {
+              return Dialog(
+                backgroundColor: Colors.transparent,
+                insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    // 1. Kontainer Putih (Isi Popup)
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const SizedBox(height: 15),
+                          const Icon(
+                            Icons.mark_email_read_outlined,
+                            color: Color(0xFFF46A06),
+                            size: 48,
+                          ),
+                          const SizedBox(height: 15),
+                          const Text(
+                            'Email Belum Diverifikasi',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            (errorMessage.length > 10 && errorMessage.length < 100) 
+                              ? errorMessage 
+                              : 'Silakan cek email Anda untuk melakukan verifikasi akun.',
+                            style: const TextStyle(fontSize: 16),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
+                    ),
+                    
+                    Positioned(
+                      top: -15.0,
+                      right: -15.0,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2)
+                          ),
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.black54,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        } else {
           setState(() {
-            apiErrorMessage = 'Tidak ada koneksi internet.';
+            apiErrorMessage = errorMessage;
           });
         }
-      } on TimeoutException {
-        hideLoadingDialog();
-        if (mounted) {
-          setState(() {
-            apiErrorMessage = 'Koneksi ke server terputus atau terlalu lama.';
-          });
-        }
-      } on http.ClientException {
-        hideLoadingDialog();
-        if (mounted) {
-          setState(() {
-            apiErrorMessage = 'Tidak dapat terhubung ke server.';
-          });
-        }
-      } on FormatException {
-        hideLoadingDialog();
-        if (mounted) {
-          setState(() {
-            apiErrorMessage = 'Format respons server tidak valid.';
-          });
-        }
-      } catch (e) {
-        hideLoadingDialog();
-        if (mounted) {
-          setState(() {
-            apiErrorMessage = 'Terjadi kesalahan: ${e.toString()}';
-          });
-        }
-        debugPrint('Error saat login: $e');
       }
     } else {
       setState(() {
@@ -216,6 +222,30 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
   }
+
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+
+  // Tangkap argumen dari deep link (jika ada)
+  final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+  if (args?['verified'] == true) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            '✅ Email kamu berhasil diverifikasi! Silakan login untuk melanjutkan.',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Color(0xFFF46A06),
+          duration: Duration(seconds: 4),
+        ),
+      );
+    });
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {

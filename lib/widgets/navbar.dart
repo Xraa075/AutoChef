@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:autochef/views/home/home_screen.dart';
 import 'package:autochef/views/profile/profile_screen.dart';
 import 'package:autochef/views/input_ingredients/input_screen.dart';
+import 'package:autochef/views/meal_plan/mealplanner.dart';
+import 'package:autochef/views/profile/favorite_screen.dart';
 
 class Navbar extends StatefulWidget {
   const Navbar({super.key});
@@ -13,7 +15,14 @@ class Navbar extends StatefulWidget {
 
 class NavbarState extends State<Navbar> {
   int selectedIndex = 0;
-  final List<Widget> pages = [HomeScreen(), InputRecipe(), ProfileScreen()];
+
+  // PERBAIKAN 1: Urutan pages ditukar (FavoriteScreen jadi ke-3, ProfileScreen jadi ke-4)
+  final List<Widget> pages = [
+    HomeScreen(),
+    const MealPlannerScreen(),
+    const FavoriteScreen(), 
+    ProfileScreen(),
+  ];
 
   void onNavTapped(int index) {
     setState(() {
@@ -21,9 +30,7 @@ class NavbarState extends State<Navbar> {
     });
   }
 
-
   Future<bool> _onWillPop() async {
-    // Menampilkan konfirmasi keluar di setiap halaman
     return await _showExitConfirmation();
   }
 
@@ -131,12 +138,21 @@ class NavbarState extends State<Navbar> {
                 ),
                 NavigationDestination(
                   icon: Icon(
-                    Icons.search_rounded,
+                    Icons.calendar_month_outlined,
                     size: 30,
                     color: Colors.white,
                   ),
                   selectedIcon: Icon(
-                    Icons.search_rounded,
+                    Icons.calendar_month_outlined,
+                    size: 30,
+                    color: Color(0xFFF46A06),
+                  ),
+                  label: '',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.favorite, size: 30, color: Colors.white),
+                  selectedIcon: Icon(
+                    Icons.favorite,
                     size: 30,
                     color: Color(0xFFF46A06),
                   ),

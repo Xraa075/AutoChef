@@ -25,19 +25,45 @@ class Recipe {
     required this.karbohidrat,
   });
 
+  static int _parseToInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) return int.tryParse(value) ?? 0;
+
+    return int.tryParse(value.toString()) ?? 0;
+  }
+
   factory Recipe.fromJson(Map<String, dynamic> json) {
     return Recipe(
-      id: json['id'],
-      namaResep: json['nama_resep'],
-      bahan: json['bahan'],
-      steps: json['steps'],
-      gambar: json['gambar'],
-      kategori: json['kategori'],
-      negara: json['negara'],
-      waktu: json['waktu'],
-      kalori: json['kalori'],
-      protein: json['protein'],
-      karbohidrat: json['karbohidrat'],
+      id: _parseToInt(json['id']),
+      namaResep: json['nama_resep'] ?? '',
+      bahan: json['bahan'] ?? '',
+      steps: json['steps'] ?? '',
+      gambar: json['url_gambar'] ?? json['gambar'] ?? '', 
+      
+      kategori: json['kategori'] ?? '',
+      negara: json['negara'] ?? '',
+      waktu: _parseToInt(json['waktu_masak'] ?? json['waktu']), 
+      
+      kalori: _parseToInt(json['kalori']),
+      protein: _parseToInt(json['protein']),
+      karbohidrat: _parseToInt(json['karbohidrat']),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'nama_resep': namaResep,
+      'gambar': gambar,
+      'negara': negara,
+      'waktu': waktu,
+      'kalori': kalori,
+      'protein': protein,
+      'karbohidrat': karbohidrat,
+      'bahan': bahan,
+      'steps': steps,
+    };
   }
 }
