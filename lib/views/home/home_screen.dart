@@ -14,6 +14,7 @@ import 'dart:async';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:autochef/views/filter_screen/filter_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -372,44 +373,88 @@ class _HomeScreenState extends State<HomeScreen> {
             color: const Color(0xFFF46A06),
             child: ListView(
               children: [
-                // const Padding(
-                //   padding: EdgeInsets.symmetric(horizontal: 20),
-                //   child: Text(
-                //     "Kategori",
-                //     style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                //   ),
-                // ),
-                // const SizedBox(height: 15),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //   children: [
-                //     CategoryItemTap(
-                //       title: "Snacks",
-                //       kategori: "snack",
-                //       imagePath: "lib/assets/images/snacks.jpg",
-                //     ),
-                //     CategoryItemTap(
-                //       title: "Meal",
-                //       kategori: "meal",
-                //       imagePath: "lib/assets/images/meal.jpg",
-                //     ),
-                //     CategoryItemTap(
-                //       title: "Vegan",
-                //       kategori: "vegan",
-                //       imagePath: "lib/assets/images/vegan.jpg",
-                //     ),
-                //     CategoryItemTap(
-                //       title: "Dessert",
-                //       kategori: "dessert",
-                //       imagePath: "lib/assets/images/dessert.jpg",
-                //     ),
-                //     CategoryItemTap(
-                //       title: "Drinks",
-                //       kategori: "drink",
-                //       imagePath: "lib/assets/images/drinks.jpg",
-                //     ),
-                //   ],
-                // ),
+               const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    "Kategori",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                  ),
+                ),
+                const SizedBox(height: 15),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              for (var category in [
+                                "Olahan Daging",
+                                "Olahan Ayam",
+                                "Makanan Laut",
+                                "Menu Harian",
+                                "Cemilan",
+                              ])
+                                Container(
+                                  margin: const EdgeInsets.only(right: 10),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey.shade400),
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: Colors.transparent,
+                                  ),
+                                  child: Text(
+                                    category,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: 30, 
+                        width: 1.5, 
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                        color: Colors.grey.shade400,
+                      ),
+                      
+                      const SizedBox(width: 5),
+
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const FilterScreen(),
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(15),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade400),
+                            borderRadius: BorderRadius.circular(15),
+                            color: Colors.transparent,
+                          ),
+                          child: const Icon(
+                            Icons.tune_rounded, 
+                            color: Colors.black87,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 10),
                 const Padding(
                   padding: EdgeInsets.all(20.0),

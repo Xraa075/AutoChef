@@ -7,7 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:autochef/models/recipe_detail_model.dart';
 
 class ApiRekomendasi {
-  static const String _baseUrl = "http://100.120.18.38:8080/api";
+  // static const String _baseUrl = "http://100.120.18.38:8080/api";
+  static const String _baseUrl = 'https://backend.autochef.site/api';
 
   static Future<List<Recipe>> fetchRekomendasi() async {
     try {

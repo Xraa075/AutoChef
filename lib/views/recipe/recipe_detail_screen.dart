@@ -21,6 +21,7 @@ class DetailMakanan extends StatefulWidget {
 
 class _DetailMakananState extends State<DetailMakanan> {
   late Future<DetailModel.RecipeDetail> _futureRecipeDetail;
+  int _selectedTabIndex = 0; // 0 = Bahan Bahan, 1 = Nutrisi
 
   @override
   void initState() {
@@ -42,6 +43,81 @@ class _DetailMakananState extends State<DetailMakanan> {
     } catch (e) {
       debugPrint('Error when logging recipe view: $e');
     }
+  }
+
+  // Widget baru untuk membuat tombol Tab "Bahan Bahan" & "Nutrisi"
+  Widget _buildTabToggle() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 20),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade400),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedTabIndex = 0;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: _selectedTabIndex == 0
+                      ? const Color(0xFFFBC72A)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Center(
+                  child: Text(
+                    "Bahan Bahan",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: _selectedTabIndex == 0
+                          ? FontWeight.w500
+                          : FontWeight.normal,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedTabIndex = 1;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: _selectedTabIndex == 1
+                      ? const Color(0xFFFBC72A)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Center(
+                  child: Text(
+                    "Nutrisi",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                      fontWeight: _selectedTabIndex == 1
+                          ? FontWeight.w500
+                          : FontWeight.normal,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -77,14 +153,14 @@ class _DetailMakananState extends State<DetailMakanan> {
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.grey.withOpacity(0.5),
+                color: Colors.white.withOpacity(0.5), // Disesuaikan agar icon panah lebih jelas
               ),
               child: IconButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
                 icon: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
+                  Icons.arrow_back,
                   color: Colors.black,
                   size: 25,
                 ),
@@ -119,12 +195,7 @@ class _DetailMakananState extends State<DetailMakanan> {
                               widget.recipe.namaResep,
                               widget.recipe.negara,
                             ),
-                             RecipeInfo(
-                              waktu: widget.recipe.waktu,
-                              kalori: widget.recipe.kalori,
-                              protein: widget.recipe.protein,
-                              karbohidrat: widget.recipe.karbohidrat,
-                            ),
+                            _buildTabToggle(), // Menampilkan tab saat loading
                             const Center(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(vertical: 40.0),
@@ -137,7 +208,7 @@ class _DetailMakananState extends State<DetailMakanan> {
                         );
                       }
                       if (snapshot.hasError || !snapshot.hasData) {
-                         return ListView(
+                        return ListView(
                           controller: scrollController,
                           children: [
                             _buildDragHandle(),
@@ -146,6 +217,7 @@ class _DetailMakananState extends State<DetailMakanan> {
                               widget.recipe.namaResep,
                               widget.recipe.negara,
                             ),
+                            _buildTabToggle(), // Menampilkan tab saat error
                             Center(
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -161,9 +233,11 @@ class _DetailMakananState extends State<DetailMakanan> {
                           ],
                         );
                       }
+                      
                       final detail = snapshot.data!;
                       return ListView(
                         controller: scrollController,
+                        padding: const EdgeInsets.only(bottom: 20),
                         children: [
                           _buildDragHandle(),
                           _buildHeader(
@@ -171,21 +245,24 @@ class _DetailMakananState extends State<DetailMakanan> {
                             detail.namaResep,
                             detail.negara,
                           ),
-                          const SizedBox(height: 20),
-                          RecipeInfo(
-                            waktu: detail.waktuMasak,
-                            kalori: 0, 
-                            protein: 0, 
-                            karbohidrat: 0, 
-                          ),
-                          const SizedBox(height: 20),
-                          Ingredients(
-                            ingredients: detail.bahan,
-                          ),
-                          const SizedBox(height: 20),
-                          Steps(
-                            steps: detail.langkahLangkah,
-                          ),
+                          _buildTabToggle(), // Memanggil widget tab
+                          
+                          // Logika pergantian tampilan berdasarkan tab yang dipilih
+                          if (_selectedTabIndex == 0) ...[
+                            // Konten Tab 1: Bahan Bahan & Langkah-langkah
+                            Ingredients(ingredients: detail.bahan),
+                            const SizedBox(height: 20),
+                            Steps(steps: detail.langkahLangkah),
+                          ] else ...[
+                            // Konten Tab 2: Nutrisi (Waktu, Kalori, Protein, Karbohidrat)
+                            const SizedBox(height: 10),
+                            RecipeInfo(
+                              waktu: detail.waktuMasak,
+                              kalori: 0, 
+                              protein: 0, 
+                              karbohidrat: 0, 
+                            ),
+                          ]
                         ],
                       );
                     },
@@ -202,61 +279,66 @@ class _DetailMakananState extends State<DetailMakanan> {
   Widget _buildDragHandle() {
     return Container(
       alignment: Alignment.center,
-      margin: const EdgeInsets.only(bottom: 10, top: 10),
+      margin: const EdgeInsets.only(bottom: 15, top: 10),
       child: Container(
         width: 50,
         height: 5,
         decoration: BoxDecoration(
-          color: Colors.grey,
+          color: Colors.grey.shade400,
           borderRadius: BorderRadius.circular(10),
         ),
       ),
     );
   }
 
-
   Widget _buildHeader(BuildContext context, String namaResep, String negara) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Text(
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
                 namaResep,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.calendar_month_outlined,
-                color: Color(0xFFF46A06),
-                size: 32,
+              /*
+              const SizedBox(height: 4),
+              Text(
+                negara,
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              // MEMANGGIL CLASS BARU DISINI
-              onPressed: () {
-                MealPlanPopup.show(
-                  context, 
-                  recipeId: widget.recipe.id, 
-                  recipeName: widget.recipe.namaResep
-                );
-              },
-            ),
-          ],
+              */
+            ],
+          ),
         ),
-        const SizedBox(height: 6),
-        Text(
-          negara,
-          style: TextStyle(
-            fontSize: 18,
-            color: const Color.fromARGB(121, 0, 0, 0),
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.5,
+        Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFE599),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            icon: const Icon(
+              Icons.event_note,
+              color: Colors.black,
+              size: 26,
+            ),
+            onPressed: () {
+              MealPlanPopup.show(
+                context, 
+                recipeId: widget.recipe.id, 
+                recipeName: widget.recipe.namaResep
+              );
+            },
           ),
         ),
       ],
