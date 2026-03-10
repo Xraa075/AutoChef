@@ -397,21 +397,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                 "Menu Harian",
                                 "Cemilan",
                               ])
-                                Container(
-                                  margin: const EdgeInsets.only(right: 10),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 24, vertical: 12),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey.shade400),
-                                    borderRadius: BorderRadius.circular(15),
-                                    color: Colors.transparent,
-                                  ),
-                                  child: Text(
-                                    category,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black87,
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => RekomendationRecipe(kategori: category),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 10),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24, vertical: 12),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.grey.shade400),
+                                      borderRadius: BorderRadius.circular(15),
+                                      color: Colors.transparent,
+                                    ),
+                                    child: Text(
+                                      category,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -419,39 +429,37 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      Container(
-                        height: 30, 
-                        width: 1.5, 
-                        margin: const EdgeInsets.symmetric(horizontal: 5),
-                        color: Colors.grey.shade400,
-                      ),
-                      
-                      const SizedBox(width: 5),
-
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const FilterScreen(),
-                            ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(15),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade400),
-                            borderRadius: BorderRadius.circular(15),
-                            color: Colors.transparent,
-                          ),
-                          child: const Icon(
-                            Icons.tune_rounded, 
-                            color: Colors.black87,
-                            size: 20,
-                          ),
-                        ),
-                      ),
+                      // Container(
+                      //   height: 30, 
+                      //   width: 1.5, 
+                      //   margin: const EdgeInsets.symmetric(horizontal: 5),
+                      //   color: Colors.grey.shade400,
+                      // ),
+                      // const SizedBox(width: 5),
+                      // InkWell(
+                      //   onTap: () {
+                      //     Navigator.push(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //         builder: (context) => const FilterScreen(),
+                      //       ),
+                      //     );
+                      //   },
+                      //   borderRadius: BorderRadius.circular(15),
+                      //   child: Container(
+                      //     padding: const EdgeInsets.all(10),
+                      //     decoration: BoxDecoration(
+                      //       border: Border.all(color: Colors.grey.shade400),
+                      //       borderRadius: BorderRadius.circular(15),
+                      //       color: Colors.transparent,
+                      //     ),
+                      //     child: const Icon(
+                      //       Icons.tune_rounded, 
+                      //       color: Colors.black87,
+                      //       size: 20,
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

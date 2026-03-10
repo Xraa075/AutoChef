@@ -9,6 +9,7 @@ import 'package:autochef/services/api_service.dart';
 import 'package:autochef/services/kategori_service.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
 import 'package:autochef/services/search_service.dart';
+import 'package:autochef/services/api_categories.dart';
 
 class RekomendationRecipe extends StatefulWidget {
   final List<String>? bahan;
@@ -62,7 +63,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
       } else if (widget.bahan != null && widget.bahan!.isNotEmpty) {
         response = await apiService.searchRecipes(widget.bahan!);
       } else if (widget.kategori != null && widget.kategori!.isNotEmpty) {
-        response = await kategoriService.getRecipesByKategori(widget.kategori!);
+        response = await ApiCategories.fetchRecipesByCategory(widget.kategori!);
       } else if (widget.namaResep != null && widget.namaResep!.isNotEmpty) {
         response = await SearchService.searchResep(widget.namaResep!);
       } else {
