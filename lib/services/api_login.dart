@@ -4,8 +4,8 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
-// const String _baseUrl = 'http://100.120.18.38:8080/api';
-const String _baseUrl = 'https://backend.autochef.site/api';
+const String _baseUrl = 'http://100.120.18.38:8080/api';
+// const String _baseUrl = 'https://backend.autochef.site/api';
 
 Future<Map<String, dynamic>> register(
     String name, String email, String password, String confirmPassword) async {

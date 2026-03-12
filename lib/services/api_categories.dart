@@ -10,17 +10,17 @@ class ApiCategories {
   static int _getCategoryId(String categoryName) {
     switch (categoryName) {
       case "Olahan Daging":
-        return 1;
+        return 7;
       case "Olahan Ayam":
         return 2;
       case "Makanan Laut":
-        return 3;
-      case "Menu Harian":
         return 4;
-      case "Cemilan":
+      case "Menu Harian":
         return 5;
+      case "Cemilan":
+        return 6;
       default:
-        return 1;
+        return 2;
     }
   }
 
@@ -37,13 +37,19 @@ class ApiCategories {
 
       final Map<String, String> headers = {'Accept': 'application/json'};
 
+      debugPrint('Status isLoggedIn: $isLoggedIn');
+      
       if (isLoggedIn && token != null) {
         headers['Authorization'] = 'Bearer $token';
+        debugPrint('Token dikirim: Ya (panjang token: ${token.length} karakter)');
+      } else {
+        debugPrint('Peringatan: Token TIDAK dikirim ke backend!');
       }
 
       final response = await http.get(Uri.parse(requestUrl), headers: headers);
 
       debugPrint('Category response code: ${response.statusCode}');
+      debugPrint('Category response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);

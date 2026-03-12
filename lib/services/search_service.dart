@@ -7,8 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SearchService {
   static Future<List<Recipe>> searchResep(String query) async {
     final encodedQuery = Uri.encodeComponent(query);
-    // final url = Uri.parse("http://100.120.18.38:8080/api/recipes?search=$encodedQuery");
-    final url = Uri.parse("https://backend.autochef.site/api/recipes?search=$encodedQuery");
+    final url = Uri.parse("http://100.120.18.38:8080/api/recipes?search=$encodedQuery");
+    // final url = Uri.parse("https://backend.autochef.site/api/recipes?search=$encodedQuery");
 
     debugPrint('Mencari resep (GET) ke: $url');
 

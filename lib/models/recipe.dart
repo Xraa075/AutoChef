@@ -42,7 +42,7 @@ class Recipe {
       steps: json['steps'] ?? '',
       gambar: json['url_gambar'] ?? json['gambar'] ?? '', 
       
-      kategori: json['kategori'] ?? '',
+      kategori: json['kategori']?.toString() ?? '',
       negara: json['negara'] ?? '',
       waktu: _parseToInt(json['waktu_masak'] ?? json['waktu']), 
       
