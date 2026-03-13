@@ -89,7 +89,7 @@ class MealPlanService {
                 gambar: recipeJson['url_gambar'],
                 waktu: recipeJson['waktu_masak'],
                 negara: recipeJson['negara'] ?? '',
-                kategori: recipeJson['kategori'] ?? '',
+                kategori: recipeJson['kategori']?.toString() ?? '',
                 kalori: 0,
                 protein: 0,
                 karbohidrat: 0,

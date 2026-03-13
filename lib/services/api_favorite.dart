@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiFavorite {
-  // static const String _baseUrl = 'http://100.120.18.38:8080/api';
-  static const String _baseUrl = 'https://backend.autochef.site/api';
+  static const String _baseUrl = 'http://100.120.18.38:8080/api';
+  // static const String _baseUrl = 'https://backend.autochef.site/api';
 
   // Get All Favorites
   static Future<List<dynamic>> getAllFavorites(String token) async {
