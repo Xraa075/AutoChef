@@ -13,6 +13,7 @@ class RecipeDetail {
   final String negara;
   final List<Bahan> bahan;
   final List<Langkah> langkahLangkah;
+  final TotalNutrisi? totalNutrisi;
 
   RecipeDetail({
     required this.id,
@@ -23,6 +24,7 @@ class RecipeDetail {
     required this.negara,
     required this.bahan,
     required this.langkahLangkah,
+    this.totalNutrisi,
   });
 
   factory RecipeDetail.fromJson(Map<String, dynamic> json) => RecipeDetail(
@@ -35,7 +37,11 @@ class RecipeDetail {
         bahan: List<Bahan>.from(json["bahan"].map((x) => Bahan.fromJson(x))),
         langkahLangkah: List<Langkah>.from(
             json["langkah_langkah"].map((x) => Langkah.fromJson(x))),
+        totalNutrisi: json["total_nutrisi"] != null 
+            ? TotalNutrisi.fromJson(json["total_nutrisi"]) 
+            : null,
       );
+      
 }
 
 class Bahan {
@@ -87,4 +93,30 @@ class Langkah {
         urutan: json["urutan"],
         instruksi: json["instruksi"],
       );
+}
+
+class TotalNutrisi {
+  final num kaloriKcal;
+  final num proteinGram;
+  final num karbohidratGram;
+  final num lemakGram;
+  final num seratGram;
+
+  TotalNutrisi({
+    required this.kaloriKcal,
+    required this.proteinGram,
+    required this.karbohidratGram,
+    required this.lemakGram,
+    required this.seratGram,
+  });
+
+  factory TotalNutrisi.fromJson(Map<String, dynamic> json) {
+    return TotalNutrisi(
+      kaloriKcal: json['kalori_kcal'] ?? 0,
+      proteinGram: json['protein_gram'] ?? 0,
+      karbohidratGram: json['karbohidrat_gram'] ?? 0,
+      lemakGram: json['lemak_gram'] ?? 0,
+      seratGram: json['serat_gram'] ?? 0,
+    );
+  }
 }

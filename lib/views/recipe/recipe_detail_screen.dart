@@ -258,9 +258,9 @@ class _DetailMakananState extends State<DetailMakanan> {
                             const SizedBox(height: 10),
                             RecipeInfo(
                               waktu: detail.waktuMasak,
-                              kalori: 0, 
-                              protein: 0, 
-                              karbohidrat: 0, 
+                              kalori: detail.totalNutrisi?.kaloriKcal ?? 0, 
+                              protein: detail.totalNutrisi?.proteinGram ?? 0, 
+                              karbohidrat: detail.totalNutrisi?.karbohidratGram ?? 0, 
                             ),
                           ]
                         ],

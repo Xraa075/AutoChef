@@ -3,9 +3,9 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class RecipeInfo extends StatelessWidget {
   final int waktu;
-  final int kalori;
-  final int protein;
-  final int karbohidrat;
+  final num kalori;
+  final num protein;
+  final num karbohidrat;
 
   const RecipeInfo({
     super.key,
