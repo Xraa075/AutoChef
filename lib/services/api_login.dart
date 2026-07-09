@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 const String _baseUrl = 'http://100.120.18.38:8080/api';
 // const String _baseUrl = 'https://backend.autochef.site/api';
@@ -203,5 +204,80 @@ Future<Map<String, dynamic>> getUserProfile(String token) async {
     return {'status': 'error', 'message': 'Koneksi ke server timeout.'};
   } catch (e) {
     return {'status': 'error', 'message': 'Terjadi kesalahan: ${e.toString()}'};
+  }
+}
+
+/// Login menggunakan akun Google.
+/// Menggunakan Google Sign-In SDK untuk mendapatkan ID Token,
+/// kemudian mengirimnya ke backend untuk verifikasi.
+Future<Map<String, dynamic>> loginWithGoogle() async {
+  try {
+    final GoogleSignIn googleSignIn = GoogleSignIn(
+      serverClientId:
+          '149279807205-kcbc6uuaq75ou7fhkqn91g0er936ritb.apps.googleusercontent.com',
+    );
+
+    // Tampilkan dialog Google Sign-In
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+    if (googleUser == null) {
+      return {'status': 'cancelled', 'message': 'Login dibatalkan.'};
+    }
+
+    // Dapatkan authentication details (ID Token)
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+    final String? idToken = googleAuth.idToken;
+
+    if (idToken == null) {
+      return {
+        'status': 'error',
+        'message': 'Gagal mendapatkan token dari Google.'
+      };
+    }
+
+    debugPrint('Google ID Token didapatkan, mengirim ke backend...');
+
+    // Kirim ID Token ke backend
+    var url = Uri.parse('$_baseUrl/auth/google');
+    var response = await http.post(
+      url,
+      headers: {'Accept': 'application/json'},
+      body: {'id_token': idToken},
+    ).timeout(const Duration(seconds: 20));
+
+    Map<String, dynamic>? responseData;
+    if (response.body.isNotEmpty) {
+      try {
+        responseData = jsonDecode(response.body);
+      } catch (e) {
+        return {
+          'status': 'error',
+          'message': 'Format respons dari server tidak valid.'
+        };
+      }
+    }
+
+    if (response.statusCode == 200) {
+      return {'status': 'success', 'data': responseData};
+    } else {
+      return {
+        'status': 'error',
+        'message': responseData?['message'] ?? 'Gagal login dengan Google.'
+      };
+    }
+  } on SocketException {
+    return {'status': 'error', 'message': 'Tidak ada koneksi internet.'};
+  } on TimeoutException {
+    return {
+      'status': 'error',
+      'message': 'Koneksi ke server terputus atau terlalu lama.'
+    };
+  } catch (e) {
+    debugPrint('Google Sign-In error: ${e.toString()}');
+    return {
+      'status': 'error',
+      'message': 'Gagal login dengan Google: ${e.toString()}'
+    };
   }
 }

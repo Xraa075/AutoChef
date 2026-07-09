@@ -33,7 +33,7 @@ class RecipeDetail {
         urlGambar: json["url_gambar"],
         waktuMasak: json["waktu_masak"],
         kategori: json["kategori"]?.toString(),
-        negara: json["negara"],
+        negara: json["negara"]?.toString() ?? '',
         bahan: List<Bahan>.from(json["bahan"].map((x) => Bahan.fromJson(x))),
         langkahLangkah: List<Langkah>.from(
             json["langkah_langkah"].map((x) => Langkah.fromJson(x))),
