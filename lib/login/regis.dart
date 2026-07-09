@@ -1,6 +1,8 @@
 // (MODIFIKASI) regis.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:autochef/widgets/navbar.dart';
 import 'login.dart';
 import '../services/api_login.dart';
 
@@ -24,6 +26,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isGoogleLoading = false;
 
   final emailRegex = RegExp(
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
@@ -108,6 +111,63 @@ class _RegisterPageState extends State<RegisterPage> {
       return 'Password dan Konfirmasi Password tidak cocok';
     }
     return null;
+  }
+
+  Future<void> loginWithGoogleUser() async {
+    setState(() {
+      apiErrorMessage = null;
+      _isGoogleLoading = true;
+    });
+
+    final response = await loginWithGoogle();
+
+    if (!mounted) return;
+    setState(() {
+      _isGoogleLoading = false;
+    });
+
+    if (response['status'] == 'cancelled') {
+      return;
+    }
+
+    if (response['status'] == 'success') {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      Map<String, dynamic>? responseData = response['data'];
+      String? token = responseData?['access_token'];
+      Map<String, dynamic>? userDataFromApi = responseData?['user'];
+
+      if (token != null) {
+        await prefs.setBool('hasLoggedAsUser', true);
+        await prefs.setString('token', token);
+        await prefs.setString(
+          'username',
+          userDataFromApi?['name'] ?? 'Pengguna',
+        );
+        await prefs.setString('email', userDataFromApi?['email'] ?? '');
+        await prefs.setString(
+          'userImage',
+          userDataFromApi?['profile_photo_url'] ??
+              userDataFromApi?['profile_photo_path'] ??
+              'lib/assets/images/avatar1.png',
+        );
+
+        if (mounted) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const Navbar()),
+            (route) => false,
+          );
+        }
+      } else {
+        setState(() {
+          apiErrorMessage = 'Respons login tidak lengkap dari server.';
+        });
+      }
+    } else {
+      setState(() {
+        apiErrorMessage = response['message'] ?? 'Gagal daftar dengan Google.';
+      });
+    }
   }
 
   Future<void> registerUser(BuildContext context) async {
@@ -347,6 +407,74 @@ class _RegisterPageState extends State<RegisterPage> {
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // --- Divider "atau" ---
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Divider(
+                                  color: Colors.grey[300],
+                                  thickness: 1,
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 12),
+                                child: Text(
+                                  'atau',
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Divider(
+                                  color: Colors.grey[300],
+                                  thickness: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          // --- Tombol Google Sign-In ---
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                side: const BorderSide(color: Colors.grey),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                backgroundColor: Colors.white,
+                              ),
+                              onPressed: _isGoogleLoading ? null : loginWithGoogleUser,
+                              icon: _isGoogleLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Color(0xFFF46A06),
+                                      ),
+                                    )
+                                  : Image.network(
+                                      'https://www.google.com/favicon.ico',
+                                      height: 20,
+                                      width: 20,
+                                      errorBuilder: (context, error, stackTrace) =>
+                                          const Icon(Icons.g_mobiledata, size: 24, color: Colors.red),
+                                    ),
+                              label: Text(
+                                _isGoogleLoading ? 'Menghubungkan...' : 'Daftar dengan Google',
+                                style: const TextStyle(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 15,
                                 ),
                               ),
                             ),
