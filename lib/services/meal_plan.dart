@@ -46,6 +46,7 @@ class IngredientDetail {
 
 class MealPlanService {
   static const String _baseUrl = "http://100.120.18.38:8080/api";
+  // static const String _baseUrl = "https://backend.autochef.site/api";
 
   static Future<Map<String, List<Recipe>>> getMealPlans() async {
     try {
@@ -88,7 +89,7 @@ class MealPlanService {
                 gambar: recipeJson['url_gambar'],
                 waktu: recipeJson['waktu_masak'],
                 negara: recipeJson['negara'] ?? '',
-                kategori: recipeJson['kategori'] ?? '',
+                kategori: recipeJson['kategori']?.toString() ?? '',
                 kalori: 0,
                 protein: 0,
                 karbohidrat: 0,

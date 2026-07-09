@@ -3,7 +3,7 @@ import 'package:autochef/models/recipe.dart';
 import 'package:autochef/widgets/header.dart';
 import 'package:autochef/widgets/category_item.dart';
 import 'package:autochef/services/search_service.dart';
-import 'package:autochef/widgets/healthy_food_item.dart';
+import 'package:autochef/widgets/small_card.dart';
 import 'package:autochef/services/api_profile.dart';
 import 'package:autochef/services/api_rekomendation.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
@@ -14,6 +14,7 @@ import 'dart:async';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:autochef/views/filter_screen/filter_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,6 +34,9 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _speechEnabled = false;
   bool _isListening = false;
   late TextEditingController _searchController;
+  
+  // OPTIMASI 1: Cache SharedPreferences agar tidak getInstance berulang kali
+  SharedPreferences? _prefs;
 
   @override
   void initState() {
@@ -96,6 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
     await _fetchInitialData();
   }
 
+  // OPTIMASI 2: Menjalankan pemanggilan data secara paralel dengan Future.wait
   Future<void> _fetchInitialData() async {
     if (!mounted) return;
     setState(() {
@@ -110,8 +115,20 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       return;
     }
-    await _updateUserProfile();
-    await getRekomendasi();
+
+    _prefs ??= await SharedPreferences.getInstance();
+
+    // Berjalan bersamaan di background, untuk mengurangi durasi penundaan UI Thread
+    await Future.wait([
+      _updateUserProfile(),
+      getRekomendasi(),
+    ]);
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _updateUserProfile() async {
@@ -119,12 +136,9 @@ class _HomeScreenState extends State<HomeScreen> {
       final result = await ApiProfile.getProfile();
       if (result['success'] == true && result['data'] != null) {
         final data = result['data'];
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('name', data['name'] ?? 'Pengguna'); 
-        await prefs.setString('email', data['email'] ?? '');
-        if (mounted) {
-          setState(() {}); 
-        }
+        _prefs ??= await SharedPreferences.getInstance();
+        await _prefs!.setString('name', data['name'] ?? 'Pengguna'); 
+        await _prefs!.setString('email', data['email'] ?? '');
       }
     } catch (e) {
       debugPrint("Gagal update user profile di home: $e");
@@ -138,17 +152,11 @@ class _HomeScreenState extends State<HomeScreen> {
       debugPrint('Received ${data.length} recommendations');
 
       if (mounted) {
-        setState(() {
-          _rekomendasi = data;
-          _isLoading = false;
-        });
+        _rekomendasi = data;
       }
     } catch (e) {
       debugPrint('Error getting recommendations: $e');
       if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
         _showPopup("Gagal memuat rekomendasi");
       }
     }
@@ -249,19 +257,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget buildShimmerGrid() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 6,
+  // OPTIMASI 3: Memberikan parameter Sliver agar serasi dengan CustomScrollView
+  Widget buildShimmerGridSliver() {
+    return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 0.65,
+      sliver: SliverGrid(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 0.65,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => buildShimmerItem(),
+          childCount: 6,
+        ),
       ),
-      itemBuilder: (context, index) => buildShimmerItem(),
     );
   }
 
@@ -319,7 +330,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderSide: BorderSide.none,
                       ),
                     ),
-                    // onSubmitted: (_) => handleSearch(context),
                     onSubmitted: (value) {
                       handleSearch(context);
                     },
@@ -359,7 +369,6 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: Container(
           margin: const EdgeInsets.only(top: 10),
-          padding: const EdgeInsets.fromLTRB(0, 20, 0, 20),
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
@@ -367,118 +376,132 @@ class _HomeScreenState extends State<HomeScreen> {
               topRight: Radius.circular(28),
             ),
           ),
+          // OPTIMASI 4: Migrasi total dari ListView mandiri ke CustomScrollView (Slivers)
           child: RefreshIndicator(
             onRefresh: _fetchInitialData,
             color: const Color(0xFFF46A06),
-            child: ListView(
-              children: [
-                // const Padding(
-                //   padding: EdgeInsets.symmetric(horizontal: 20),
-                //   child: Text(
-                //     "Kategori",
-                //     style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                //   ),
-                // ),
-                // const SizedBox(height: 15),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                //   children: [
-                //     CategoryItemTap(
-                //       title: "Snacks",
-                //       kategori: "snack",
-                //       imagePath: "lib/assets/images/snacks.jpg",
-                //     ),
-                //     CategoryItemTap(
-                //       title: "Meal",
-                //       kategori: "meal",
-                //       imagePath: "lib/assets/images/meal.jpg",
-                //     ),
-                //     CategoryItemTap(
-                //       title: "Vegan",
-                //       kategori: "vegan",
-                //       imagePath: "lib/assets/images/vegan.jpg",
-                //     ),
-                //     CategoryItemTap(
-                //       title: "Dessert",
-                //       kategori: "dessert",
-                //       imagePath: "lib/assets/images/dessert.jpg",
-                //     ),
-                //     CategoryItemTap(
-                //       title: "Drinks",
-                //       kategori: "drink",
-                //       imagePath: "lib/assets/images/drinks.jpg",
-                //     ),
-                //   ],
-                // ),
-                const SizedBox(height: 10),
-                const Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Text(
-                    "Rekomendasi",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                  ),
-                ),
-                _isLoading
-                    ? buildShimmerGrid()
-                    : _rekomendasi.isEmpty
-                        ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 50.0,
-                                horizontal: 20.0,
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.ramen_dining_outlined,
-                                    size: 60,
-                                    color: Colors.grey.shade400,
-                                  ),
-                                  const SizedBox(height: 10),
-                                  const Text(
-                                    "Belum ada rekomendasi saat ini.",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey,
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Kategori",
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 15),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              for (var category in [
+                                "Olahan Daging",
+                                "Olahan Ayam",
+                                "Makanan Laut",
+                                "Menu Harian",
+                                "Cemilan",
+                              ])
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => RekomendationRecipe(kategori: category),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 10),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 24, vertical: 12),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.grey.shade400),
+                                      borderRadius: BorderRadius.circular(15),
+                                      color: Colors.transparent,
+                                    ),
+                                    child: Text(
+                                      category,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black87,
+                                      ),
                                     ),
                                   ),
-                                ],
+                                ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20.0),
+                          child: Text(
+                            "Rekomendasi",
+                            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                
+                // Kondisi Grid Rekomendasi diubah menjadi bagian dari struktur Slivers
+                _isLoading
+                    ? buildShimmerGridSliver()
+                    : _rekomendasi.isEmpty
+                        ? SliverToBoxAdapter(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 50.0, horizontal: 20.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.ramen_dining_outlined, size: 60, color: Colors.grey.shade400),
+                                    const SizedBox(height: 10),
+                                    const Text(
+                                      "Belum ada rekomendasi saat ini.",
+                                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           )
-                        : GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
+                        : SliverPadding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
-                            itemCount: _rekomendasi.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                              childAspectRatio: 0.65,
-                            ),
-                            itemBuilder: (context, index) {
-                              final resep = _rekomendasi[index];
-                              return HealthyFoodItem(
-                                recipe: resep,
-                                onTap: () async {
-                                  final result = await Navigator.push<bool>(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder:
-                                          (context) => DetailMakanan(recipe: resep),
-                                    ),
+                            sliver: SliverGrid(
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                                childAspectRatio: 0.65,
+                              ),
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  final resep = _rekomendasi[index];
+                                  return HealthyFoodItem(
+                                    recipe: resep,
+                                    onTap: () async {
+                                      final result = await Navigator.push<bool>(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => DetailMakanan(recipe: resep),
+                                        ),
+                                      );
+                                      if (result == true && mounted) {
+                                        await _fetchInitialData();
+                                      }
+                                    },
                                   );
-                                  if (result == true && mounted) {
-                                    await _fetchInitialData();
-                                  }
                                 },
-                              );
-                            },
+                                childCount: _rekomendasi.length,
+                              ),
+                            ),
                           ),
-                const SizedBox(height: 10),
+                const SliverToBoxAdapter(child: SizedBox(height: 30)),
               ],
             ),
           ),
@@ -512,8 +535,7 @@ class CategoryItemTap extends StatelessWidget {
         );
 
         if (hasChanges == true && context.mounted) {
-          final homeScreenState =
-              context.findAncestorStateOfType<_HomeScreenState>();
+          final homeScreenState = context.findAncestorStateOfType<_HomeScreenState>();
           if (homeScreenState != null) {
             await homeScreenState.refreshData();
           }

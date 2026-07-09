@@ -10,6 +10,8 @@ class Recipe {
   final int kalori;
   final int protein;
   final int karbohidrat;
+  // Tambahan variable baru untuk menyimpan status favorit
+  bool is_favorited; 
 
   Recipe({
     required this.id,
@@ -23,6 +25,7 @@ class Recipe {
     required this.kalori,
     required this.protein,
     required this.karbohidrat,
+    this.is_favorited = false,
   });
 
   static int _parseToInt(dynamic value) {
@@ -41,14 +44,13 @@ class Recipe {
       bahan: json['bahan'] ?? '',
       steps: json['steps'] ?? '',
       gambar: json['url_gambar'] ?? json['gambar'] ?? '', 
-      
-      kategori: json['kategori'] ?? '',
+      kategori: json['kategori']?.toString() ?? '',
       negara: json['negara'] ?? '',
       waktu: _parseToInt(json['waktu_masak'] ?? json['waktu']), 
-      
       kalori: _parseToInt(json['kalori']),
       protein: _parseToInt(json['protein']),
       karbohidrat: _parseToInt(json['karbohidrat']),
+      is_favorited: json['is_favorited'] ?? false, 
     );
   }
 
@@ -64,6 +66,8 @@ class Recipe {
       'karbohidrat': karbohidrat,
       'bahan': bahan,
       'steps': steps,
+      // Langsung mengambil data status favorit yang dikirim oleh server
+      'is_favorited': is_favorited,
     };
   }
 }

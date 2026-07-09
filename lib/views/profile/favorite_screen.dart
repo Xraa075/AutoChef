@@ -2,7 +2,7 @@ import 'package:autochef/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autochef/models/recipe.dart';
-import 'package:autochef/widgets/healthy_food_item.dart';
+import 'package:autochef/widgets/small_card.dart';
 // Pastikan path import ini sesuai dengan struktur folder project Kami-sama
 import 'package:autochef/services/api_favorite.dart'; 
 
