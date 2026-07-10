@@ -337,10 +337,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   
                                   const SizedBox(height: 20),
                                   
-                                  _buildLabel("Password"),
+                                  _buildLabel("Password Baru"),
                                   _buildTextField(
                                     controller: _passwordController,
-                                    hint: "Password",
+                                    hint: "Password Baru",
                                     isPassword: true,
                                     obscureText: _obscurePassword,
                                     onToggleVisibility: () => setState(() => _obscurePassword = !_obscurePassword),
@@ -348,10 +348,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                                   const SizedBox(height: 20),
 
-                                  _buildLabel("Konfirmasi Password"),
+                                  _buildLabel("Konfirmasi Password Baru"),
                                   _buildTextField(
                                     controller: _confirmPasswordController,
-                                    hint: "Konfirmasi Password",
+                                    hint: "Konfirmasi Password Baru",
                                     isPassword: true,
                                     obscureText: _obscureConfirmPassword,
                                     onToggleVisibility: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),

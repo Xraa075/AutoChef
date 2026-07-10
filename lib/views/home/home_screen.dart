@@ -67,7 +67,24 @@ class _HomeScreenState extends State<HomeScreen> {
   void _initSpeech() async {
     var status = await Permission.microphone.request();
     if (status.isGranted) {
-      _speechEnabled = await _speechToText.initialize();
+      _speechEnabled = await _speechToText.initialize(
+        onError: (errorNotification) {
+          setState(() {
+            _isListening = false;
+          });
+          debugPrint("Speech error: $errorNotification");
+        },
+        onStatus: (statusNotification) {
+          setState(() {
+            _isListening = _speechToText.isListening;
+          });
+          if (statusNotification == 'notListening' || statusNotification == 'done') {
+            if (_searchController.text.trim().isNotEmpty) {
+              handleSearch(context);
+            }
+          }
+        },
+      );
       setState(() {});
     } else {
        debugPrint("Izin mikrofon ditolak");
@@ -76,24 +93,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _startListening() async {
     if (!_speechEnabled) return;
-    await _speechToText.listen(onResult: (result) {
-      setState(() {
-        _searchController.text = result.recognizedWords;
-        _searchController.selection = TextSelection.fromPosition(
-          TextPosition(offset: _searchController.text.length),
-        );
-      });
-    }, localeId: 'id_ID');
-    setState(() {
-      _isListening = true;
-    });
+    // pauseFor: 2 artinya jika user diam selama 2 detik, sistem menganggap sudah selesai bicara
+    await _speechToText.listen(
+      onResult: (result) {
+        setState(() {
+          _searchController.text = result.recognizedWords;
+          _searchController.selection = TextSelection.fromPosition(
+            TextPosition(offset: _searchController.text.length),
+          );
+        });
+      },
+      localeId: 'id_ID',
+      pauseFor: const Duration(seconds: 2), 
+    );
   }
 
   void _stopListening() async {
     await _speechToText.stop();
-    setState(() {
-      _isListening = false;
-    });
   }
 
   Future<void> refreshData() async {
