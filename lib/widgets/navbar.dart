@@ -109,66 +109,60 @@ class NavbarState extends State<Navbar> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        extendBody: true,
+        extendBody: false, // Diubah menjadi false agar halaman tidak menembus ke belakang navbar
         body: pages[selectedIndex],
-        bottomNavigationBar: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+        bottomNavigationBar: NavigationBarTheme( // Menghapus ClipRRect agar tidak melengkung
+          data: NavigationBarThemeData(
+            height: 65,
+            backgroundColor: const Color(0xFFFBC72A),
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+            indicatorColor: Colors.transparent,
           ),
-          child: NavigationBarTheme(
-            data: NavigationBarThemeData(
-              height: 65,
-              backgroundColor: const Color(0xFFFBC72A),
-              labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-              indicatorColor: Colors.transparent,
-            ),
-            child: NavigationBar(
-              onDestinationSelected: onNavTapped,
-              selectedIndex: selectedIndex,
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.home_rounded, size: 30, color: Colors.white),
-                  selectedIcon: Icon(
-                    Icons.home_rounded,
-                    size: 30,
-                    color: Color(0xFFF46A06),
-                  ),
-                  label: '',
+          child: NavigationBar(
+            onDestinationSelected: onNavTapped,
+            selectedIndex: selectedIndex,
+            destinations: const [
+              NavigationDestination(
+                icon: Icon(Icons.home_rounded, size: 30, color: Colors.white),
+                selectedIcon: Icon(
+                  Icons.home_rounded,
+                  size: 30,
+                  color: Color(0xFFF46A06),
                 ),
-                NavigationDestination(
-                  icon: Icon(
-                    Icons.calendar_month_outlined,
-                    size: 30,
-                    color: Colors.white,
-                  ),
-                  selectedIcon: Icon(
-                    Icons.calendar_month_outlined,
-                    size: 30,
-                    color: Color(0xFFF46A06),
-                  ),
-                  label: '',
+                label: '',
+              ),
+              NavigationDestination(
+                icon: Icon(
+                  Icons.calendar_month_outlined,
+                  size: 30,
+                  color: Colors.white,
                 ),
-                NavigationDestination(
-                  icon: Icon(Icons.favorite, size: 30, color: Colors.white),
-                  selectedIcon: Icon(
-                    Icons.favorite,
-                    size: 30,
-                    color: Color(0xFFF46A06),
-                  ),
-                  label: '',
+                selectedIcon: Icon(
+                  Icons.calendar_month_outlined,
+                  size: 30,
+                  color: Color(0xFFF46A06),
                 ),
-                NavigationDestination(
-                  icon: Icon(Icons.person, size: 30, color: Colors.white),
-                  selectedIcon: Icon(
-                    Icons.person,
-                    size: 30,
-                    color: Color(0xFFF46A06),
-                  ),
-                  label: '',
+                label: '',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.favorite, size: 30, color: Colors.white),
+                selectedIcon: Icon(
+                  Icons.favorite,
+                  size: 30,
+                  color: Color(0xFFF46A06),
                 ),
-              ],
-            ),
+                label: '',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.person, size: 30, color: Colors.white),
+                selectedIcon: Icon(
+                  Icons.person,
+                  size: 30,
+                  color: Color(0xFFF46A06),
+                ),
+                label: '',
+              ),
+            ],
           ),
         ),
       ),

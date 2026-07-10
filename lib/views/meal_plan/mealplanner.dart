@@ -293,21 +293,48 @@ class _MealPlannerScreenState extends State<MealPlannerScreen> {
                 ),
               ]
             : recipes.map((recipe) {
-                return RecipeCard(
-                  recipe: recipe,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            DetailMakanan(recipe: recipe),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: RecipeCard(
+                          recipe: recipe,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    DetailMakanan(recipe: recipe),
+                              ),
+                            ).then((_) => _loadData());
+                          },
+                        ),
                       ),
-                    ).then((_) =>
-                        _loadData());
-                  },
-                  onDeleteTapped: () {
-                    _showDeleteConfirmation(day, recipe);
-                  },
+                      const SizedBox(width: 12),
+                      InkWell(
+                        onTap: () {
+                          _showDeleteConfirmation(day, recipe);
+                        },
+                        borderRadius: BorderRadius.circular(24),
+                        child: Container(
+                          width: 55,
+                          height: 110,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFDEBB3),
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.delete_outline_rounded,
+                              color: Colors.red,
+                              size: 26,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 );
               }).toList(),
       ),

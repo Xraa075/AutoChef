@@ -10,6 +10,7 @@ import 'package:autochef/services/kategori_service.dart';
 import 'package:autochef/views/recipe/recipe_detail_screen.dart';
 import 'package:autochef/services/search_service.dart';
 import 'package:autochef/services/api_categories.dart';
+import 'package:autochef/data/user.dart';
 
 class RekomendationRecipe extends StatefulWidget {
   final List<String>? bahan;
@@ -142,9 +143,52 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
       onWillPop: _onWillPop,
       child: Scaffold(
         backgroundColor: const Color(0xFFFBC72A),
-        appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(120),
-          child: CustomHeader(title: "Ini adalah rekomendsi resep untukmu"),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(110), // Menaikkan tinggi menjadi 110 agar tidak overflow
+          child: SafeArea(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              color: const Color(0xFFFBC72A),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center, // Memastikan semua komponen sejajar di tengah secara vertikal
+                children: [
+                  InkWell(
+                    onTap: () => _onWillPop(),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_back, color: Colors.black),
+                    ),
+                  ),
+                  FutureBuilder(
+                    future: getActiveUser(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const CircleAvatar(
+                          radius: 24,
+                          backgroundColor: Colors.white,
+                        );
+                      }
+                      final currentUser = snapshot.data!;
+                      final imagePath = currentUser.userImage;
+                      return CircleAvatar(
+                        backgroundImage: imagePath.startsWith('http')
+                            ? NetworkImage(imagePath)
+                            : AssetImage(imagePath) as ImageProvider,
+                        radius: 24,
+                        backgroundColor: Colors.white,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
         body: Column(
           children: [
@@ -164,7 +208,7 @@ class _RekomendationRecipeState extends State<RekomendationRecipe> {
                     const Padding(
                       padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
                       child: Text(
-                        "Rekomendasi",
+                        "Hasil Pencarian",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
