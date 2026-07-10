@@ -329,6 +329,34 @@ void didChangeDependencies() {
                               ),
                             ],
                           ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/lupa-password');
+                              },
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                              ),
+                              child: const Text(
+                                "Lupa Password?",
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 0, 0, 0),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          
+                          if (apiErrorMessage != null) ...[
+                            Text(
+                              apiErrorMessage!,
+                              style: const TextStyle(color: Colors.red, fontSize: 14),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
                           const SizedBox(height: 25),
                           SizedBox(
                             width: double.infinity,
