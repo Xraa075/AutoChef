@@ -13,6 +13,9 @@ import 'package:autochef/screens/policy_announcement_screen.dart';
 import 'package:autochef/views/meal_plan/mealplanner.dart';
 import 'package:autochef/views/profile/favorite_screen.dart';
 import 'package:autochef/views/filter_screen/filter_screen.dart';
+import 'package:autochef/login/lupa_password.dart';
+import 'package:autochef/login/otp.dart';
+import 'package:autochef/login/reset_password.dart';
 
 class Routes {
   static const String introScreen = '/intro-screen';
@@ -27,6 +30,9 @@ class Routes {
   static const String mealPlanner = '/meal-planner';
   static const String favorite = '/favorite';
   static const String filterScreen = '/filter-screen';
+  static const String lupaPassword = '/lupa-password';
+  static const String otp = '/otp';
+  static const String resetPassword = '/reset-password';
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -38,6 +44,15 @@ class Routes {
 
       case login:
         return MaterialPageRoute(builder: (_) => LoginPage());
+
+      case lupaPassword:
+        return MaterialPageRoute( settings: settings, builder: (_) => const LupaPasswordPage()); 
+
+      case otp:
+        return MaterialPageRoute( settings: settings, builder: (_) => const OtpPage());
+
+      case resetPassword:
+        return MaterialPageRoute( settings: settings, builder: (_) => const ResetPasswordPage());
 
       case register:
         return MaterialPageRoute(builder: (_) => RegisterPage());
