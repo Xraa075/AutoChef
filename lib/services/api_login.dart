@@ -217,6 +217,9 @@ Future<Map<String, dynamic>> loginWithGoogle() async {
           '149279807205-kcbc6uuaq75ou7fhkqn91g0er936ritb.apps.googleusercontent.com',
     );
 
+    // Sign out terlebih dahulu agar dialog pemilihan akun selalu muncul
+    await googleSignIn.signOut();
+
     // Tampilkan dialog Google Sign-In
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
